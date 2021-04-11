@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+__pycache__/
+.idea/
+*.iml
+*.iws
+*.ipr
+venv/
+bin/
+.DS_Store
+._*
+
