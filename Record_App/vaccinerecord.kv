@@ -1,0 +1,386 @@
+ScreenManager:
+    Screen:
+        name: 'menu'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Vaccination Record App'
+                font_size: sp(40)
+            Button:
+                text: 'New Person'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'new_person'
+                    root.transition.direction = 'left'
+                    app.clear_new_person_screen()
+            Button:
+                text: 'New Vaccination'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'new_vaccination'
+                    root.transition.direction = 'left'
+                    app.clear_new_vaccination_screen()
+    Screen:
+        name: 'new_person'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Name'
+                font_size: sp(40)
+            TextInput:
+                id: name_entry_new_person
+                font_size: sp(40)
+                multiline: False
+                focus_next: patient_id_entry_new_person
+                write_tab: False
+            Label:
+                text: 'Patient ID'
+                font_size: sp(40)
+            TextInput:
+                id: patient_id_entry_new_person
+                font_size: sp(40)
+                multiline: False
+                input_filter: 'int'
+                focus_next: month_entry_new_person
+                write_tab: False
+            Label:
+                text: 'Date of Birth'
+                font_size: sp(40)
+            BoxLayout:
+                orientation: 'horizontal'
+                Label:
+                    text: 'MM'
+                    font_size: sp(20)
+                Label:
+                    text: 'DD'
+                    font_size: sp(20)
+                Label:
+                    text: 'YYYY'
+                    font_size: sp(20)
+            BoxLayout:
+                orientation: 'horizontal'
+                TextInput:
+                    id: month_entry_new_person
+                    font_size: sp(40)
+                    multiline: False
+                    focus_next: day_entry_new_person
+                    input_filter: 'int'
+                    write_tab: False
+                TextInput:
+                    id: day_entry_new_person
+                    font_size: sp(40)
+                    multiline: False
+                    focus_next: year_entry_new_person
+                    input_filter: 'int'
+                    write_tab: False
+                TextInput:
+                    id: year_entry_new_person
+                    font_size: sp(40)
+                    multiline: False
+                    input_filter: 'int'
+                    write_tab: False
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Cancel'
+                    font_size: sp(40)
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+                Button:
+                    text: 'Confirm'
+                    font_size: sp(40)
+                    on_press:
+                        app.create_new_person()
+    Screen:
+        name: 'new_vaccination'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Select existing lot or create a new one'
+                font_size: sp(30)
+            Spinner:
+                id: lot_dropdown
+                font_size: sp(35)
+                text: 'Select Lot'
+            Button:
+                text: 'Create new Lot'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'new_lot'
+                    root.transition.direction = 'left'
+                    app.clear_new_lot_screen()
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Cancel'
+                    font_size: sp(40)
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+                Button:
+                    text: 'Continue'
+                    font_size: sp(40)
+                    on_press:
+                        root.current = 'new_vaccination_continued'
+                        root.transition.direction = 'left'
+    Screen:
+        name: 'new_lot'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Select a vaccine'
+                font_size: sp(40)
+            Spinner:
+                id: new_lot_vaccine_dropdown
+                text: 'Select an existing vaccine'
+                font_size: sp(35)
+            Label:
+                text: 'Enter Lot ID'
+                font_size: sp(40)
+            TextInput:
+                id: lot_id_entry_new_lot
+                font_size: sp(40)
+                multiline: False
+                focus_next: month_entry_new_person
+                input_filter: 'int'
+                write_tab: False
+            Label:
+                text: 'Manufacture Date'
+                font_size: sp(40)
+            BoxLayout:
+                orientation: 'horizontal'
+                Label:
+                    text: 'MM'
+                    font_size: sp(20)
+                Label:
+                    text: 'DD'
+                    font_size: sp(20)
+                Label:
+                    text: 'YYYY'
+                    font_size: sp(20)
+            BoxLayout:
+                orientation: 'horizontal'
+                TextInput:
+                    id: month_entry_new_lot
+                    font_size: sp(40)
+                    multiline: False
+                    focus_next: day_entry_new_lot
+                    input_filter: 'int'
+                    write_tab: False
+                TextInput:
+                    id: day_entry_new_lot
+                    font_size: sp(40)
+                    multiline: False
+                    focus_next: year_entry_new_lot
+                    input_filter: 'int'
+                    write_tab: False
+                TextInput:
+                    id: year_entry_new_lot
+                    font_size: sp(40)
+                    multiline: False
+                    input_filter: 'int'
+                    write_tab: False
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Cancel'
+                    font_size: sp(40)
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+                Button:
+                    text: 'Confirm'
+                    font_size: sp(40)
+                    on_press:
+                        app.create_new_lot()
+                        app.lot_confirmed()
+    Screen:
+        name: 'new_vaccination_continued'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Name'
+                font_size: sp(40)
+            TextInput:
+                id: name_input_new_vaccination
+                font_size: sp(40)
+                multiline: False
+                focus_next: month_entry_new_person
+                write_tab: False
+            Label:
+                text: 'Vaccination Date'
+                font_size: sp(40)
+            BoxLayout:
+                orientation: 'horizontal'
+                Label:
+                    text: 'MM'
+                    font_size: sp(20)
+                Label:
+                    text: 'DD'
+                    font_size: sp(20)
+                Label:
+                    text: 'YYYY'
+                    font_size: sp(20)
+            BoxLayout:
+                orientation: 'horizontal'
+                TextInput:
+                    id: month_entry_new_vaccination
+                    font_size: sp(40)
+                    multiline: False
+                    focus_next: day_entry_new_vaccination
+                    input_filter: 'int'
+                    write_tab: False
+                TextInput:
+                    id: day_entry_new_vaccination
+                    font_size: sp(40)
+                    multiline: False
+                    focus_next: year_entry_new_vaccination
+                    input_filter: 'int'
+                    write_tab: False
+                TextInput:
+                    id: year_entry_new_vaccination
+                    font_size: sp(40)
+                    multiline: False
+                    input_filter: 'int'
+                    write_tab: False
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Cancel'
+                    font_size: sp(40)
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+                Button:
+                    text: 'Back'
+                    font_size: sp(40)
+                    on_press:
+                        root.current = 'new_vaccination'
+                        root.transition.direction = 'right'
+                Button:
+                    text: 'Confirm'
+                    font_size: sp(40)
+                    on_press:
+                        app.create_vaccination_record()
+    Screen:
+        name: 'new_person_confirmed'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Success!'
+                font_size: sp(40)
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: 'A new person as been created'
+                    font_size: sp(18)
+                Label:
+                    text: 'Would you like to record a vaccine for this person now?'
+                    font_size: sp(18)
+            Button:
+                text: 'Yes'
+                font_size: sp(40)
+                on_press:
+                    app.clear_new_vaccination_screen()
+                    app.fill_in_person_name_new_vaccination()
+                    root.current = 'new_vaccination'
+                    root.transition.direction = 'left'
+            Button:
+                text: 'Not right now'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'menu'
+                    root.transition.direction = 'right'
+    Screen:
+        name: 'new_vaccination_confirmed'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Success!'
+                font_size: sp(40)
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: 'Vaccination Recorded!'
+                    font_size: sp(18)
+                Label:
+                    text: 'Would you like to record another vaccination?'
+                    font_size: sp(18)
+            Button:
+                text: 'Yes'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'new_vaccination'
+                    root.transition.direction = 'left'
+            Button:
+                text: 'Not right now'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'menu'
+                    root.transition.direction = 'right'
+    Screen:
+        name: 'person_updated'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Success!'
+                font_size: sp(40)
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: 'This person has been updated!'
+                    font_size: sp(18)
+                Label:
+                    text: 'Would you like to record a vaccine for this person now?'
+                    font_size: sp(18)
+            Button:
+                text: 'Yes'
+                font_size: sp(40)
+                on_press:
+                    app.clear_new_vaccination_screen()
+                    app.fill_in_person_name_new_vaccination()
+                    root.current = 'new_vaccination'
+                    root.transition.direction = 'left'
+            Button:
+                text: 'Not right now'
+                font_size: sp(40)
+                on_press:
+                    root.current = 'menu'
+                    root.transition.direction = 'right'
+<NewInputError@Popup>:
+    title: 'Input Error'
+    font_size: sp(30)
+    size_hint: (None,None)
+    size: (500,200)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'{app.input_error_message}'
+            font_size: sp(15)
+        Button:
+            text: 'Okay'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
+<MatchingIDError@Popup>:
+    title: 'Input Error'
+    font_size: sp(30)
+    size_hint: (None,None)
+    size: (500,350)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Patient with this patient ID already exists. \nWould you like to update this person with \nthe current values in the entry boxes?'
+            font_size: sp(18)
+        Button:
+            text: 'Yes'
+            font_size: sp(30)
+            on_press:
+                app.update_person()
+                root.dismiss()
+        Button:
+            text: 'No thanks'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
