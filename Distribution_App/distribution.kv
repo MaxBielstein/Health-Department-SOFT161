@@ -1,0 +1,290 @@
+<HomeScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'Add/Edit Vaccination Clinics'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'clinic'
+            Button:
+                text: 'New Vaccine'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'new_vaccine'
+            Button:
+                text: 'Order Vaccine'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'order_vaccine'
+<ClinicScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Add/Edit Vaccination Clinic'
+                font_size: 60
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Existing Clinic'
+                    font_size: 60
+                    on_press:
+                        root.manager.transition.direction = 'right'
+                        root.manager.current = 'clinic_0'
+                Button:
+                    text: 'New Clinic'
+                    font_size: 60
+                    background_color: [.5, .5, 1, .5]
+            Label:
+                text: 'Clinic Name'
+                font_size: 60
+            TextInput:
+                write_tab: False
+                multiline: False
+                font_size: 60
+            Label:
+                text: 'Clinic Address'
+                font_size: 60
+            TextInput:
+                write_tab: False
+                multiline: False
+                font_size: 60
+            Button:
+                text: 'Add and Select Clinic'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'm_for_clinic'
+            Button:
+                text: 'Back'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+<ClinicScreen0>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Add/Edit Vaccination Clinic'
+                font_size: 60
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Existing Clinic'
+                    font_size: 60
+                    background_color: [.5, .5, 1, .5]
+                Button:
+                    text: 'New Clinic'
+                    font_size: 60
+                    on_press:
+                        root.manager.transition.direction = 'left'
+                        root.manager.current = 'clinic'
+            Label:
+                text: 'Clinic Name'
+                font_size: 60
+            Label:
+                text: 'Prefill'
+                font_size: 60
+            Label:
+                text: 'Clinic Address'
+                font_size: 60
+            Label:
+                text: 'Prefill'
+                font_size: 60
+            Button:
+                text: 'Select Clinic'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'm_for_clinic'
+            Button:
+                text: 'Back'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+<SelectManufacturerForClinic>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Manufacturers'
+                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Add'
+                    font_size: 60
+
+                Button:
+                    text: 'Remove'
+                    font_size: 60
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Back'
+                    font_size: 60
+                    on_press:
+                        root.manager.transition.direction = 'right'
+                        root.manager.current = 'clinic'
+                Button:
+                    text: 'Done'
+                    font_size: 60
+                    on_press:
+                        root.manager.transition.direction = 'right'
+                        root.manager.current = 'home'
+<NewVaccineScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select a Manufacturer'
+                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+            Button:
+                text: 'Continue'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'm_for_vaccine'
+            Button:
+                text: 'Back'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+<ManufacturerForVaccine>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Select Manufacturer For Vaccine'
+                font_size: 60
+
+            Label:
+                text: 'Vaccine Name'
+                font_size: 60
+            TextInput:
+                write_tab: False
+                multiline: False
+                font_size: 60
+            Label:
+                text: 'Associated Disease'
+                font_size: 60
+            TextInput:
+                write_tab: False
+                multiline: False
+                font_size: 60
+            Label:
+                text: 'Required Doses'
+                font_size: 60
+            TextInput:
+                write_tab: False
+                multiline: False
+                font_size: 60
+            BoxLayout:
+                orientation: 'horizontal'
+                Button:
+                    text: 'Add'
+                    font_size: 60
+                Button:
+                    text: 'Done'
+                    font_size: 60
+                    on_press:
+                        root.manager.transition.direction = 'right'
+                        root.manager.current = 'home'
+            Button:
+                text: 'Back'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'new_vaccine'
+<OrderVaccineScreen>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select a Clinic'
+                values: 'Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4'
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select a Disease'
+                values: 'Disease 1', 'Disease 2', 'Disease 3', 'Disease 4'
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+            Button:
+                text: 'Continue'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'm_for_order'
+            Button:
+                text: 'Back'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+<OrderManufacturer>
+    BoxLayout:
+        orientation: 'vertical'
+        BoxLayout:
+            orientation: 'vertical'
+
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select a Manufacturer'
+                values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+            Label:
+                text: 'Number Of Doses'
+                font_size: 60
+            TextInput:
+                write_tab: False
+                multiline: False
+                font_size: 60
+            Button:
+                text: 'Done'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'home'
+            Button:
+                text: 'Back'
+                font_size: 60
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'order_vaccine'
+
