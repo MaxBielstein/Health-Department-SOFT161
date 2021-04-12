@@ -5,6 +5,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+import mysql.connector
 
 
 class ClinicScreen(Screen):
@@ -38,9 +39,8 @@ class OrderManufacturer(Screen):
 class HomeScreen(Screen):
     pass
 
+
 Persisted = declarative_base()
-
-
 
 
 class Clinic(Persisted):
@@ -58,7 +58,6 @@ class Manufacturer(Persisted):
     name = Column(String(256), nullable=False)
 
 
-
 class Vaccine(Persisted):
     __tablename__ = 'Vaccines'
     vaccine_id = Column(Integer, primary_key=True)
@@ -67,6 +66,8 @@ class Vaccine(Persisted):
     disease = Column(String(256), nullable=False)
     manufacturer_id = Column(Integer, ForeignKey('Manufacturers.manufacturer_id'))
 
+
+# noinspection PyInterpreter
 class DistributionDatabase(object):
     @staticmethod
     def construct_mysql_url(authority, port, database, username, password):
@@ -105,9 +106,46 @@ class DistributionApp(App):
         return sm
 
 
+# These methods below query data from the database and return the specified data
+
+# if column name is None then it returns the whole table
+def get_sql_data(table_name, column_name):
+    database = mysql.connector.connect(host='localhost', database='milestone_one', user='root', password='cse1208')
+    finder = database.cursor(buffered=True)
+    if column_name is None:
+        finder.execute(f'SELECT * FROM {table_name}')
+        return finder.fetchall()
+    else:
+        finder.execute(f'SELECT {column_name} FROM {table_name}')
+        list_of_columns = []
+        for element in finder.fetchall():
+            list_of_columns.append(element[0])
+        return list_of_columns
 
 
+# returns a single element from table
+def get_specific_sql_data(table_name, column, identifier_column, oracle):
+    database = mysql.connector.connect(host='localhost', database='milestone_one', user='root', password='cse1208')
+    finder = database.cursor(buffered=True)
+    finder.execute(f'select {column} from {table_name} where {identifier_column} = \"{oracle}\"')
+    result = finder.fetchall()
+    return_list = []
+    for item in result:
+        return_list.append(item[0])
 
+    if len(return_list) is not 0:
+        return return_list
+    else:
+        return []
+
+
+# This is a simple method for adding data to the sql database
+def sql_input(data):
+    url = DistributionDatabase.construct_mysql_url('localhost', 3306, 'milestone_one', 'root', 'cse1208')
+    record_database = DistributionDatabase(url)
+    session = record_database.create_session()
+    session.add(data)
+    session.commit()
 
 
 if __name__ == '__main__':
