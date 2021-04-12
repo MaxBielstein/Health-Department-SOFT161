@@ -96,15 +96,18 @@
                 font_size: 60
             Label:
                 text: 'Prefill'
+                id: clinic_name_label
                 font_size: 60
             Label:
                 text: 'Clinic Address'
                 font_size: 60
             Label:
                 text: 'Prefill'
+                id: clinic_address_label
                 font_size: 60
             Button:
                 text: 'Select Clinic'
+                id: select_clinic_existing
                 font_size: 60
                 on_press:
                     root.manager.transition.direction = 'left'
@@ -126,6 +129,7 @@
                 size: 500, 100
                 pos_hint: {'center': 'center'}
                 text: 'Manufacturers'
+                id: select_manufacturer_for_clinic_spinner
                 values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
@@ -133,10 +137,12 @@
                 orientation: 'horizontal'
                 Button:
                     text: 'Add'
+                    id: add_manufacturer_for_clinic
                     font_size: 60
 
                 Button:
                     text: 'Remove'
+                    id: remove_manufacturer_for_clinic
                     font_size: 60
             BoxLayout:
                 orientation: 'horizontal'
@@ -148,6 +154,7 @@
                         root.manager.current = 'clinic'
                 Button:
                     text: 'Done'
+                    id: done_manufacturer_for_clinic
                     font_size: 60
                     on_press:
                         root.manager.transition.direction = 'right'
