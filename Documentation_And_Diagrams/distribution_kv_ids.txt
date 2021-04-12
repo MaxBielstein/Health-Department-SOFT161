@@ -1,1 +1,4 @@
-
+Clinic Screen IDS:
+    new_clinic_name - New Clinic Name Textfield
+    new_clinic_address - New Clinic Adress Textfield
+    create_new_clinic - Create New Clinic Button
