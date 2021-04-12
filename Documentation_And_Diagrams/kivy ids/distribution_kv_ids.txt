@@ -12,4 +12,4 @@ SelectManufacturerForClinic IDs:
     select_manufacturer_for_clinic_spinner - Spinner to choose a manufacturer for a clinic
     add_manufacturer_for_clinic - Adds selected manufacturer to clinic assignment
     remove_manufacturer_for_clinic - Removes selected manufacturer from a clinic assignment
-    
+    done_manufacturer_for_clinic - Finalizes changes made to manufacturer list
