@@ -36,7 +36,7 @@
                     font_size: 60
                     on_press:
                         root.manager.transition.direction = 'right'
-                        root.manager.current = 'clinic_0'
+                        root.manager.current = 'ExistingClinic'
                 Button:
                     text: 'New Clinic'
                     font_size: 60
@@ -45,6 +45,7 @@
                 text: 'Clinic Name'
                 font_size: 60
             TextInput:
+                id: new_clinic_name
                 write_tab: False
                 multiline: False
                 font_size: 60
@@ -52,10 +53,12 @@
                 text: 'Clinic Address'
                 font_size: 60
             TextInput:
+                id: new_clinic_address
                 write_tab: False
                 multiline: False
                 font_size: 60
             Button:
+                id: create_new_clinic
                 text: 'Add and Select Clinic'
                 font_size: 60
                 on_press:
@@ -68,7 +71,7 @@
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
 
-<ClinicScreen0>
+<ExistingClinic>
     BoxLayout:
         orientation: 'vertical'
         BoxLayout:
