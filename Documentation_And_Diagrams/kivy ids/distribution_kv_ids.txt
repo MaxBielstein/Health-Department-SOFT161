@@ -1,4 +1,15 @@
-Clinic Screen IDS:
+Clinic Screen IDs:
     new_clinic_name - New Clinic Name Textfield
-    new_clinic_address - New Clinic Adress Textfield
-    create_new_clinic - Create New Clinic Button
+    new_clinic_address - New Clinic Address Textfield
+    create_new_clinic - Create New Clinic Button and then selects it
+
+ExistingClinic Screen IDs:
+    clinic_name_label - Label that shows a clinics name
+    clinic_address_label - Label that shows a clinics address
+    select_clinic_existing - Select Clinic Button
+
+SelectManufacturerForClinic IDs:
+    select_manufacturer_for_clinic_spinner - Spinner to choose a manufacturer for a clinic
+    add_manufacturer_for_clinic - Adds selected manufacturer to clinic assignment
+    remove_manufacturer_for_clinic - Removes selected manufacturer from a clinic assignment
+    done_manufacturer_for_clinic - Finalizes changes made to manufacturer list
