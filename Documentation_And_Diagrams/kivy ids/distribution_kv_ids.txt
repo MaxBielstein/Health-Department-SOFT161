@@ -1,3 +1,6 @@
+Button IDs are mostly redundant as method should be ran from button press
+
+
 Clinic Screen IDs:
     new_clinic_name - New Clinic Name Textfield
     new_clinic_address - New Clinic Address Textfield
@@ -13,3 +16,26 @@ SelectManufacturerForClinic IDs:
     add_manufacturer_for_clinic - Adds selected manufacturer to clinic assignment
     remove_manufacturer_for_clinic - Removes selected manufacturer from a clinic assignment
     done_manufacturer_for_clinic - Finalizes changes made to manufacturer list
+
+NewVaccineScreen IDs:
+    select_manufacturer_for_new_vaccine_spinner - Spinner to choose a manufacturer for the new 
+    manufacturer_choosen_for_new_vaccine_confirm - Button that confirms choosen manufacturer and moves on
+
+ManufacturerForVaccine:
+    manufacturer_choosen_for_new_vaccine - Label that shows the selected manufacturer for the new vaccine
+    new_vaccine_name - Textfield that takes the name for the new vaccine being created
+    new_vaccine_disease - Textfield that takes the associated disease for the new vaccine being created
+    new_vaccine_required_doses - Textfield that takes the required doses for the new vaccine being created
+    add_new_vaccine - Button that adds the new vaccine created
+    save_new_vaccine - Done button that should commit the new vaccine to the database
+
+OrderVaccineScreen:
+    clinic_order_vaccine_spinner - Spinner to choose a clinic to order for
+    order_select_disease - Spinner to choose disease to order vaccine for
+    add_new_order - Button to advance order process to next screen could be used to save current screens values to temp varriables
+
+OrderManufacturer:
+    order_manufacturer_spinner - Spinner to choose what manufacturer will be making the order
+    order_doses - Textfield that gets the number of doses for the order
+    order_order - Done button that should commit order to database
+
