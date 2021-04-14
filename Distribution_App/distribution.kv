@@ -1,26 +1,58 @@
 <HomeScreen>
-    BoxLayout:
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+
         orientation: 'vertical'
-        BoxLayout:
-            orientation: 'vertical'
-            Button:
-                text: 'Add/Edit Vaccination Clinics'
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'clinic'
-            Button:
-                text: 'New Vaccine'
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'new_vaccine'
-            Button:
-                text: 'Order Vaccine'
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'order_vaccine'
+
+        MDLabel:
+            text: 'Vaccine Distribution App'
+            font_size: 30
+            halign: 'center'
+
+
+        MDFillRoundFlatButton:
+            text: 'Add/Edit Vaccination Clinics'
+            font_size: 30
+            pos_hint: {'center_x': 0.5,}
+
+            size: 0, 60
+            size_hint: None, None
+
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'clinic'
+
+        MDFillRoundFlatButton:
+            text: 'New Vaccine'
+            font_size: 30
+            pos_hint: {'center_x': 0.5,}
+
+            size: 0, 60
+            size_hint: None, None
+            increment_width: 240
+
+
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'new_vaccine'
+
+        MDFillRoundFlatButton:
+            text: 'Order Vaccine'
+            font_size: 30
+            pos_hint: {'center_x': 0.5,}
+
+            size: 0, 60
+            size_hint: None, None
+            increment_width: 230
+
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'order_vaccine'
 
 <ClinicScreen>
     BoxLayout:
