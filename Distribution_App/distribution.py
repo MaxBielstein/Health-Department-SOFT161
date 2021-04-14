@@ -1,4 +1,6 @@
 from kivy.app import App
+from kivy.factory import Factory
+from kivy.properties import NumericProperty, StringProperty
 from kivymd.app import MDApp
 from kivy.core.window import Window  # For inspection.
 from kivy.modules import inspector  # For inspection.
@@ -91,9 +93,11 @@ class DistributionDatabase(object):
 
 
 class DistributionApp(MDApp):
+    input_error_message = StringProperty('')
+    new_clinic_name = StringProperty()
+    new_clinic_address = StringProperty()
 
     def build(self):
-
         self.theme_cls.primary_palette = "Blue"
 
         inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
@@ -110,7 +114,50 @@ class DistributionApp(MDApp):
         return sm
 
     def existing_clinic_clicked(self):
-        self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics', 'clinic_name')
+        self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('Clinics',
+                                                                                         'name')
+
+    def create_new_clinic(self):
+        id_path = self.root.ids
+        if id_path.new_clinic_name.text is not '':
+            self.new_clinic_name = id_path.new_clinic_name.text
+
+        if id_path.new_clinic_address.text is not '':
+            self.new_clinic_address = id_path.new_clinic_address.text
+
+        if self.check_for_required_inputs_new_clinic():
+            new_clinic(self, self.new_clinic_name, self.new_clinic_address)
+
+    def check_for_required_inputs_new_clinic(self):
+        if self.new_clinic_name is '':
+            self.input_error_message = 'Name field must be filled'
+            Factory.NewInputError().open()
+            return False
+        elif self.new_clinic_name in get_sql_data('Clinics', 'name'):
+            self.input_error_message = 'Clinic with this name already exists'
+            Factory.NewInputError().open()
+            return False
+
+        if self.new_clinic_address is '':
+            self.input_error_message = 'Address field must be filled'
+            Factory.NewInputError().open()
+            return False
+        elif self.new_clinic_address in get_sql_data('Clinics', 'address'):
+            self.input_error_message = 'Clinic with this address already exists'
+            Factory.NewInputError().open()
+            return False
+
+        return True
+
+
+def new_clinic(self, name, address):
+    clinic = Clinic(name=name, address=address)
+    if int(clinic.clinic_id) not in get_sql_data('Clinics', 'clinic_id'):
+        sql_input(clinic)
+        # self.confirm_screen('new_person_confirmed')
+    else:
+        Factory.MatchingIDError().open()
+
 
 # These methods below query data from the database and return the specified data
 
