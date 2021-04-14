@@ -37,6 +37,7 @@ class VaccinationClinics(Persisted):
     clinic_address = Column(String(256), nullable=False)
     manufacturer_id = Column(Integer, ForeignKey('manufacturers.manufacturer_id', ondelete='CASCADE'), nullable=False)
     manufacturer_clinics = relationship('ManufacturerClinics', uselist=True, back_populates='vaccination_clinic')
+    orders = relationship('Orders', uselist=True, back_populates='vaccination_clinic')
     manufacturers = relationship('Manufacturers', uselist=True, secondary='manufacturer_clinics',
                                  back_populates='vaccination_clinics')
 
@@ -49,12 +50,27 @@ class ManufacturerClinics(Persisted):
     manufacturer = relationship('Manufacturers', back_populates='manufacturer_clinics')
 
 
+class Orders(Persisted):
+    __tablename__ = 'orders'
+    order_id = Column(Integer, primary_key=True)
+    manufacturer_id = Column(Integer, ForeignKey('manufacturers.manufacturer_id', ondelete='CASCADE'),
+                             primary_key=False, nullable=False)
+    clinic_id = Column(Integer, ForeignKey('vaccination_clinics.clinic_id', ondelete='CASCADE'), primary_key=False,
+                       nullable=False)
+    vaccine_id = Column(Integer, ForeignKey('vaccines.vaccine_id', ondelete='CASCADE'), primary_key=False,
+                        nullable=False)
+    vaccine = relationship('Vaccines', back_populates='orders')
+    vaccination_clinic = relationship('VaccinationClinics', back_populates='orders')
+    manufacturer = relationship('Manufacturers', back_populates='orders')
+
+
 class Manufacturers(Persisted):
     __tablename__ = 'manufacturers'
     manufacturer_id = Column(Integer, primary_key=True)
     manufacturer_location = Column(String(256), nullable=False)
     manufacturer_name = Column(String(256), nullable=False)
     manufacturer_clinics = relationship('ManufacturerClinics', uselist=True, back_populates='manufacturer')
+    orders = relationship('Orders', uselist=True, back_populates='manufacturer')
     vaccination_clinics = relationship('VaccinationClinics', uselist=True, secondary='manufacturer_clinics',
                                        back_populates='manufacturers')
     vaccines = relationship('Vaccines', uselist=True, back_populates='manufacturer')
@@ -69,6 +85,7 @@ class Vaccines(Persisted):
     manufacturer_id = Column(Integer, ForeignKey('manufacturers.manufacturer_id', ondelete='CASCADE'), nullable=False)
     lots = relationship('Lots', uselist=True, back_populates='vaccine')
     manufacturer = relationship('Manufacturers', back_populates='vaccines')
+    orders = relationship('Orders', back_populates='vaccine')
 
 
 class Lots(Persisted):
@@ -108,7 +125,8 @@ def add_starter_data(session_to_add_to):
                                   manufacturer_location='California')
     vaccination_clinic1 = VaccinationClinics(manufacturer_id=1, clinic_name='UNL Vaccination Clinic',
                                              clinic_address='123 UNL street',
-                                             manufacturer_clinics=[ManufacturerClinics(manufacturer=manufacturer1), ManufacturerClinics(manufacturer=manufacturer2)])
+                                             manufacturer_clinics=[ManufacturerClinics(manufacturer=manufacturer1),
+                                                                   ManufacturerClinics(manufacturer=manufacturer2)])
 
     lot122_date = datetime(year=1999, month=1, day=1)
     kevin_birthdate = datetime(year=1980, month=1, day=1)
@@ -143,11 +161,13 @@ def add_starter_data(session_to_add_to):
     lot125 = Lots(vaccine=smallpox_vaccine,
                   people_lots=[PeopleLots(person=kevin, vaccination_date=kevin_vaccination_date)], lot_id=125,
                   manufacture_date=lot125_date)
+    order1 = Orders(manufacturer=manufacturer1, vaccination_clinic=vaccination_clinic1, vaccine=covid19_vaccine)
     session_to_add_to.add(lot122)
     session_to_add_to.add(lot123)
     session_to_add_to.add(lot124)
     session_to_add_to.add(lot125)
     session_to_add_to.add(vaccination_clinic1)
+    session_to_add_to.add(order1)
 
 
 if __name__ == '__main__':
