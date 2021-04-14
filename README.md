@@ -2,7 +2,7 @@
 
 This is for the SOFT161 capstone project at the University of Nebraska-Lincoln for Taylor Runge, Nick Colleran, Max Bielstein, and Ethan Rasgorshek.
 
-This project uses aditional widgets from KivyMD as such requires that anyone working on or viewing the project run the following command in a directory above the projects scope
+This project uses aditional widgets from KivyMD and as such requires that anyone working on or viewing the project run the following command in a directory above the projects scope
 	
 	pip install kivymd
 
