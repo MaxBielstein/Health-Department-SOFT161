@@ -55,102 +55,221 @@
                 root.manager.current = 'order_vaccine'
 
 <ClinicScreen>
-    BoxLayout:
+
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+
         orientation: 'vertical'
-        BoxLayout:
+
+        MDBoxLayout:
             orientation: 'vertical'
-            Label:
-                text: 'Add/Edit Vaccination Clinic'
-                font_size: 60
-            BoxLayout:
-                orientation: 'horizontal'
-                Button:
-                    text: 'Existing Clinic'
-                    font_size: 60
-                    on_press:
-                        root.manager.transition.direction = 'right'
-                        root.manager.current = 'ExistingClinic'
-                Button:
-                    text: 'New Clinic'
-                    font_size: 60
-                    background_color: [.5, .5, 1, .5]
-            Label:
-                text: 'Clinic Name'
-                font_size: 60
-            TextInput:
-                id: new_clinic_name
-                write_tab: False
-                multiline: False
-                font_size: 60
-            Label:
-                text: 'Clinic Address'
-                font_size: 60
-            TextInput:
-                id: new_clinic_address
-                write_tab: False
-                multiline: False
-                font_size: 60
-            Button:
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                MDLabel:
+                    text: 'Add/Edit Vaccination Clinic'
+                    font_size: 45
+                    halign: 'center'
+
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    size_hint: None, None
+                    size: self.minimum_size
+                    pos_hint: {'center_x': 0.5,}
+
+                    MDRectangleFlatButton:
+                        text: 'Existing Clinic'
+                        theme_text_color: 'Primary'
+                        text_color: 0, 0.5, 1, 1
+                        font_size: 30
+                        on_press:
+                            root.manager.transition.duration = 0
+                            root.manager.current = 'ExistingClinic'
+
+                    MDRaisedButton:
+                        text: 'New Clinic'
+                        font_size: 30
+
+                Widget:
+                    size_hint_y: None
+                    height: 40
+
+                MDTextField:
+                    hint_text: 'Clinic Name'
+                    id: new_clinic_name
+                    write_tab: False
+                    multiline: False
+                    font_size: 25
+
+                MDTextField:
+                    hint_text: 'Clinic Address'
+                    id: new_clinic_address
+                    write_tab: False
+                    multiline: False
+                    font_size: 25
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 id: create_new_clinic
                 text: 'Add and Select Clinic'
-                font_size: 60
+                font_size: 30
                 on_press:
+                    root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
-            Button:
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
+                    root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
 
+        Widget:
+            size_hint_y: None
+            height: 10
+
+
 <ExistingClinic>
-    BoxLayout:
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+
         orientation: 'vertical'
-        BoxLayout:
+
+        MDBoxLayout:
             orientation: 'vertical'
-            Label:
-                text: 'Add/Edit Vaccination Clinic'
-                font_size: 60
-            BoxLayout:
+
+            MDBoxLayout:
+                orientation: 'vertical'
+
+                MDLabel:
+                    text: 'Add/Edit Vaccination Clinic'
+                    font_size: 45
+                    halign: 'center'
+
+                Widget:
+                    size_hint_y: None
+                    height: 10
+
+                MDBoxLayout:
+                    orientation: 'horizontal'
+                    size_hint: None, None
+                    size: self.minimum_size
+                    pos_hint: {'center_x': 0.5,}
+
+                    MDRaisedButton:
+                        text: 'Existing Clinic'
+                        font_size: 30
+
+                    MDRectangleFlatButton:
+                        text: 'New Clinic'
+                        theme_text_color: 'Primary'
+                        text_color: 0, 0.5, 1, 1
+                        font_size: 30
+                        on_press:
+                            root.manager.transition.duration = 0
+                            root.manager.current = 'clinic'
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                Widget:
+                    size_hint_y: None
+                    height: 10
+
+                Spinner:
+                    pos_hint_x: {'center_x': .5}
+                    size_hint: None, None
+                    size: 120, 60
+                    text: 'Clinics'
+                    font_size: 30
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Clinic 1', 'Clinic 2', 'Clinic 3'
+
+
+            MDBoxLayout:
                 orientation: 'horizontal'
-                Button:
-                    text: 'Existing Clinic'
-                    font_size: 60
-                    background_color: [.5, .5, 1, .5]
-                Button:
-                    text: 'New Clinic'
-                    font_size: 60
-                    on_press:
-                        root.manager.transition.direction = 'left'
-                        root.manager.current = 'clinic'
-            Label:
-                text: 'Clinic Name'
-                font_size: 60
-            Label:
-                text: 'Prefill'
-                id: clinic_name_label
-                font_size: 60
-            Label:
-                text: 'Clinic Address'
-                font_size: 60
-            Label:
-                text: 'Prefill'
-                id: clinic_address_label
-                font_size: 60
-            Button:
+
+                MDLabel:
+                    text: 'Clinic Name:'
+                    font_size: 30
+
+                MDLabel:
+                    text: 'Placeholder'
+                    id: clinic_name_label
+                    font_size: 30
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+
+                MDLabel:
+                    text: 'Clinic Address:'
+                    font_size: 30
+
+                MDLabel:
+                    text: 'Placeholder'
+                    id: clinic_address_label
+                    font_size: 30
+
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 text: 'Select Clinic'
                 id: select_clinic_existing
-                font_size: 60
+                font_size: 30
                 on_press:
+                    root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
-            Button:
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
+                    root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+
+        Widget:
+            size_hint_y: None
+            height: 10
 
 <SelectManufacturerForClinic>
     BoxLayout:
