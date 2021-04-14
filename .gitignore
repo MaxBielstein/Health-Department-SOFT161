@@ -9,4 +9,4 @@ venv/
 bin/
 .DS_Store
 ._*
-
+credentials.json
