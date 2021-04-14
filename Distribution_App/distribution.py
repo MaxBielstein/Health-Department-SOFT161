@@ -109,12 +109,14 @@ class DistributionApp(MDApp):
 
         return sm
 
+    def existing_clinic_clicked(self):
+        self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics', 'clinic_name')
 
 # These methods below query data from the database and return the specified data
 
 # if column name is None then it returns the whole table
 def get_sql_data(table_name, column_name):
-    database = mysql.connector.connect(host='localhost', database='milestone_one', user='root', password='cse1208')
+    database = mysql.connector.connect(host='localhost', database='combined', user='root', password='cse1208')
     finder = database.cursor(buffered=True)
     if column_name is None:
         finder.execute(f'SELECT * FROM {table_name}')
@@ -129,7 +131,7 @@ def get_sql_data(table_name, column_name):
 
 # returns a single element from table
 def get_specific_sql_data(table_name, column, identifier_column, oracle):
-    database = mysql.connector.connect(host='localhost', database='milestone_one', user='root', password='cse1208')
+    database = mysql.connector.connect(host='localhost', database='combined', user='root', password='cse1208')
     finder = database.cursor(buffered=True)
     finder.execute(f'select {column} from {table_name} where {identifier_column} = \"{oracle}\"')
     result = finder.fetchall()
@@ -145,7 +147,7 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
 
 # This is a simple method for adding data to the sql database
 def sql_input(data):
-    url = DistributionDatabase.construct_mysql_url('localhost', 3306, 'milestone_one', 'root', 'cse1208')
+    url = DistributionDatabase.construct_mysql_url('localhost', 3306, 'combined', 'root', 'cse1208')
     record_database = DistributionDatabase(url)
     session = record_database.create_session()
     session.add(data)
