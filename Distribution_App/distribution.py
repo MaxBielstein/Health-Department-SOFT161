@@ -1,4 +1,5 @@
 from kivy.app import App
+from kivymd.app import MDApp
 from kivy.core.window import Window  # For inspection.
 from kivy.modules import inspector  # For inspection.
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -89,9 +90,12 @@ class DistributionDatabase(object):
         return self.Session()
 
 
-class DistributionApp(App):
+class DistributionApp(MDApp):
 
     def build(self):
+
+        self.theme_cls.primary_palette = "Blue"
+
         inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
         sm = ScreenManager()
         sm.add_widget(HomeScreen(name='home'))
