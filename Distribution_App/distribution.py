@@ -112,6 +112,7 @@ class DistributionApp(MDApp):
     def existing_clinic_clicked(self):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics', 'clinic_name')
 
+
 # These methods below query data from the database and return the specified data
 
 # if column name is None then it returns the whole table
