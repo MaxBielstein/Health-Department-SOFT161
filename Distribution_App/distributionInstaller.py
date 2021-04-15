@@ -22,7 +22,7 @@ def add_starter_data(session):
 
 def main():
     try:
-        url = DistributionDatabase.construct_mysql_url('localhost', 3306, 'milestone_one', 'root', 'cse1208')
+        url = DistributionDatabase.construct_mysql_url('localhost', 3306, 'combined', 'root', 'cse1208')
         distribution_database = DistributionDatabase(url)
 
         distribution_database.ensure_tables_exist()
