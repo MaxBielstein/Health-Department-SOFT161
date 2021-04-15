@@ -115,7 +115,7 @@ class DistributionApp(MDApp):
 
     def existing_clinic_clicked(self):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
-                                                                                         'name')
+                                                                                         'clinic_name')
 
     def create_new_clinic(self):
         id_path = self.root.ids
@@ -133,7 +133,7 @@ class DistributionApp(MDApp):
             self.input_error_message = 'Name field must be filled'
             Factory.NewInputError().open()
             return False
-        elif self.new_clinic_name in get_sql_data('vaccination_clinics', 'name'):
+        elif self.new_clinic_name in get_sql_data('vaccination_clinics', 'clinic_name'):
             self.input_error_message = 'Clinic with this name already exists'
             Factory.NewInputError().open()
             return False
