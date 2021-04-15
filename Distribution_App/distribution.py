@@ -47,7 +47,7 @@ Persisted = declarative_base()
 
 
 class Clinic(Persisted):
-    __tablename__ = 'Clinics'
+    __tablename__ = 'manufacturer_clinics'
     name = Column(String(256), nullable=False)
     address = Column(String(256), nullable=False)
     clinic_id = Column(Integer, primary_key=True)
@@ -114,7 +114,7 @@ class DistributionApp(MDApp):
         return sm
 
     def existing_clinic_clicked(self):
-        self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('Clinics',
+        self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'name')
 
     def create_new_clinic(self):
@@ -133,7 +133,7 @@ class DistributionApp(MDApp):
             self.input_error_message = 'Name field must be filled'
             Factory.NewInputError().open()
             return False
-        elif self.new_clinic_name in get_sql_data('Clinics', 'name'):
+        elif self.new_clinic_name in get_sql_data('vaccination_clinics', 'name'):
             self.input_error_message = 'Clinic with this name already exists'
             Factory.NewInputError().open()
             return False
@@ -142,7 +142,7 @@ class DistributionApp(MDApp):
             self.input_error_message = 'Address field must be filled'
             Factory.NewInputError().open()
             return False
-        elif self.new_clinic_address in get_sql_data('Clinics', 'address'):
+        elif self.new_clinic_address in get_sql_data('vaccination_clinics', 'address'):
             self.input_error_message = 'Clinic with this address already exists'
             Factory.NewInputError().open()
             return False
@@ -152,7 +152,7 @@ class DistributionApp(MDApp):
 
 def new_clinic(self, name, address):
     clinic = Clinic(name=name, address=address)
-    if int(clinic.clinic_id) not in get_sql_data('Clinics', 'clinic_id'):
+    if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
         sql_input(clinic)
         # self.confirm_screen('new_person_confirmed')
     else:
