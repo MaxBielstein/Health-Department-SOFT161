@@ -95,11 +95,12 @@ class DistributionApp(MDApp):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
-    def existing_manufacturer_load(self):
-        self.root.get_screen('m_for_clinic').ids.select_manufacturer_for_clinic_spinner.values = get_sql_data(
+    def load_manufacturer_spinners_for_clinics(self):
+        self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
 
+# The following methods handle creating a new clinic, checking its requirements, and adding it to the database
     def create_new_clinic(self):
         id_path = self.root.get_screen('clinic').ids
         if id_path.new_clinic_name.text is not '':

@@ -142,6 +142,7 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
                     app.create_new_clinic()
+                    app.load_manufacturer_spinners_for_clinics()
             MDRaisedButton:
                 text: 'Back'
                 font_size: 30
@@ -266,6 +267,7 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
+                    app.load_manufacturer_spinners_for_clinics()
 
             MDRaisedButton:
                 text: 'Back'
@@ -338,7 +340,6 @@
                     font_size: 20
                     id: select_manufacturer_to_remove_for_clinic_spinner
                     background_color: 0, 1.5, 4, 1
-                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -350,7 +351,6 @@
                     font_size: 20
                     id: select_manufacturer_to_add_for_clinic_spinner
                     background_color: 0, 1.5, 4, 1
-                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -369,11 +369,15 @@
                     text: 'Add'
                     id: add_manufacturer_for_clinic
                     font_size: 30
+                    on_press:
+                        app.load_manufacturer_spinners_for_clinics()
 
                 MDRaisedButton:
                     text: 'Remove'
                     id: remove_manufacturer_for_clinic
                     font_size: 30
+                    on_press:
+                        app.load_manufacturer_spinners_for_clinics()
 
     MDBoxLayout:
         orientation: 'vertical'
