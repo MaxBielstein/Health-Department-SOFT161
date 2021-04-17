@@ -284,41 +284,103 @@
 
         MDBoxLayout:
             orientation: 'vertical'
-            Spinner:
-                size_hint: None, None
-                size: 500, 100
-                pos_hint: {'center': 'center'}
-                text: 'Manufacturers'
-                id: select_manufacturer_for_clinic_spinner
-                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: "Add/Remove Manufacturers from clinic"
+                font_size: 45
+                halign: 'center'
+
+            Widget:
+                size_hint_y: None
+                height: 40
+
+
+
+
             MDBoxLayout:
                 orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                Spinner:
+                    size_hint: None, None
+                    size: 250, 60
+                    pos_hint: {'center': 'center'}
+                    text: 'Current Manufacturers'
+                    font_size: 20
+                    id: select_manufacturer_to_add_for_clinic_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+
+                Spinner:
+                    size_hint: None, None
+                    size: 250, 60
+                    pos_hint: {'center': 'center'}
+                    text: 'Available Manufacturers'
+                    font_size: 20
+                    id: select_manufacturer_to_remove_for_clinic_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+            Widget:
+                size_hint_y: None
+                height: 40
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
                 MDRaisedButton:
                     text: 'Add'
                     id: add_manufacturer_for_clinic
-                    font_size: 60
+                    font_size: 30
 
                 MDRaisedButton:
                     text: 'Remove'
                     id: remove_manufacturer_for_clinic
-                    font_size: 60
+                    font_size: 30
+
     MDBoxLayout:
-        orientation: 'horizontal'
-        MDRaisedButton:
-            text: 'Back'
-            font_size: 60
-            on_press:
-                root.manager.transition.direction = 'right'
-                root.manager.current = 'clinic'
-        MDRaisedButton:
-            text: 'Done'
-            id: done_manufacturer_for_clinic
-            font_size: 60
-            on_press:
-                root.manager.transition.direction = 'right'
-                root.manager.current = 'home'
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'clinic'
+            MDRaisedButton:
+                text: 'Done'
+                id: done_manufacturer_for_clinic
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+        Widget:
+            size_hint_y: None
+            height: 10
 
 <NewVaccineScreen>
     BoxLayout:
