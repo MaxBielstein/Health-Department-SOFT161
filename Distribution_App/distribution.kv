@@ -38,8 +38,10 @@
 
 
             on_press:
+                app.load_manufacturer_spinners_for_vaccines()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'new_vaccine'
+
 
         MDFillRoundFlatButton:
             text: 'Order Vaccine'
@@ -441,7 +443,6 @@
                 text: 'Select a Manufacturer'
                 id: select_manufacturer_for_new_vaccine_spinner
                 background_color: 0, 1.5, 4, 1
-                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
 
@@ -592,7 +593,6 @@
                 pos_hint: {'center': 'center'}
                 text: 'Select a Manufacturer'
                 id: order_manufacturer_spinner
-                values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
             Label:

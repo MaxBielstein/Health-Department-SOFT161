@@ -100,6 +100,11 @@ class DistributionApp(MDApp):
             'manufacturers',
             'manufacturer_name')
 
+    def load_manufacturer_spinners_for_vaccines(self):
+        self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
+            'manufacturers',
+            'manufacturer_name')
+
 # The following methods handle creating a new clinic, checking its requirements, and adding it to the database
     def create_new_clinic(self):
         id_path = self.root.get_screen('clinic').ids
