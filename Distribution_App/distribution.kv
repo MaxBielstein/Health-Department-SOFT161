@@ -391,32 +391,75 @@
             height: 10
 
 <NewVaccineScreen>
-    BoxLayout:
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
         orientation: 'vertical'
-        BoxLayout:
+
+        MDBoxLayout:
             orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Select a Manufacturer for the New Vaccine'
+                font_size: 45
+                halign: 'center'
+
+            Widget:
+                size_hint_y: None
+                height: 60
+
             Spinner:
                 size_hint: None, None
                 size: 500, 100
                 pos_hint: {'center': 'center'}
                 text: 'Select a Manufacturer'
                 id: select_manufacturer_for_new_vaccine_spinner
+                background_color: 0, 1.5, 4, 1
                 values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
-            Button:
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 text: 'Continue'
                 id: manufacturer_choosen_for_new_vaccine_confirm
-                font_size: 60
+                font_size: 30
                 on_press:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_vaccine'
-            Button:
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+
+        Widget:
+            size_hint_y: None
+            height: 10
 
 <ManufacturerForVaccine>
     BoxLayout:
