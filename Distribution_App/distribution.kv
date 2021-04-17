@@ -299,35 +299,36 @@
 
             MDLabel:
                 text: "Add/Remove Manufacturers from clinic"
-                font_size: 45
+                font_size: 35
+
+
+
+            Widget:
+                size_hint_y: None
+                height: 30
+                halign: 'center'
+
+
+            MDLabel:
+                text: "Select a manufacturer from available manufacturers then press add to add a manufacturer"
+                font_size: 15
                 halign: 'center'
 
             Widget:
                 size_hint_y: None
-                height: 40
+                height: 3
+                halign: 'center'
 
-
-
-
+            MDLabel:
+                text: "Select a manufacturer from current manufacturers then press remove to remove a manufacturer"
+                font_size: 15
+                halign: 'center'
             MDBoxLayout:
                 orientation: 'horizontal'
                 spacing: 25
                 size_hint: None, None
                 size: self.minimum_size
                 pos_hint: {'center_x': 0.5,}
-
-                Spinner:
-                    size_hint: None, None
-                    size: 250, 60
-                    pos_hint: {'center': 'center'}
-                    text: 'Current Manufacturers'
-                    font_size: 20
-                    id: select_manufacturer_to_add_for_clinic_spinner
-                    background_color: 0, 1.5, 4, 1
-                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
-                    on_text:
-                        print("The spinner {} has text {}".format(self, self.text))
-
 
                 Spinner:
                     size_hint: None, None
@@ -341,9 +342,21 @@
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
+                Spinner:
+                    size_hint: None, None
+                    size: 250, 60
+                    pos_hint: {'center': 'center'}
+                    text: 'Current Manufacturers'
+                    font_size: 20
+                    id: select_manufacturer_to_add_for_clinic_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
             Widget:
                 size_hint_y: None
-                height: 40
+                height: 10
 
             MDBoxLayout:
                 orientation: 'horizontal'

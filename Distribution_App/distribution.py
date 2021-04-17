@@ -144,7 +144,7 @@ class DistributionApp(MDApp):
 
 
 def new_clinic(self, name, address, id):
-    clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address, manufacturer_id=1)
+    clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
         sql_input(clinic)
         # self.confirm_screen('new_person_confirmed')

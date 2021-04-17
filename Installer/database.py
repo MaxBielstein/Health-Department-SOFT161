@@ -35,7 +35,7 @@ class VaccinationClinics(Persisted):
     clinic_id = Column(Integer, primary_key=True)
     clinic_name = Column(String(256), nullable=False)
     clinic_address = Column(String(256), nullable=False)
-    manufacturer_id = Column(Integer, ForeignKey('manufacturers.manufacturer_id', ondelete='CASCADE'), nullable=False)
+    # manufacturer_id = Column(Integer, ForeignKey('manufacturers.manufacturer_id', ondelete='CASCADE'), nullable=False)
     manufacturer_clinics = relationship('ManufacturerClinics', uselist=True, back_populates='vaccination_clinic')
     orders = relationship('Orders', uselist=True, back_populates='vaccination_clinic')
     manufacturers = relationship('Manufacturers', uselist=True, secondary='manufacturer_clinics',
@@ -123,7 +123,7 @@ def add_starter_data(session_to_add_to):
                                   manufacturer_location='Colorado')
     manufacturer3 = Manufacturers(manufacturer_id=3, manufacturer_name='manufacturer 3',
                                   manufacturer_location='California')
-    vaccination_clinic1 = VaccinationClinics(manufacturer_id=1, clinic_name='UNL Vaccination Clinic',
+    vaccination_clinic1 = VaccinationClinics(clinic_name='UNL Vaccination Clinic',
                                              clinic_address='123 UNL street',
                                              manufacturer_clinics=[ManufacturerClinics(manufacturer=manufacturer1),
                                                                    ManufacturerClinics(manufacturer=manufacturer2)])
