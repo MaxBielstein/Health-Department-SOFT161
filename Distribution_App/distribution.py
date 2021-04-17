@@ -8,6 +8,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from database import *
 import mysql.connector
 
 
@@ -44,30 +45,6 @@ class HomeScreen(Screen):
 
 
 Persisted = declarative_base()
-
-
-class vaccination_clinics(Persisted):
-    __tablename__ = 'vaccination_clinics'
-    clinic_name = Column(String(256), nullable=False)
-    clinic_address = Column(String(256), nullable=False)
-    clinic_id = Column(Integer, primary_key=True)
-    manufacturer_id = Column(Integer, ForeignKey('Manufacturers.manufacturer_id'))
-
-
-class Manufacturer(Persisted):
-    __tablename__ = 'Manufacturers'
-    manufacturer_id = Column(Integer, primary_key=True)
-    location = Column(String(256), nullable=False)
-    name = Column(String(256), nullable=False)
-
-
-class Vaccine(Persisted):
-    __tablename__ = 'Vaccines'
-    vaccine_id = Column(Integer, primary_key=True)
-    doses = Column(Integer, nullable=False)
-    name = Column(String(256), nullable=False)
-    disease = Column(String(256), nullable=False)
-    manufacturer_id = Column(Integer, ForeignKey('Manufacturers.manufacturer_id'))
 
 
 # noinspection PyInterpreter
@@ -119,77 +96,57 @@ class DistributionApp(MDApp):
                                                                                          'clinic_name')
 
     def existing_manufacturer_load(self):
-        self.root.get_screen('m_for_clinic').ids.select_manufacturer_for_clinic_spinner.values = get_sql_data('vaccination_clinics',
-                                                                                         'clinic_name')
+        self.root.get_screen('m_for_clinic').ids.select_manufacturer_for_clinic_spinner.values = get_sql_data(
+            'manufacturers',
+            'manufacturer_name')
 
     def create_new_clinic(self):
-        print('create new clinic pressed')
         id_path = self.root.get_screen('clinic').ids
-        print('id path set')
         if id_path.new_clinic_name.text is not '':
-            print('clinic name not empty')
             self.new_clinic_name_property = id_path.new_clinic_name.text
 
         if id_path.new_clinic_id.text is not '':
-            print('clinic id not empty')
             self.new_clinic_ID_property = id_path.new_clinic_id.text
 
         if id_path.new_clinic_address.text is not '':
-            print('clinic address not empty')
             self.new_clinic_address_property = id_path.new_clinic_address.text
 
         if self.check_for_required_inputs_new_clinic():
-            print('input check passed')
-            new_clinic(self, self.new_clinic_name_property, self.new_clinic_address_property, self.new_clinic_ID_property)
+            new_clinic(self, self.new_clinic_name_property, self.new_clinic_address_property,
+                       self.new_clinic_ID_property)
 
     def check_for_required_inputs_new_clinic(self):
-        print('input check called')
         if self.new_clinic_name_property is '':
             self.input_error_message = 'Name field must be filled'
-            print("no name")
             # Factory.NewInputError().open()
             return False
         elif self.new_clinic_name_property in get_sql_data('vaccination_clinics', 'clinic_name'):
             self.input_error_message = 'Clinic with this name already exists'
             # Factory.NewInputError().open()
-            print("Clinic with this name already exists")
             return False
-        print("check 1")
         if self.new_clinic_ID_property is '':
             self.input_error_message = 'no id found'
-            print("no id")
             # Factory.NewInputError().open()
             return False
         elif self.new_clinic_ID_property in get_sql_data('vaccination_clinics', 'clinic_id'):
             self.input_error_message = 'Clinic with this ID already exists'
             # Factory.NewInputError().open()
-            print("Clinic with this ID already exists")
             return False
-        print("check 2")
         if self.new_clinic_address_property is '':
             self.input_error_message = 'Address field must be filled'
-            print('Address field must be filled')
             # Factory.NewInputError().open()
             return False
         elif self.new_clinic_address_property in get_sql_data('vaccination_clinics', 'clinic_address'):
             self.input_error_message = 'Clinic with this address already exists'
-            print('Clinic with this address already exists')
             # Factory.NewInputError().open()
             return False
-        print("check 2")
         return True
 
 
 def new_clinic(self, name, address, id):
-    clinic = vaccination_clinics(clinic_id=id, clinic_name=name, clinic_address=address, manufacturer_id = 1)
-    print("clinic object created")
-    print(clinic.clinic_name)
-    print(clinic.clinic_address)
-    print(clinic.clinic_id)
+    clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address, manufacturer_id=1)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
-        print('clinic going to be entered')
         sql_input(clinic)
-        print('clinic entered')
         # self.confirm_screen('new_person_confirmed')
     else:
         Factory.MatchingIDError().open()
