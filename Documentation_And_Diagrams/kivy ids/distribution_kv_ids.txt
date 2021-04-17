@@ -12,7 +12,8 @@ ExistingClinic Screen IDs:
     select_clinic_existing - Select Clinic Button
 
 SelectManufacturerForClinic IDs:
-    select_manufacturer_for_clinic_spinner - Spinner to choose a manufacturer for a clinic
+    select_manufacturer_to_add_for_clinic_spinner - Spinner to choose a manufacturer to add for a clinic
+    select_manufacturer_to_remove_for_clinic_spinner - Spinner to choose a manufacturer to remove for a clinic
     add_manufacturer_for_clinic - Adds selected manufacturer to clinic assignment
     remove_manufacturer_for_clinic - Removes selected manufacturer from a clinic assignment
     done_manufacturer_for_clinic - Finalizes changes made to manufacturer list
