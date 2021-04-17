@@ -2,7 +2,7 @@ from sys import stderr
 
 from sqlalchemy.exc import SQLAlchemyError
 
-from distribution import DistributionDatabase, Manufacturer, Clinic
+from distribution import DistributionDatabase, Manufacturer, vaccination_clinics
 
 
 def add_starter_data(session):
@@ -12,9 +12,9 @@ def add_starter_data(session):
     session.add(manufacturer1)
     session.add(manufacturer2)
     session.add(manufacturer3)
-    clinic1 = Clinic(name='clinic 1', address='Nebraska')
-    clinic2 = Clinic(name='clinic 2', address='Colorado')
-    clinic3 = Clinic(name='clinic 3', address='California')
+    clinic1 = vaccination_clinics(name='clinic 1', address='Nebraska')
+    clinic2 = vaccination_clinics(name='clinic 2', address='Colorado')
+    clinic3 = vaccination_clinics(name='clinic 3', address='California')
     session.add(clinic1)
     session.add(clinic2)
     session.add(clinic3)
