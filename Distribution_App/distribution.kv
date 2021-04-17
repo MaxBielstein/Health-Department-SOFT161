@@ -102,14 +102,22 @@
 
                 MDTextField:
                     hint_text: 'Clinic Name'
-                    id: new_clinic_name
+                    id:new_clinic_name
                     write_tab: False
                     multiline: False
                     font_size: 25
 
                 MDTextField:
                     hint_text: 'Clinic Address'
-                    id: new_clinic_address
+                    id:new_clinic_address
+                    write_tab: False
+                    multiline: False
+                    font_size: 25
+
+                MDTextField:
+                    hint_text: 'Clinic ID'
+                    input_filter: 'int'
+                    id:new_clinic_id
                     write_tab: False
                     multiline: False
                     font_size: 25
@@ -133,7 +141,7 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
-
+                    app.create_new_clinic()
             MDRaisedButton:
                 text: 'Back'
                 font_size: 30
