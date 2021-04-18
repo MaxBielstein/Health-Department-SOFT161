@@ -22,7 +22,7 @@ NewVaccineScreen IDs:
     select_manufacturer_for_new_vaccine_spinner - Spinner to choose a manufacturer for the new 
     manufacturer_choosen_for_new_vaccine_confirm - Button that confirms choosen manufacturer and moves on
 
-ManufacturerForVaccine:
+ManufacturerForVaccine IDs:
     manufacturer_choosen_for_new_vaccine - Label that shows the selected manufacturer for the new vaccine
     new_vaccine_name - Textfield that takes the name for the new vaccine being created
     new_vaccine_disease - Textfield that takes the associated disease for the new vaccine being created
@@ -30,13 +30,14 @@ ManufacturerForVaccine:
     add_new_vaccine - Button that adds the new vaccine created
     save_new_vaccine - Done button that should commit the new vaccine to the database
 
-OrderVaccineScreen:
+OrderVaccine IDs:
     clinic_order_vaccine_spinner - Spinner to choose a clinic to order for
     order_select_disease - Spinner to choose disease to order vaccine for
     add_new_order - Button to advance order process to next screen could be used to save current screens values to temp varriables
-
-OrderManufacturer:
     order_manufacturer_spinner - Spinner to choose what manufacturer will be making the order
     order_doses - Textfield that gets the number of doses for the order
-    order_order - Done button that should commit order to database
+    order_order - Order button that should commit order to database
+
+
+    
 
