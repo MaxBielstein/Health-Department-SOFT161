@@ -153,13 +153,9 @@
                     root.manager.current = 'm_for_clinic'
                     app.create_new_clinic()
                     app.load_manufacturer_spinners_for_clinics()
-            MDRaisedButton:
-                text: 'Back'
-                font_size: 30
-                on_press:
-                    root.manager.transition.duration = 0.4
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'home'
+        Widget:
+            size_hint_y: None
+            height: 10
 
 
 <ExistingClinic>
@@ -501,49 +497,37 @@
         MDBoxLayout:
             orientation: 'vertical'
 
-            MDLabel:
-                text: 'Details for New Vaccine'
-                font_size: 45
-                halign: 'center'
-
-            Widget:
-                size_hint_y: None
-                height: 10
             MDBoxLayout:
                 orientation: 'horizontal'
                 padding: 25
                 spacing: 25
+                pos_hint: {'center_x': 0.5,}
 
                 MDLabel:
                     text: 'Selected Manufacture:'
                     font_size: 20
+                    halign: 'center'
 
                 MDLabel:
                     text: 'Prefill'
                     id: manufacturer_choosen_for_new_vaccine
                     font_size: 20
+                    halign: 'center'
 
             MDTextField:
                 hint_text: 'Vaccine Name'
                 id: new_vaccine_name
                 write_tab: False
                 multiline: False
-                font_size: 60
+                font_size: 30
 
-            Label:
-                text: 'Vaccine ID'
-                font_size: 60
-
-            TextInput:
+            MDTextField:
                 id: new_vaccine_ID
+                hint_text: 'Vaccine ID'
                 write_tab: False
                 multiline: False
-                font_size: 60
+                font_size: 30
                 input_filter: 'int'
-
-            Label:
-                text: 'Associated Disease'
-                font_size: 60
 
             MDTextField:
                 hint_text: 'Associated Disease'
@@ -557,7 +541,7 @@
                 id: new_vaccine_required_doses
                 write_tab: False
                 multiline: False
-                font_size: 60
+                font_size: 30
                 input_filter: 'int'
 
 
