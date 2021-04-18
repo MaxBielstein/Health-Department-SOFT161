@@ -20,10 +20,10 @@ SelectManufacturerForClinic IDs:
 
 NewVaccineScreen IDs:
     select_manufacturer_for_new_vaccine_spinner - Spinner to choose a manufacturer for the new 
-    manufacturer_choosen_for_new_vaccine_confirm - Button that confirms choosen manufacturer and moves on
+    manufacturer_chosen_for_new_vaccine_confirm - Button that confirms chosen manufacturer and moves on
 
 ManufacturerForVaccine IDs:
-    manufacturer_choosen_for_new_vaccine - Label that shows the selected manufacturer for the new vaccine
+    manufacturer_chosen_for_new_vaccine - Label that shows the selected manufacturer for the new vaccine
     new_vaccine_name - Textfield that takes the name for the new vaccine being created
     new_vaccine_disease - Textfield that takes the associated disease for the new vaccine being created
     new_vaccine_required_doses - Textfield that takes the required doses for the new vaccine being created
