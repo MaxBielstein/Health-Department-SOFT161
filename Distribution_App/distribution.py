@@ -70,10 +70,17 @@ class DistributionDatabase(object):
 
 
 class DistributionApp(MDApp):
+    # clinics
     input_error_message = StringProperty('')
     new_clinic_name_property = StringProperty()
     new_clinic_address_property = StringProperty()
     new_clinic_ID_property = NumericProperty()
+    # vaccines
+    new_vaccine_name_property = StringProperty()
+    new_vaccine_disease_property = StringProperty()
+    new_vaccine_ID_property = NumericProperty()
+    new_vaccine_doses_property = NumericProperty()
+    new_vaccine_manufacturer_ID_property = NumericProperty()
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -95,11 +102,24 @@ class DistributionApp(MDApp):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
-    def existing_manufacturer_load(self):
-        self.root.get_screen('m_for_clinic').ids.select_manufacturer_for_clinic_spinner.values = get_sql_data(
+    def load_manufacturer_spinners_for_clinics(self):
+        self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
 
+    def load_manufacturer_spinners_for_vaccines(self):
+        self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
+            'manufacturers',
+            'manufacturer_name')
+
+    def get_selected_manufacturer_for_vaccines(self):
+        if 'Select a Manufacturer' in self.root.get_screen(
+                'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text:
+            print("no selection made")
+        else:
+            pass
+
+    # The following methods handle creating a new clinic, checking its requirements, and adding it to the database
     def create_new_clinic(self):
         id_path = self.root.get_screen('clinic').ids
         if id_path.new_clinic_name.text is not '':
@@ -149,7 +169,66 @@ def new_clinic(self, name, address, id):
         sql_input(clinic)
         # self.confirm_screen('new_person_confirmed')
     else:
-        Factory.MatchingIDError().open()
+        pass
+        # Factory.MatchingIDError().open()
+
+    # The following methods handle creating a new vaccine, checking its requirements, and adding it to the database
+    def create_new_vaccine(self):
+        id_path = self.root.get_screen('m_for_vaccine').ids
+        if id_path.new_vaccine_name.text is not '':
+            self.new_vaccine_name_property = id_path.new_vaccine_name.text
+
+        if id_path.new_clinic_id.text is not '':
+            self.new_vaccine_ID_property = id_path.new_vaccine_id.text
+
+        if id_path.new_vaccine_doses_property.text is not '':
+            self.new_vaccine_doses_property = id_path.new_vaccine_doses.text
+
+        if self.check_for_required_inputs_new_vaccine():
+            new_clinic(self, self.new_clinic_name_property, self.new_clinic_address_property,
+                       self.new_clinic_ID_property)
+
+    def check_for_required_inputs_new_vaccine(self):
+        if self.new_vaccine_name_property is '':
+            self.input_error_message = 'Name field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        elif self.new_vaccine_name_property in get_sql_data('Vaccines', 'vaccine_name'):
+            self.input_error_message = 'Vaccine with this name already exists'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_vaccine_ID_property is '':
+            self.input_error_message = 'No ID for the vaccine was provided'
+            # Factory.NewInputError().open()
+            return False
+        elif self.new_vaccine_ID_property in get_sql_data('vaccines', 'vaccine_id'):
+            self.input_error_message = 'Vaccine with this ID already exists'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_vaccine_disease_property is '':
+            self.input_error_message = 'Disease field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_vaccine_doses_property is '':
+            self.input_error_message = 'Required Doses field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_vaccine_manufacturer_ID_property is '':
+            self.input_error_message = 'A Manufacturer ID was not correctly passed in'
+            # Factory.NewInputError().open()
+            return False
+        return True
+
+
+def new_vaccine(self, id, doses, disease, name, manufacturer_id):
+    vaccine = VaccinationClinics(vaccine_id=id, required_doses=doses, relevant_disease=disease, vaccine_name=name,
+                                 manufacturer_id=manufacturer_id)
+    if int(vaccine.clinic_id) not in get_sql_data('Vaccines', 'vaccine_id'):
+        sql_input(vaccine)
+        # self.confirm_screen('new_person_confirmed')
+    else:
+        pass
+        # Factory.MatchingIDError().open()
 
 
 # These methods below query data from the database and return the specified data

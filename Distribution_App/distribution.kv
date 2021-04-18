@@ -38,8 +38,10 @@
 
 
             on_press:
+                app.load_manufacturer_spinners_for_vaccines()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'new_vaccine'
+
 
         MDFillRoundFlatButton:
             text: 'Order Vaccine'
@@ -150,10 +152,14 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
                     app.create_new_clinic()
-
-        Widget:
-            size_hint_y: None
-            height: 10
+                    app.load_manufacturer_spinners_for_clinics()
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
 
 
 <ExistingClinic>
@@ -264,8 +270,10 @@
                 font_size: 30
                 on_press:
                     root.manager.transition.duration = 0.4
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'home'
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'm_for_clinic'
+                    app.load_manufacturer_spinners_for_clinics()
+
 
             MDRaisedButton:
                 text: 'Select Clinic'
@@ -342,7 +350,6 @@
                     font_size: 20
                     id: select_manufacturer_to_remove_for_clinic_spinner
                     background_color: 0, 1.5, 4, 1
-                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -354,7 +361,6 @@
                     font_size: 20
                     id: select_manufacturer_to_add_for_clinic_spinner
                     background_color: 0, 1.5, 4, 1
-                    values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -373,11 +379,15 @@
                     text: 'Add'
                     id: add_manufacturer_for_clinic
                     font_size: 30
+                    on_press:
+                        app.load_manufacturer_spinners_for_clinics()
 
                 MDRaisedButton:
                     text: 'Remove'
                     id: remove_manufacturer_for_clinic
                     font_size: 30
+                    on_press:
+                        app.load_manufacturer_spinners_for_clinics()
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -442,7 +452,6 @@
                 font_size: 30
                 id: select_manufacturer_for_new_vaccine_spinner
                 background_color: 0, 1.5, 4, 1
-                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
 
@@ -519,7 +528,22 @@
                 id: new_vaccine_name
                 write_tab: False
                 multiline: False
-                font_size: 30
+                font_size: 60
+
+            Label:
+                text: 'Vaccine ID'
+                font_size: 60
+
+            TextInput:
+                id: new_vaccine_ID
+                write_tab: False
+                multiline: False
+                font_size: 60
+                input_filter: 'int'
+
+            Label:
+                text: 'Associated Disease'
+                font_size: 60
 
             MDTextField:
                 hint_text: 'Associated Disease'
@@ -533,7 +557,9 @@
                 id: new_vaccine_required_doses
                 write_tab: False
                 multiline: False
-                font_size: 30
+                font_size: 60
+                input_filter: 'int'
+
 
             MDRaisedButton:
                 text: 'Add'
@@ -645,7 +671,7 @@
                 height: 10
 
             MDTextField:
-                hint_text: 'Number Of Doses'
+                hint_text: 'Number of Doses'
                 id: order_doses
                 write_tab: False
                 multiline: False
