@@ -6,7 +6,6 @@
         elevation: 5
         padding: 25
         spacing: 25
-
         orientation: 'vertical'
 
         MDLabel:
@@ -14,15 +13,12 @@
             font_size: 30
             halign: 'center'
 
-
         MDFillRoundFlatButton:
             text: 'Add/Edit Vaccination Clinics'
             font_size: 30
             pos_hint: {'center_x': 0.5,}
-
             size: 0, 60
             size_hint: None, None
-
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'clinic'
@@ -31,12 +27,9 @@
             text: 'New Vaccine'
             font_size: 30
             pos_hint: {'center_x': 0.5,}
-
             size: 0, 60
             size_hint: None, None
             increment_width: 240
-
-
             on_press:
                 app.load_manufacturer_spinners_for_vaccines()
                 root.manager.transition.direction = 'left'
@@ -47,11 +40,9 @@
             text: 'Order Vaccine'
             font_size: 30
             pos_hint: {'center_x': 0.5,}
-
             size: 0, 60
             size_hint: None, None
             increment_width: 230
-
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'order_vaccine'
@@ -65,7 +56,6 @@
         elevation: 5
         padding: 25
         spacing: 25
-
         orientation: 'vertical'
 
         MDBoxLayout:
@@ -73,6 +63,7 @@
 
             MDBoxLayout:
                 orientation: 'vertical'
+
                 MDLabel:
                     text: 'Add/Edit Vaccination Clinic'
                     font_size: 45
@@ -153,6 +144,7 @@
                     root.manager.current = 'm_for_clinic'
                     app.create_new_clinic()
                     app.load_manufacturer_spinners_for_clinics()
+
         Widget:
             size_hint_y: None
             height: 10
@@ -167,7 +159,6 @@
         elevation: 5
         padding: 25
         spacing: 25
-
         orientation: 'vertical'
 
         MDBoxLayout:
@@ -402,6 +393,7 @@
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'clinic'
+
             MDRaisedButton:
                 text: 'Done'
                 id: done_manufacturer_for_clinic
@@ -409,6 +401,7 @@
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+
         Widget:
             size_hint_y: None
             height: 10
@@ -433,7 +426,7 @@
 
             MDLabel:
                 text: 'Select a Manufacturer for the New Vaccine'
-                font_size: 45
+                font_size: 30
                 halign: 'center'
 
             Widget:
@@ -474,7 +467,7 @@
 
             MDRaisedButton:
                 text: 'Continue'
-                id: manufacturer_choosen_for_new_vaccine_confirm
+                id: manufacturer_chosen_for_new_vaccine_confirm
                 font_size: 30
                 on_press:
                     root.manager.transition.direction = 'left'
@@ -485,6 +478,7 @@
             height: 10
 
 <ManufacturerForVaccine>
+
     MDCard:
         size_hint: None, None
         size: 600, 400
@@ -510,7 +504,7 @@
 
                 MDLabel:
                     text: 'Prefill'
-                    id: manufacturer_choosen_for_new_vaccine
+                    id: manufacturer_chosen_for_new_vaccine
                     font_size: 20
                     halign: 'center'
 
@@ -543,7 +537,6 @@
                 multiline: False
                 font_size: 30
                 input_filter: 'int'
-
 
             MDRaisedButton:
                 text: 'Add'
