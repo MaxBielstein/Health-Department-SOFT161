@@ -117,6 +117,7 @@ class DistributionApp(MDApp):
                 'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text:
             print("no selection made")
         else:
+            # to be implimented
             pass
 
     # The following methods handle creating a new clinic, checking its requirements, and adding it to the database
