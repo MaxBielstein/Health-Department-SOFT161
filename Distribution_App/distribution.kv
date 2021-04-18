@@ -574,77 +574,116 @@
             height: 10
 
 <OrderVaccineScreen>
-    BoxLayout:
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
         orientation: 'vertical'
-        BoxLayout:
+
+        MDLabel:
+            text: 'Fill out information for the order'
+            font_size: 45
+            halign: 'center'
+
+
+        MDBoxLayout:
             orientation: 'vertical'
-            Spinner:
-                size_hint: None, None
-                size: 500, 100
-                pos_hint: {'center': 'center'}
-                text: 'Select a Clinic'
-                id: clinic_order_vaccine_spinner
-                values: 'Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
 
-            Spinner:
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
                 size_hint: None, None
-                size: 500, 100
-                pos_hint: {'center': 'center'}
-                text: 'Select a Disease'
-                id: order_select_disease
-                values: 'Disease 1', 'Disease 2', 'Disease 3', 'Disease 4'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
-            Button:
-                text: 'Continue'
-                id: add_new_order
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'm_for_order'
-            Button:
-                text: 'Back'
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'home'
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
 
-<OrderManufacturer>
-    BoxLayout:
-        orientation: 'vertical'
-        BoxLayout:
-            orientation: 'vertical'
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Select a Clinic'
+                    font_size: 15
+                    id: clinic_order_vaccine_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
 
-            Spinner:
-                size_hint: None, None
-                size: 500, 100
-                pos_hint: {'center': 'center'}
-                text: 'Select a Manufacturer'
-                id: order_manufacturer_spinner
-                values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
-            Label:
-                text: 'Number Of Doses'
-                font_size: 60
-            TextInput:
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Select a Disease'
+                    font_size: 15
+                    id: order_select_disease
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Disease 1', 'Disease 2', 'Disease 3', 'Disease 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Select a Manufacturer'
+                    font_size: 15
+                    id: order_manufacturer_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+            Widget:
+                size_hint_y: None
+                height: 10
+
+            MDTextField:
+                hint_text: 'Number Of Doses'
                 id: order_doses
                 write_tab: False
                 multiline: False
-                font_size: 60
-            Button:
-                text: 'Done'
-                id: order_order
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'home'
-            Button:
+                font_size: 30
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
                     root.manager.transition.direction = 'right'
-                    root.manager.current = 'order_vaccine'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
+                text: 'Order'
+                id: add_new_order
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<ReviewOrders>
+
 

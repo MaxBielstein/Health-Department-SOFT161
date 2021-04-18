@@ -36,7 +36,7 @@ class OrderVaccineScreen(Screen):
     pass
 
 
-class OrderManufacturer(Screen):
+class ReviewOrders(Screen):
     pass
 
 
@@ -86,7 +86,7 @@ class DistributionApp(MDApp):
         sm.add_widget(ManufacturerForVaccine(name='m_for_vaccine'))
         sm.add_widget(ExistingClinic(name='ExistingClinic'))
         sm.add_widget(OrderVaccineScreen(name='order_vaccine'))
-        sm.add_widget(OrderManufacturer(name='m_for_order'))
+        sm.add_widget(ReviewOrders(name='review_orders'))
         sm.add_widget(SelectManufacturerForClinic(name='m_for_clinic'))
 
         return sm
