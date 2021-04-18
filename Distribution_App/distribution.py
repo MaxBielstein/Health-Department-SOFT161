@@ -178,11 +178,14 @@ def new_clinic(self, name, address, id):
         if id_path.new_vaccine_name.text is not '':
             self.new_vaccine_name_property = id_path.new_vaccine_name.text
 
-        if id_path.new_clinic_id.text is not '':
+        if id_path.new_vaccine_id.text is not '':
             self.new_vaccine_ID_property = id_path.new_vaccine_id.text
 
         if id_path.new_vaccine_doses_property.text is not '':
             self.new_vaccine_doses_property = id_path.new_vaccine_doses.text
+
+        if id_path.new_vaccine_disease_property.text is not '':
+            self.new_vaccine_disease_property = id_path.new_vaccine_disease.text
 
         if self.check_for_required_inputs_new_vaccine():
             new_clinic(self, self.new_clinic_name_property, self.new_clinic_address_property,
