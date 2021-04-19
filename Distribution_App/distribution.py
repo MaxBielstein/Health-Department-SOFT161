@@ -5,6 +5,8 @@ from kivymd.app import MDApp
 from kivy.core.window import Window  # For inspection.
 from kivy.modules import inspector  # For inspection.
 from kivy.uix.screenmanager import ScreenManager, Screen
+from kivymd.uix.button import MDFlatButton
+from kivymd.uix.dialog import MDDialog
 from sqlalchemy import *
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -15,30 +17,32 @@ import mysql.connector
 class ClinicScreen(Screen):
     pass
 
-
 class ManufacturerForVaccine(Screen):
     pass
-
 
 class ExistingClinic(Screen):
     pass
 
-
 class SelectManufacturerForClinic(Screen):
     pass
-
 
 class NewVaccineScreen(Screen):
     pass
 
-
 class OrderVaccineScreen(Screen):
     pass
 
-
-class ReviewOrders(Screen):
+class ReviewOrdersClinic(Screen):
     pass
 
+class ReviewOrdersManufacturer(Screen):
+    pass
+
+class SelectOrder(Screen):
+    pass
+
+class OrderInformation(Screen):
+    pass
 
 class HomeScreen(Screen):
     pass
@@ -93,10 +97,16 @@ class DistributionApp(MDApp):
         sm.add_widget(ManufacturerForVaccine(name='m_for_vaccine'))
         sm.add_widget(ExistingClinic(name='ExistingClinic'))
         sm.add_widget(OrderVaccineScreen(name='order_vaccine'))
-        sm.add_widget(ReviewOrders(name='review_orders'))
         sm.add_widget(SelectManufacturerForClinic(name='m_for_clinic'))
+        sm.add_widget(ReviewOrdersClinic(name='review_orders_clinic'))
+        sm.add_widget(ReviewOrdersManufacturer(name='review_orders_manufacturer'))
+        sm.add_widget(SelectOrder(name='select_order'))
+        sm.add_widget(OrderInformation(name='order_information'))
 
         return sm
+
+    def fulfillment_confirmation(self):
+        self.root.get_screen('OrderInformation').ids.done_order_button.disabled = False
 
     def existing_clinic_clicked(self):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
