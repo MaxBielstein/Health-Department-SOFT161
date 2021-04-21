@@ -203,3 +203,7 @@ if __name__ == '__main__':
         print('Database setup failed!', file=stderr)
         print(f'Cause: {exception}', file=stderr)
         exit(1)
+    except FileNotFoundError:
+        print('Database connection failed!')
+        print('credentials.json not found')
+        exit(1)
