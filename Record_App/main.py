@@ -285,14 +285,15 @@ def new_person(self, name, patient_id, birthdate_month, birthdate_day, birthdate
 
 # if column name is None then it returns the whole table
 with open('credentials.json', 'r') as credentials_file:
-    data = json.load(credentials_file)
-    host = data['host']
-    user = data['username']
-    password = data['password']
+    credentials = json.load(credentials_file)
+    host = credentials['host']
+    database_name = credentials['database']
+    user = credentials['username']
+    password = credentials['password']
 
 
 def get_sql_data(table_name, column_name):
-    database = mysql.connector.connect(host=host, database='ethanr', user=user, password=password)
+    database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
     finder = database.cursor(buffered=True)
     if column_name is None:
         finder.execute(f'SELECT * FROM {table_name}')
@@ -307,7 +308,7 @@ def get_sql_data(table_name, column_name):
 
 # returns a single element from table
 def get_specific_sql_data(table_name, column, identifier_column, oracle):
-    database = mysql.connector.connect(host=host, database='ethanr', user=user, password=password)
+    database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
     finder = database.cursor(buffered=True)
     finder.execute(f'select {column} from {table_name} where {identifier_column} = \"{oracle}\"')
     result = finder.fetchall()
@@ -323,7 +324,7 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
 
 # This returns a People object associated with the parameter patient_id as well as the session to commit the data
 def get_person_data(patient_id):
-    url = RecordDatabase.construct_mysql_url(host, 3306, 'ethanr', user, password)
+    url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
     record_database = RecordDatabase(url)
     session = record_database.create_session()
     person_data = session.query(People).filter(People.patient_id == patient_id).one()
@@ -332,7 +333,7 @@ def get_person_data(patient_id):
 
 # This is a simple method for adding data to the sql database
 def sql_input(data):
-    url = RecordDatabase.construct_mysql_url(host, 3306, 'ethanr', user, password)
+    url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
     record_database = RecordDatabase(url)
     session = record_database.create_session()
     session.add(data)

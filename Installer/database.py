@@ -177,9 +177,10 @@ if __name__ == '__main__':
         with open('credentials.json', 'r') as credentials_file:
             data = json.load(credentials_file)
             host = data['host']
+            database_name = data['database']
             user = data['username']
             password = data['password']
-        url = RecordDatabase.construct_mysql_url(host, 3306, 'ethanr', user, password)
+        url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
         record_database = RecordDatabase(url)
         record_database.ensure_tables_exist()
         session = record_database.create_session()
