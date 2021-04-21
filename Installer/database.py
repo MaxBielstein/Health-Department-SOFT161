@@ -114,6 +114,7 @@ class PeopleLots(Persisted):
     lot_id = Column(Integer, ForeignKey('lots.lot_id', ondelete='CASCADE'), primary_key=True)
     patient_id = Column(Integer, ForeignKey('people.patient_id', ondelete='CASCADE'), primary_key=True)
     vaccination_date = Column(DateTime)
+    patient_temperature = Column(Integer)
     lot = relationship('Lots', back_populates='people_lots')
     person = relationship('People', back_populates='people_lots')
 
