@@ -47,6 +47,17 @@
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'order_vaccine'
 
+        MDFillRoundFlatButton:
+            text: 'Review Orders'
+            font_size: 30
+            pos_hint: {'center_x': 0.5,}
+            size: 0, 60
+            size_hint: None, None
+            increment_width: 230
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'review_orders_clinic'
+
 <ClinicScreen>
 
     MDCard:
@@ -63,11 +74,6 @@
 
             MDBoxLayout:
                 orientation: 'vertical'
-
-                MDLabel:
-                    text: 'Add/Edit Vaccination Clinic'
-                    font_size: 45
-                    halign: 'center'
 
                 MDBoxLayout:
                     orientation: 'horizontal'
@@ -88,6 +94,11 @@
                     MDRaisedButton:
                         text: 'New Clinic'
                         font_size: 30
+
+                MDLabel:
+                    text: 'Add/Edit Vaccination Clinic'
+                    font_size: 45
+                    halign: 'center'
 
                 Widget:
                     size_hint_y: None
@@ -167,15 +178,6 @@
             MDBoxLayout:
                 orientation: 'vertical'
 
-                MDLabel:
-                    text: 'Add/Edit Vaccination Clinic'
-                    font_size: 45
-                    halign: 'center'
-
-                Widget:
-                    size_hint_y: None
-                    height: 10
-
                 MDBoxLayout:
                     orientation: 'horizontal'
                     size_hint: None, None
@@ -194,6 +196,14 @@
                         on_press:
                             root.manager.transition.duration = 0
                             root.manager.current = 'clinic'
+                Widget:
+                    size_hint_y: None
+                    height: 10
+
+                MDLabel:
+                    text: 'Add/Edit Vaccination Clinic'
+                    font_size: 45
+                    halign: 'center'
 
             MDBoxLayout:
                 orientation: 'vertical'
@@ -202,9 +212,7 @@
                 size: self.minimum_size
                 pos_hint: {'center_x': 0.5,}
 
-                Widget:
-                    size_hint_y: None
-                    height: 10
+
 
                 Spinner:
                     id: clinics_spinner
@@ -257,9 +265,9 @@
                 font_size: 30
                 on_press:
                     root.manager.transition.duration = 0.4
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'm_for_clinic'
-                    app.load_manufacturer_spinners_for_clinics()
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
 
 
             MDRaisedButton:
@@ -270,7 +278,7 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
-
+                    app.load_manufacturer_spinners_for_clinics()
 
 
         Widget:
@@ -644,13 +652,16 @@
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
-            Widget:
-                size_hint_y: None
-                height: 10
-
             MDTextField:
                 hint_text: 'Number of Doses'
                 id: order_doses
+                write_tab: False
+                multiline: False
+                font_size: 30
+
+            MDTextField:
+                hint_text: 'Order ID'
+                id: order_id
                 write_tab: False
                 multiline: False
                 font_size: 30
@@ -688,4 +699,379 @@
             size_hint_y: None
             height: 10
 
-<ReviewOrders>
+<ReviewOrdersClinic>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+
+                MDRectangleFlatButton:
+                    text: 'Manufacturer Orders'
+                    theme_text_color: 'Primary'
+                    text_color: 0, 0.5, 1, 1
+                    font_size: 30
+                    on_press:
+                        root.manager.transition.duration = 0
+                        root.manager.current = 'review_orders_manufacturer'
+
+                MDRaisedButton:
+                    text: 'Clinic Orders'
+                    font_size: 30
+
+            MDLabel:
+                text: 'Select a clinic to see its Outstanding Orders'
+                font_size: 30
+                halign: 'center'
+
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select a Clinic'
+                font_size: 30
+                id: select_clinic_review_order
+                background_color: 0, 1.5, 4, 1
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
+                text: 'Continue'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'select_order'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<ReviewOrdersManufacturer>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+
+                MDRaisedButton:
+                    text: 'Manufacturer Orders'
+                    font_size: 30
+
+
+                MDRectangleFlatButton:
+                    text: 'Clinic Orders'
+                    theme_text_color: 'Primary'
+                    text_color: 0, 0.5, 1, 1
+                    font_size: 30
+                    on_press:
+                        root.manager.transition.duration = 0
+                        root.manager.current = 'review_orders_clinic'
+
+            MDLabel:
+                text: 'Select a Manufacturer to see its Outstanding Orders'
+                font_size: 30
+                halign: 'center'
+
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select a Manufacturer'
+                font_size: 30
+                id: select_manufacturer_review_order
+                background_color: 0, 1.5, 4, 1
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
+                text: 'Continue'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'select_order'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<SelectOrder>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Select an Order to Review'
+                font_size: 30
+                halign: 'center'
+
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select an Order'
+                font_size: 30
+                id: select_order_to_review
+                background_color: 0, 1.5, 4, 1
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'review_orders_clinic'
+
+            MDRaisedButton:
+                text: 'Continue'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'order_information'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<OrderInformation>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Order Information'
+                font_size: 45
+                halign: 'center'
+
+            Widget:
+                size_hint_y: None
+                height: 10
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Order ID:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_order_id
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Clinic:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_clinic
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Manufacturer:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_manufacturer
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Doses:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_doses
+
+            MDLabel:
+                text: 'Confirm Fulfillment'
+                font_size: 30
+                halign: 'center'
+
+            MDSwitch:
+                on_active: root.ids.done_order_button.disabled=False
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'review_orders_clinic'
+
+            MDRaisedButton:
+                text: 'Done'
+                font_size: 30
+                disabled: True
+                id: done_order_button
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'home'
+
+        Widget:
+            size_hint_y: None
+            height: 10
