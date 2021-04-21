@@ -525,7 +525,7 @@
                 font_size: 30
 
             MDTextField:
-                id: new_vaccine_ID
+                id: new_vaccine_id
                 hint_text: 'Vaccine ID'
                 write_tab: False
                 multiline: False
@@ -551,6 +551,8 @@
                 text: 'Add'
                 id: add_new_vaccine
                 font_size: 30
+                on_press:
+                    app.create_new_vaccine()
 
     MDBoxLayout:
         orientation: 'vertical'
