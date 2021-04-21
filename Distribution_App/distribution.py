@@ -117,8 +117,10 @@ class DistributionApp(MDApp):
                 'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text:
             print("no selection made")
         else:
-            # to be implimented
-            pass
+            new_vaccine_manufacturer_ID_property = get_specific_sql_data('manufacturers', 'manufacturer_id',
+                                                                         'manufacturer_name', self.root.get_screen(
+                    'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text)
+        print(new_vaccine_manufacturer_ID_property)
 
     # The following methods handle creating a new clinic, checking its requirements, and adding it to the database
     def create_new_clinic(self):
