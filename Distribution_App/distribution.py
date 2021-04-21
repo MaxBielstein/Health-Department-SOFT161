@@ -17,32 +17,42 @@ import mysql.connector
 class ClinicScreen(Screen):
     pass
 
+
 class ManufacturerForVaccine(Screen):
     pass
+
 
 class ExistingClinic(Screen):
     pass
 
+
 class SelectManufacturerForClinic(Screen):
     pass
+
 
 class NewVaccineScreen(Screen):
     pass
 
+
 class OrderVaccineScreen(Screen):
     pass
+
 
 class ReviewOrdersClinic(Screen):
     pass
 
+
 class ReviewOrdersManufacturer(Screen):
     pass
+
 
 class SelectOrder(Screen):
     pass
 
+
 class OrderInformation(Screen):
     pass
+
 
 class HomeScreen(Screen):
     pass
@@ -129,8 +139,10 @@ class DistributionApp(MDApp):
         else:
             new_vaccine_manufacturer_ID_property = get_specific_sql_data('manufacturers', 'manufacturer_id',
                                                                          'manufacturer_name', self.root.get_screen(
-                    'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text)
-        print(new_vaccine_manufacturer_ID_property)
+                    'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text)[0]
+            self.root.get_screen('m_for_vaccine').ids.manufacturer_chosen_for_new_vaccine.text = \
+                get_specific_sql_data('manufacturers', 'manufacturer_name',
+                                      'manufacturer_id', new_vaccine_manufacturer_ID_property)[0]
 
     # The following methods handle creating a new clinic, checking its requirements, and adding it to the database
     def create_new_clinic(self):
