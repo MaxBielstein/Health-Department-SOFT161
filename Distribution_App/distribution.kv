@@ -6,7 +6,6 @@
         elevation: 5
         padding: 25
         spacing: 25
-
         orientation: 'vertical'
 
         MDLabel:
@@ -14,15 +13,12 @@
             font_size: 30
             halign: 'center'
 
-
         MDFillRoundFlatButton:
             text: 'Add/Edit Vaccination Clinics'
             font_size: 30
             pos_hint: {'center_x': 0.5,}
-
             size: 0, 60
             size_hint: None, None
-
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'clinic'
@@ -31,28 +27,36 @@
             text: 'New Vaccine'
             font_size: 30
             pos_hint: {'center_x': 0.5,}
-
             size: 0, 60
             size_hint: None, None
             increment_width: 240
-
-
             on_press:
+                app.load_manufacturer_spinners_for_vaccines()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'new_vaccine'
+
 
         MDFillRoundFlatButton:
             text: 'Order Vaccine'
             font_size: 30
             pos_hint: {'center_x': 0.5,}
-
             size: 0, 60
             size_hint: None, None
             increment_width: 230
-
             on_press:
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'order_vaccine'
+
+        MDFillRoundFlatButton:
+            text: 'Review Orders'
+            font_size: 30
+            pos_hint: {'center_x': 0.5,}
+            size: 0, 60
+            size_hint: None, None
+            increment_width: 230
+            on_press:
+                root.manager.transition.direction = 'left'
+                root.manager.current = 'review_orders_clinic'
 
 <ClinicScreen>
 
@@ -63,7 +67,6 @@
         elevation: 5
         padding: 25
         spacing: 25
-
         orientation: 'vertical'
 
         MDBoxLayout:
@@ -71,10 +74,6 @@
 
             MDBoxLayout:
                 orientation: 'vertical'
-                MDLabel:
-                    text: 'Add/Edit Vaccination Clinic'
-                    font_size: 45
-                    halign: 'center'
 
                 MDBoxLayout:
                     orientation: 'horizontal'
@@ -96,20 +95,33 @@
                         text: 'New Clinic'
                         font_size: 30
 
+                MDLabel:
+                    text: 'Add/Edit Vaccination Clinic'
+                    font_size: 45
+                    halign: 'center'
+
                 Widget:
                     size_hint_y: None
                     height: 40
 
                 MDTextField:
                     hint_text: 'Clinic Name'
-                    id: new_clinic_name
+                    id:new_clinic_name
                     write_tab: False
                     multiline: False
                     font_size: 25
 
                 MDTextField:
                     hint_text: 'Clinic Address'
-                    id: new_clinic_address
+                    id:new_clinic_address
+                    write_tab: False
+                    multiline: False
+                    font_size: 25
+
+                MDTextField:
+                    hint_text: 'Clinic ID'
+                    input_filter: 'int'
+                    id:new_clinic_id
                     write_tab: False
                     multiline: False
                     font_size: 25
@@ -126,6 +138,14 @@
             pos_hint: {'center_x': 0.5,}
 
             MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
                 id: create_new_clinic
                 text: 'Add and Select Clinic'
                 font_size: 30
@@ -133,14 +153,8 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
-
-            MDRaisedButton:
-                text: 'Back'
-                font_size: 30
-                on_press:
-                    root.manager.transition.duration = 0.4
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'home'
+                    app.create_new_clinic()
+                    app.load_manufacturer_spinners_for_clinics()
 
         Widget:
             size_hint_y: None
@@ -156,7 +170,6 @@
         elevation: 5
         padding: 25
         spacing: 25
-
         orientation: 'vertical'
 
         MDBoxLayout:
@@ -164,15 +177,6 @@
 
             MDBoxLayout:
                 orientation: 'vertical'
-
-                MDLabel:
-                    text: 'Add/Edit Vaccination Clinic'
-                    font_size: 45
-                    halign: 'center'
-
-                Widget:
-                    size_hint_y: None
-                    height: 10
 
                 MDBoxLayout:
                     orientation: 'horizontal'
@@ -192,6 +196,14 @@
                         on_press:
                             root.manager.transition.duration = 0
                             root.manager.current = 'clinic'
+                Widget:
+                    size_hint_y: None
+                    height: 10
+
+                MDLabel:
+                    text: 'Add/Edit Vaccination Clinic'
+                    font_size: 45
+                    halign: 'center'
 
             MDBoxLayout:
                 orientation: 'vertical'
@@ -200,9 +212,7 @@
                 size: self.minimum_size
                 pos_hint: {'center_x': 0.5,}
 
-                Widget:
-                    size_hint_y: None
-                    height: 10
+
 
                 Spinner:
                     id: clinics_spinner
@@ -251,6 +261,16 @@
             pos_hint: {'center_x': 0.5,}
 
             MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+
+
+            MDRaisedButton:
                 text: 'Select Clinic'
                 id: select_clinic_existing
                 font_size: 30
@@ -258,14 +278,8 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
+                    app.load_manufacturer_spinners_for_clinics()
 
-            MDRaisedButton:
-                text: 'Back'
-                font_size: 30
-                on_press:
-                    root.manager.transition.duration = 0.4
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'home'
 
         Widget:
             size_hint_y: None
@@ -284,206 +298,783 @@
 
         MDBoxLayout:
             orientation: 'vertical'
-            Spinner:
-                size_hint: None, None
-                size: 500, 100
-                pos_hint: {'center': 'center'}
-                text: 'Manufacturers'
-                id: select_manufacturer_for_clinic_spinner
-                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: "Add/Remove Manufacturers from clinic"
+                font_size: 35
+
+
+
+            Widget:
+                size_hint_y: None
+                height: 30
+                halign: 'center'
+
+
+            MDLabel:
+                text: "Select a manufacturer from available manufacturers then press add to add a manufacturer"
+                font_size: 15
+                halign: 'center'
+
+            Widget:
+                size_hint_y: None
+                height: 3
+                halign: 'center'
+
+            MDLabel:
+                text: "Select a manufacturer from current manufacturers then press remove to remove a manufacturer"
+                font_size: 15
+                halign: 'center'
+
             MDBoxLayout:
                 orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                Spinner:
+                    size_hint: None, None
+                    size: 250, 60
+                    pos_hint: {'center': 'center'}
+                    text: 'Available Manufacturers'
+                    font_size: 20
+                    id: select_manufacturer_to_remove_for_clinic_spinner
+                    background_color: 0, 1.5, 4, 1
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+                Spinner:
+                    size_hint: None, None
+                    size: 250, 60
+                    pos_hint: {'center': 'center'}
+                    text: 'Current Manufacturers'
+                    font_size: 20
+                    id: select_manufacturer_to_add_for_clinic_spinner
+                    background_color: 0, 1.5, 4, 1
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+            Widget:
+                size_hint_y: None
+                height: 10
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
                 MDRaisedButton:
                     text: 'Add'
                     id: add_manufacturer_for_clinic
-                    font_size: 60
+                    font_size: 30
+                    on_press:
+                        app.load_manufacturer_spinners_for_clinics()
 
                 MDRaisedButton:
                     text: 'Remove'
                     id: remove_manufacturer_for_clinic
-                    font_size: 60
+                    font_size: 30
+                    on_press:
+                        app.load_manufacturer_spinners_for_clinics()
+
     MDBoxLayout:
-        orientation: 'horizontal'
-        MDRaisedButton:
-            text: 'Back'
-            font_size: 60
-            on_press:
-                root.manager.transition.direction = 'right'
-                root.manager.current = 'clinic'
-        MDRaisedButton:
-            text: 'Done'
-            id: done_manufacturer_for_clinic
-            font_size: 60
-            on_press:
-                root.manager.transition.direction = 'right'
-                root.manager.current = 'home'
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'clinic'
+
+            MDRaisedButton:
+                text: 'Done'
+                id: done_manufacturer_for_clinic
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+        Widget:
+            size_hint_y: None
+            height: 10
 
 <NewVaccineScreen>
-    BoxLayout:
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
         orientation: 'vertical'
-        BoxLayout:
+
+        MDBoxLayout:
             orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Select a Manufacturer for the New Vaccine'
+                font_size: 30
+                halign: 'center'
+
+            Widget:
+                size_hint_y: None
+                height: 60
+
             Spinner:
                 size_hint: None, None
                 size: 500, 100
                 pos_hint: {'center': 'center'}
                 text: 'Select a Manufacturer'
+                font_size: 30
                 id: select_manufacturer_for_new_vaccine_spinner
-                values: 'Manufacturer 1', 'Manufacturer 1', 'Manufacturer 3', 'Manufacturer 4'
+                background_color: 0, 1.5, 4, 1
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
-            Button:
-                text: 'Continue'
-                id: manufacturer_choosen_for_new_vaccine_confirm
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'm_for_vaccine'
-            Button:
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
 
-<ManufacturerForVaccine>
-    BoxLayout:
-        orientation: 'vertical'
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: 'Selected Manufacturer For Vaccine'
-                font_size: 60
-
-            Label:
-                text: 'Prefill'
-                id: manufacturer_choosen_for_new_vaccine
+            MDRaisedButton:
+                text: 'Continue'
+                id: manufacturer_chosen_for_new_vaccine_confirm
                 font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'm_for_vaccine'
+                    app.get_selected_manufacturer_for_vaccines()
 
-            Label:
-                text: 'Vaccine Name'
-                font_size: 60
+        Widget:
+            size_hint_y: None
+            height: 10
 
-            TextInput:
+<ManufacturerForVaccine>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Selected Manufacture:'
+                    font_size: 20
+                    halign: 'center'
+
+                MDLabel:
+                    text: ''
+                    id: manufacturer_chosen_for_new_vaccine
+                    font_size: 20
+                    halign: 'center'
+
+            MDTextField:
+                hint_text: 'Vaccine Name'
                 id: new_vaccine_name
                 write_tab: False
                 multiline: False
-                font_size: 60
+                font_size: 30
 
-            Label:
-                text: 'Associated Disease'
-                font_size: 60
+            MDTextField:
+                id: new_vaccine_id
+                hint_text: 'Vaccine ID'
+                write_tab: False
+                multiline: False
+                font_size: 30
+                input_filter: 'int'
 
-            TextInput:
+            MDTextField:
+                hint_text: 'Associated Disease'
                 id: new_vaccine_disease
                 write_tab: False
                 multiline: False
-                font_size: 60
+                font_size: 30
 
-            Label:
-                text: 'Required Doses'
-                font_size: 60
-
-            TextInput:
+            MDTextField:
+                hint_text: 'Required Doses'
                 id: new_vaccine_required_doses
                 write_tab: False
                 multiline: False
-                font_size: 60
+                font_size: 30
+                input_filter: 'int'
 
-            BoxLayout:
-                orientation: 'horizontal'
-                Button:
-                    text: 'Add'
-                    id: add_new_vaccine
-                    font_size: 60
-                Button:
-                    text: 'Done'
-                    id: save_new_vaccine
-                    font_size: 60
-                    on_press:
-                        root.manager.transition.direction = 'right'
-                        root.manager.current = 'home'
-            Button:
+            MDRaisedButton:
+                text: 'Add'
+                id: add_new_vaccine
+                font_size: 30
+                on_press:
+                    app.create_new_vaccine()
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'new_vaccine'
 
+            MDRaisedButton:
+                text: 'Done'
+                id: save_new_vaccine
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
 <OrderVaccineScreen>
-    BoxLayout:
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
         orientation: 'vertical'
-        BoxLayout:
+
+        MDLabel:
+            text: 'Fill out information for the order'
+            font_size: 45
+            halign: 'center'
+
+
+        MDBoxLayout:
             orientation: 'vertical'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Select a Clinic'
+                    font_size: 15
+                    id: clinic_order_vaccine_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Select a Disease'
+                    font_size: 15
+                    id: order_select_disease
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Disease 1', 'Disease 2', 'Disease 3', 'Disease 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Select a Manufacturer'
+                    font_size: 15
+                    id: order_manufacturer_spinner
+                    background_color: 0, 1.5, 4, 1
+                    values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
+                    on_text:
+                        print("The spinner {} has text {}".format(self, self.text))
+
+            MDTextField:
+                hint_text: 'Number of Doses'
+                id: order_doses
+                write_tab: False
+                multiline: False
+                font_size: 30
+
+            MDTextField:
+                hint_text: 'Order ID'
+                id: order_id
+                write_tab: False
+                multiline: False
+                font_size: 30
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
+                text: 'Order'
+                id: add_new_order
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<ReviewOrdersClinic>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+
+                MDRectangleFlatButton:
+                    text: 'Manufacturer Orders'
+                    theme_text_color: 'Primary'
+                    text_color: 0, 0.5, 1, 1
+                    font_size: 30
+                    on_press:
+                        root.manager.transition.duration = 0
+                        root.manager.current = 'review_orders_manufacturer'
+
+                MDRaisedButton:
+                    text: 'Clinic Orders'
+                    font_size: 30
+
+            MDLabel:
+                text: 'Select a clinic to see its Outstanding Orders'
+                font_size: 30
+                halign: 'center'
+
             Spinner:
                 size_hint: None, None
                 size: 500, 100
                 pos_hint: {'center': 'center'}
                 text: 'Select a Clinic'
-                id: clinic_order_vaccine_spinner
-                values: 'Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4'
+                font_size: 30
+                id: select_clinic_review_order
+                background_color: 0, 1.5, 4, 1
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
 
-            Spinner:
-                size_hint: None, None
-                size: 500, 100
-                pos_hint: {'center': 'center'}
-                text: 'Select a Disease'
-                id: order_select_disease
-                values: 'Disease 1', 'Disease 2', 'Disease 3', 'Disease 4'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
-            Button:
-                text: 'Continue'
-                id: add_new_order
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'm_for_order'
-            Button:
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
                 text: 'Back'
-                font_size: 60
+                font_size: 30
                 on_press:
+                    root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
 
-<OrderManufacturer>
-    BoxLayout:
+            MDRaisedButton:
+                text: 'Continue'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'select_order'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<ReviewOrdersManufacturer>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
         orientation: 'vertical'
-        BoxLayout:
+
+        MDBoxLayout:
             orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+
+                MDRaisedButton:
+                    text: 'Manufacturer Orders'
+                    font_size: 30
+
+
+                MDRectangleFlatButton:
+                    text: 'Clinic Orders'
+                    theme_text_color: 'Primary'
+                    text_color: 0, 0.5, 1, 1
+                    font_size: 30
+                    on_press:
+                        root.manager.transition.duration = 0
+                        root.manager.current = 'review_orders_clinic'
+
+            MDLabel:
+                text: 'Select a Manufacturer to see its Outstanding Orders'
+                font_size: 30
+                halign: 'center'
 
             Spinner:
                 size_hint: None, None
                 size: 500, 100
                 pos_hint: {'center': 'center'}
                 text: 'Select a Manufacturer'
-                id: order_manufacturer_spinner
-                values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
+                font_size: 30
+                id: select_manufacturer_review_order
+                background_color: 0, 1.5, 4, 1
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
-            Label:
-                text: 'Number Of Doses'
-                font_size: 60
-            TextInput:
-                id: order_doses
-                write_tab: False
-                multiline: False
-                font_size: 60
-            Button:
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
+                text: 'Continue'
+                font_size: 30
+                on_press:
+                    root.manager.transition.duration = 0.4
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'select_order'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<SelectOrder>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Select an Order to Review'
+                font_size: 30
+                halign: 'center'
+
+            Spinner:
+                size_hint: None, None
+                size: 500, 100
+                pos_hint: {'center': 'center'}
+                text: 'Select an Order'
+                font_size: 30
+                id: select_order_to_review
+                background_color: 0, 1.5, 4, 1
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'review_orders_clinic'
+
+            MDRaisedButton:
+                text: 'Continue'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'order_information'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+<OrderInformation>
+
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Order Information'
+                font_size: 45
+                halign: 'center'
+
+            Widget:
+                size_hint_y: None
+                height: 10
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Order ID:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_order_id
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Clinic:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_clinic
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Manufacturer:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_manufacturer
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Doses:'
+                    font_size: 30
+                    halign: 'right'
+
+                MDLabel:
+                    text: 'Prefill'
+                    font_size: 30
+                    halign: 'left'
+                    id: order_information_doses
+
+            MDLabel:
+                text: 'Confirm Fulfillment'
+                font_size: 30
+                halign: 'center'
+
+            MDSwitch:
+                on_active: root.ids.done_order_button.disabled=False
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+        size_hint: None, None
+        size: self.minimum_size
+        pos_hint: {'center_x': 0.5,}
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back'
+                font_size: 30
+                on_press:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'review_orders_clinic'
+
+            MDRaisedButton:
                 text: 'Done'
-                id: order_order
-                font_size: 60
+                font_size: 30
+                disabled: True
+                id: done_order_button
                 on_press:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'home'
-            Button:
-                text: 'Back'
-                font_size: 60
-                on_press:
-                    root.manager.transition.direction = 'right'
-                    root.manager.current = 'order_vaccine'
 
+        Widget:
+            size_hint_y: None
+            height: 10

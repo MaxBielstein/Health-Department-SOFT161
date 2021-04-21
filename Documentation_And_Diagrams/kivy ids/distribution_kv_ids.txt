@@ -12,30 +12,32 @@ ExistingClinic Screen IDs:
     select_clinic_existing - Select Clinic Button
 
 SelectManufacturerForClinic IDs:
-    select_manufacturer_for_clinic_spinner - Spinner to choose a manufacturer for a clinic
+    select_manufacturer_to_add_for_clinic_spinner - Spinner to choose a manufacturer to add for a clinic
+    select_manufacturer_to_remove_for_clinic_spinner - Spinner to choose a manufacturer to remove for a clinic
     add_manufacturer_for_clinic - Adds selected manufacturer to clinic assignment
     remove_manufacturer_for_clinic - Removes selected manufacturer from a clinic assignment
     done_manufacturer_for_clinic - Finalizes changes made to manufacturer list
 
 NewVaccineScreen IDs:
     select_manufacturer_for_new_vaccine_spinner - Spinner to choose a manufacturer for the new 
-    manufacturer_choosen_for_new_vaccine_confirm - Button that confirms choosen manufacturer and moves on
+    manufacturer_chosen_for_new_vaccine_confirm - Button that confirms chosen manufacturer and moves on
 
-ManufacturerForVaccine:
-    manufacturer_choosen_for_new_vaccine - Label that shows the selected manufacturer for the new vaccine
+ManufacturerForVaccine IDs:
+    manufacturer_chosen_for_new_vaccine - Label that shows the selected manufacturer for the new vaccine
     new_vaccine_name - Textfield that takes the name for the new vaccine being created
     new_vaccine_disease - Textfield that takes the associated disease for the new vaccine being created
     new_vaccine_required_doses - Textfield that takes the required doses for the new vaccine being created
     add_new_vaccine - Button that adds the new vaccine created
     save_new_vaccine - Done button that should commit the new vaccine to the database
 
-OrderVaccineScreen:
+OrderVaccine IDs:
     clinic_order_vaccine_spinner - Spinner to choose a clinic to order for
     order_select_disease - Spinner to choose disease to order vaccine for
     add_new_order - Button to advance order process to next screen could be used to save current screens values to temp varriables
-
-OrderManufacturer:
     order_manufacturer_spinner - Spinner to choose what manufacturer will be making the order
     order_doses - Textfield that gets the number of doses for the order
-    order_order - Done button that should commit order to database
+    order_order - Order button that should commit order to database
+
+
+    
 

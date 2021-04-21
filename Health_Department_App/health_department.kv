@@ -1,0 +1,35 @@
+<HomeScreen>
+    MDCard:
+        size_hint: None, None
+        size: 600, 400
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDLabel:
+                text: 'Health Department App'
+                font_size: 45
+                halign: 'center'
+
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Enter Credentials for Database'
+                    font_size: 30
+                    halign: 'center'
+
+                MDLabel:
+                    text: 'Enter Credentials for OpenMRS'
+                    font_size: 30
+                    halign: 'center'
+
