@@ -225,21 +225,24 @@ class VaccineRecordApp(App):
         self.root.ids.lot_dropdown.text = 'Select Lot'
 
     def update_person(self):
-        name = self.new_person_name
-        birthdate_month = self.new_person_birthdate_month
-        birthdate_day = self.new_person_birthdate_day
-        birthdate_year = self.new_person_birthdate_year
-        birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
-        person, session = get_person_data(self.new_person_patient_id)
-        person.name = name
-        person.birthdate = birthdate
-        self.confirm_screen('person_updated')
-        session.commit()
+        update_person_static(self)
 
 
 # These methods below where made static so that tests could but run on them
 # with a different sql database
 # They all attempt to input some type of data into the database
+
+def update_person_static(self):
+    name = self.new_person_name
+    birthdate_month = self.new_person_birthdate_month
+    birthdate_day = self.new_person_birthdate_day
+    birthdate_year = self.new_person_birthdate_year
+    birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
+    person, session = get_person_data(self.new_person_patient_id)
+    person.name = name
+    person.birthdate = birthdate
+    self.confirm_screen('person_updated')
+    session.commit()
 
 
 def new_vaccination_record(self, lot_id, name, vaccine_month, vaccine_day, vaccine_year):
