@@ -286,15 +286,19 @@ def new_person(self, name, patient_id, birthdate_month, birthdate_day, birthdate
 
 # These methods below query data from the database and return the specified data
 
+try:
+    with open('credentials.json', 'r') as credentials_file:
+        credentials = json.load(credentials_file)
+        host = credentials['host']
+        database_name = credentials['database']
+        user = credentials['username']
+        password = credentials['password']
+except FileNotFoundError:
+    print('Database connection failed!')
+    print('credentials.json not found')
+    exit(1)
+
 # if column name is None then it returns the whole table
-with open('credentials.json', 'r') as credentials_file:
-    credentials = json.load(credentials_file)
-    host = credentials['host']
-    database_name = credentials['database']
-    user = credentials['username']
-    password = credentials['password']
-
-
 def get_sql_data(table_name, column_name):
     database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
     finder = database.cursor(buffered=True)
