@@ -1,19 +1,14 @@
-from kivy.app import App
-from kivy.factory import Factory
-from kivy.properties import NumericProperty, StringProperty
-from kivymd.app import MDApp
+import mysql.connector
 from kivy.core.window import Window  # For inspection.
 from kivy.modules import inspector  # For inspection.
+from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivymd.uix.button import MDFlatButton
-from kivymd.uix.dialog import MDDialog
-from sqlalchemy import *
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from kivymd.app import MDApp
+
 from database import *
-import mysql.connector
 
 
+# Screen Classes
 class ClinicScreen(Screen):
     pass
 
@@ -61,7 +56,7 @@ class HomeScreen(Screen):
 Persisted = declarative_base()
 
 
-# noinspection PyInterpreter
+# Database
 class DistributionDatabase(object):
     @staticmethod
     def construct_mysql_url(authority, port, database, username, password):
@@ -83,6 +78,7 @@ class DistributionDatabase(object):
         return self.Session()
 
 
+# App Class
 class DistributionApp(MDApp):
     # clinics
     input_error_message = StringProperty('')
@@ -122,6 +118,7 @@ class DistributionApp(MDApp):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
+    # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
         self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
             'manufacturers',
@@ -132,20 +129,20 @@ class DistributionApp(MDApp):
             'manufacturers',
             'manufacturer_name')
 
+    # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
         if 'Select a Manufacturer' in self.root.get_screen(
                 'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text:
-            print("no selection made")
+            print("no selection made(this will be an error message)")
         else:
             self.new_vaccine_manufacturer_ID_property = get_specific_sql_data('manufacturers', 'manufacturer_id',
-                                                                         'manufacturer_name', self.root.get_screen(
+                                                                              'manufacturer_name', self.root.get_screen(
                     'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text)[0]
-            print(self.new_vaccine_manufacturer_ID_property)
             self.root.get_screen('m_for_vaccine').ids.manufacturer_chosen_for_new_vaccine.text = \
                 get_specific_sql_data('manufacturers', 'manufacturer_name',
                                       'manufacturer_id', self.new_vaccine_manufacturer_ID_property)[0]
 
-    # The following methods handle creating a new clinic, checking its requirements, and adding it to the database
+    # The following methods handle creating a new table entries and checking to be sure they have all the required parts
     def create_new_clinic(self):
         id_path = self.root.get_screen('clinic').ids
         if id_path.new_clinic_name.text is not '':
@@ -189,27 +186,20 @@ class DistributionApp(MDApp):
         return True
 
     def create_new_vaccine(self):
-        print('creating new vaccine')
         id_path = self.root.get_screen('m_for_vaccine').ids
         if id_path.new_vaccine_name.text is not '':
             self.new_vaccine_name_property = id_path.new_vaccine_name.text
-            print('name check')
 
         if id_path.new_vaccine_id.text is not '':
             self.new_vaccine_ID_property = id_path.new_vaccine_id.text
-            print('ID check')
 
         if id_path.new_vaccine_required_doses.text is not '':
             self.new_vaccine_doses_property = id_path.new_vaccine_required_doses.text
-            print('dose check')
 
         if id_path.new_vaccine_disease.text is not '':
             self.new_vaccine_disease_property = id_path.new_vaccine_disease.text
-            print('disease check')
 
         if self.check_for_required_inputs_new_vaccine():
-            print('inputs checked')
-            print(self.new_vaccine_manufacturer_ID_property)
             new_vaccine(self, self.new_vaccine_ID_property, self.new_vaccine_doses_property,
                         self.new_vaccine_disease_property, self.new_vaccine_name_property,
                         self.new_vaccine_manufacturer_ID_property)
@@ -246,6 +236,7 @@ class DistributionApp(MDApp):
         return True
 
 
+# These methods enter the table entries from the previous methods into the actual database.
 def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
@@ -257,16 +248,10 @@ def new_clinic(self, name, address, id):
 
 
 def new_vaccine(self, id, doses, disease, name, manufacturer_id):
-    print('about to create')
     vaccine = Vaccines(vaccine_id=id, required_doses=doses, relevant_disease=disease, vaccine_name=name,
                        manufacturer_id=manufacturer_id)
-    print(vaccine.manufacturer_id)
-    print(self.new_vaccine_manufacturer_ID_property)
-    print('Created')
     if int(vaccine.vaccine_id) not in get_sql_data('vaccines', 'vaccine_id'):
-        print('inputing')
         sql_input(vaccine)
-        print('input')
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
