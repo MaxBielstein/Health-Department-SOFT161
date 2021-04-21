@@ -147,9 +147,18 @@ def add_starter_data(session_to_add_to):
                                manufacturer=manufacturer2)
     smallpox_vaccine = Vaccines(relevant_disease='Smallpox', required_doses=1, vaccine_name='smallpox vaccine',
                                 manufacturer=manufacturer3)
+    anthrax_vaccine = Vaccines(relevant_disease='Anthrax', required_doses=1, vaccine_name='AVA (BioThrax)',
+                               manufacturer=manufacturer1)
+    mumps_vaccine = Vaccines(relevant_disease='Mumps', required_doses=1, vaccine_name='MMRV (ProQuad)',
+                             manufacturer=manufacturer2)
+    polio_vaccine = Vaccines(relevant_disease='Polio', required_doses=1, vaccine_name='Polio (Ipol)',
+                             manufacturer=manufacturer3)
     walter = People(name='Walter', patient_id=1, birthdate=birthdate_walter)
     kevin = People(name='kevin', patient_id=3, birthdate=kevin_birthdate)
     bob = People(name='Bob', patient_id=2, birthdate=birthdate_bob)
+    lot1 = Lots(vaccine=anthrax_vaccine, people_lots=[], manufacture_date=lot122_date, lot_id=1)
+    lot2 = Lots(vaccine=mumps_vaccine, people_lots=[], manufacture_date=lot122_date, lot_id=2)
+    lot3 = Lots(vaccine=polio_vaccine, people_lots=[], manufacture_date=lot122_date, lot_id=3)
     lot122 = Lots(vaccine=covid19_vaccine,
                   people_lots=[PeopleLots(person=walter, vaccination_date=walter_first_vaccination_date)],
                   lot_id=122, manufacture_date=lot122_date)
@@ -164,6 +173,9 @@ def add_starter_data(session_to_add_to):
                   people_lots=[PeopleLots(person=kevin, vaccination_date=kevin_vaccination_date)], lot_id=125,
                   manufacture_date=lot125_date)
     order1 = Orders(manufacturer=manufacturer1, vaccination_clinic=vaccination_clinic1, vaccine=covid19_vaccine)
+    session_to_add_to.add(lot1)
+    session_to_add_to.add(lot2)
+    session_to_add_to.add(lot3)
     session_to_add_to.add(lot122)
     session_to_add_to.add(lot123)
     session_to_add_to.add(lot124)
@@ -177,9 +189,10 @@ if __name__ == '__main__':
         with open('credentials.json', 'r') as credentials_file:
             data = json.load(credentials_file)
             host = data['host']
+            database_name = data['database']
             user = data['username']
             password = data['password']
-        url = RecordDatabase.construct_mysql_url(host, 3306, 'ethanr', user, password)
+        url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
         record_database = RecordDatabase(url)
         record_database.ensure_tables_exist()
         session = record_database.create_session()

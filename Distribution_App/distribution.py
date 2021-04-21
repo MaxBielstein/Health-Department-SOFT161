@@ -7,6 +7,9 @@ from kivymd.app import MDApp
 
 from database import *
 
+import mysql.connector
+import json
+
 
 # Screen Classes
 class ClinicScreen(Screen):
@@ -258,12 +261,19 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
         # Factory.MatchingIDError().open()
 
 
+# Loads the database credentials from the credentials.json file
+with open('credentials.json', 'r') as credentials_file:
+    data = json.load(credentials_file)
+    host = data['host']
+    database_name = data['database']
+    user = data['username']
+    password = data['password']
 
 # These methods below query data from the database and return the specified data
 
 # if column name is None then it returns the whole table
 def get_sql_data(table_name, column_name):
-    database = mysql.connector.connect(host='localhost', database='combined', user='root', password='cse1208')
+    database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
     finder = database.cursor(buffered=True)
     if column_name is None:
         finder.execute(f'SELECT * FROM {table_name}')
@@ -278,7 +288,7 @@ def get_sql_data(table_name, column_name):
 
 # returns a single element from table
 def get_specific_sql_data(table_name, column, identifier_column, oracle):
-    database = mysql.connector.connect(host='localhost', database='combined', user='root', password='cse1208')
+    database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
     finder = database.cursor(buffered=True)
     finder.execute(f'select {column} from {table_name} where {identifier_column} = \"{oracle}\"')
     result = finder.fetchall()
@@ -294,7 +304,7 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
 
 # This is a simple method for adding data to the sql database
 def sql_input(data):
-    url = DistributionDatabase.construct_mysql_url('localhost', 3306, 'combined', 'root', 'cse1208')
+    url = DistributionDatabase.construct_mysql_url(host, 3306, database_name, user, password)
     record_database = DistributionDatabase(url)
     session = record_database.create_session()
     session.add(data)
