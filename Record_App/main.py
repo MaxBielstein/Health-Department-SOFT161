@@ -304,7 +304,6 @@ def new_person(self, name, patient_id, birthdate_month, birthdate_day, birthdate
 # These methods below query data from the database and return the specified data
 
 
-
 # if column name is None then it returns the whole table
 def get_sql_data(table_name, column_name):
     database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)

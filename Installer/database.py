@@ -197,7 +197,6 @@ if __name__ == '__main__':
         record_database = RecordDatabase(url)
         record_database.ensure_tables_exist()
         session = record_database.create_session()
-        add_starter_data(session)
         session.commit()
         print('Tables created and populated')
     except SQLAlchemyError as exception:
