@@ -1,3 +1,4 @@
+import sqlalchemy
 from kivy.app import App
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
@@ -8,6 +9,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from sqlalchemy import *
+from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from database import *
@@ -29,34 +31,21 @@ class Health_departmentApp(MDApp):
         return sm
 
 
-def get_sql_data(table_name, column_name):
-    database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
-    finder = database.cursor(buffered=True)
-    if column_name is None:
-        finder.execute(f'SELECT * FROM {table_name}')
-        return finder.fetchall()
-    else:
-        finder.execute(f'SELECT {column_name} FROM {table_name}')
-        list_of_columns = []
-        for element in finder.fetchall():
-            list_of_columns.append(element[0])
-        return list_of_columns
+def connect_to_sql():
+    try:
+        url = RecordDatabase.construct_mysql_url(host, 3303, database_name, user, password)
+        record_database = RecordDatabase(url)
+        record_database.ensure_tables_exist()
+        global session
+        session = record_database.create_session()
+    except DatabaseError:
+        pass
+        # Database connection error
 
 
-# returns a single element from table
-def get_specific_sql_data(table_name, column, identifier_column, oracle):
-    database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)
-    finder = database.cursor(buffered=True)
-    finder.execute(f'select {column} from {table_name} where {identifier_column} = \"{oracle}\"')
-    result = finder.fetchall()
-    return_list = []
-    for item in result:
-        return_list.append(item[0])
-
-    if len(return_list) is not 0:
-        return return_list
-    else:
-        return []
+def get_all_people_lots():
+    vaccination_appointments = session.query(PeopleLots)
+    return vaccination_appointments
 
 
 def load_credentials_file():
@@ -83,8 +72,11 @@ global host
 global database_name
 global user
 global password
+global database
+global session
 
 if __name__ == '__main__':
     app = Health_departmentApp()
     app.run()
     load_credentials_file()
+    connect_to_sql()
