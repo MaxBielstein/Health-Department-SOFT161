@@ -64,8 +64,8 @@ def load_visits():
                                  on_visits_not_loaded)
 
 
-def load_patient():
-    get_parameters = {'limit': '100', 'startIndex': '0', 'q': '1000HU'}
+def load_patient(patient_id):
+    get_parameters = {'limit': '100', 'startIndex': '0', 'q': patient_id}
     rest_connection.send_request('patient', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
                                  on_visits_not_loaded)
 
@@ -111,8 +111,8 @@ def connect_to_databases():
     connect_to_sql()
     connect_to_openmrs()
     # TODO move to proper place, this is here for testing
-    # load_visits()
-    load_patients()
+    load_visits()
+    load_patient('1000HU')
 
 
 # Global variables:
