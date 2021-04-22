@@ -1,6 +1,12 @@
 from json import dumps
 
 import sqlalchemy
+from kivy import Config
+Config.set('graphics', 'width', '800')
+Config.set('graphics', 'height', '1200')
+Config.set('graphics', 'minimum_width', '800')
+Config.set('graphics', 'minimum_height', '1000')
+
 from kivy.app import App
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty

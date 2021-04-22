@@ -121,6 +121,13 @@ class DistributionApp(MDApp):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
+    def clear_new_vaccine_text(self):
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_name.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_id.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_disease.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_required_doses.text = ""
+        pass
+
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
         self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
@@ -131,6 +138,27 @@ class DistributionApp(MDApp):
         self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
+
+    def load_spinners_for_orders(self):
+        self.root.get_screen('review_orders_manufacturer').ids.select_manufacturer_review_order.values = get_sql_data(
+            'manufacturers',
+            'manufacturer_name')
+        self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.values = get_sql_data('vaccination_clinics',
+                                                                                         'clinic_name')
+
+
+
+    # This is for later entirely
+    def load_spinners_for_new_orders(self):
+        self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner = get_sql_data(
+            'manufacturers',
+            'manufacturer_name')
+        self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner = get_sql_data(
+            'vaccination_clinics',
+            'clinic_name')
+        self.root.get_screen('order_vaccine').ids.order_select_disease = get_sql_data(
+            'vaccination_clinics',
+            'clinic_name')
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
@@ -268,6 +296,7 @@ with open('credentials.json', 'r') as credentials_file:
     database_name = data['database']
     user = data['username']
     password = data['password']
+
 
 # These methods below query data from the database and return the specified data
 

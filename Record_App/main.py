@@ -26,6 +26,8 @@ except FileNotFoundError:
 
 # Global variable for the mysql url
 url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
+database = RecordDatabase(url)
+session = database.create_session()
 
 
 class VaccineRecordApp(App):
@@ -255,7 +257,7 @@ def update_person_static(self):
     birthdate_day = self.new_person_birthdate_day
     birthdate_year = self.new_person_birthdate_year
     birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
-    person, session = get_person_data(self.new_person_patient_id)
+    person, mysql_session = get_person_data(self.new_person_patient_id, session)
     person.name = name
     person.birthdate = birthdate
     self.confirm_screen('person_updated')
@@ -267,7 +269,7 @@ def new_vaccination_record(self, lot_id, name, vaccine_month, vaccine_day, vacci
     patient_id = get_specific_sql_data('people', 'patient_id', 'name', name)[0]
     record = PeopleLots(vaccination_date=vaccination_date, lot_id=lot_id, patient_id=patient_id)
     if record.lot_id not in get_specific_sql_data('people_lots', 'lot_id', 'patient_id', record.patient_id):
-        sql_input(record, url)
+        sql_input(record, session)
         self.confirm_screen('new_vaccination_confirmed')
     else:
         self.input_error_message = 'This person already has this vaccine!'
@@ -278,7 +280,7 @@ def new_lot(self, vaccine_id, lot_id, manufacture_month, manufacture_day, manufa
     manufacture_date = datetime(year=manufacture_year, day=manufacture_day, month=manufacture_month)
     lot = Lots(vaccine_id=vaccine_id, lot_id=lot_id, manufacture_date=manufacture_date)
     if int(lot.lot_id) not in get_sql_data('lots', 'lot_id'):
-        sql_input(lot, url)
+        sql_input(lot, session)
         self.root.current = 'new_vaccination'
         self.root.transition.direction = 'right'
         self.set_up_lots_spinner()
@@ -291,7 +293,7 @@ def new_person(self, name, patient_id, birthdate_month, birthdate_day, birthdate
     birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
     person = People(name=name, patient_id=patient_id, birthdate=birthdate)
     if int(person.patient_id) not in get_sql_data('people', 'patient_id'):
-        sql_input(person, url)
+        sql_input(person, session)
         self.confirm_screen('new_person_confirmed')
     else:
         Factory.MatchingIDError().open()
@@ -302,7 +304,6 @@ def new_person(self, name, patient_id, birthdate_month, birthdate_day, birthdate
 # to the database using mysqlconnector. Same thing for the other non-sqlalchemy query method below.
 
 # These methods below query data from the database and return the specified data
-
 
 
 # if column name is None then it returns the whole table
@@ -337,18 +338,13 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
 
 
 # This returns a People object associated with the parameter patient_id as well as the session to commit the data
-def get_person_data(patient_id):
-    url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
-    record_database = RecordDatabase(url)
-    session = record_database.create_session()
+def get_person_data(patient_id, session):
     person_data = session.query(People).filter(People.patient_id == patient_id).one()
     return person_data, session
 
 
 # This is a simple method for adding data to the sql database
-def sql_input(data, sql_url):
-    database = RecordDatabase(sql_url)
-    session = database.create_session()
+def sql_input(data, session):
     session.add(data)
     session.commit()
 
