@@ -31,7 +31,7 @@ session = database.create_session()
 
 
 class VaccineRecordApp(App):
-    new_person_patient_id = NumericProperty()
+    new_person_patient_id = StringProperty()
     new_person_name = StringProperty()
     new_person_birthdate_year = NumericProperty()
     new_person_birthdate_month = NumericProperty()
@@ -146,7 +146,7 @@ class VaccineRecordApp(App):
         if id_path.patient_id_entry_new_person.text is not '':
             self.new_person_patient_id = id_path.patient_id_entry_new_person.text
         else:
-            self.new_person_patient_id = 0
+            self.new_person_patient_id = ''
         self.new_person_name = id_path.name_entry_new_person.text
         if id_path.day_entry_new_person.text is not '':
             self.new_person_birthdate_day = int(id_path.day_entry_new_person.text)
@@ -171,7 +171,7 @@ class VaccineRecordApp(App):
             self.input_error_message = 'ID cannot be 0'
             Factory.NewInputError().open()
             return False
-        elif self.new_person_patient_id is 0:
+        elif self.new_person_patient_id is '0':
             self.input_error_message = 'Patient ID field must be filled'
             Factory.NewInputError().open()
             return False
@@ -292,7 +292,10 @@ def new_lot(self, vaccine_id, lot_id, manufacture_month, manufacture_day, manufa
 def new_person(self, name, patient_id, birthdate_month, birthdate_day, birthdate_year):
     birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
     person = People(name=name, patient_id=patient_id, birthdate=birthdate)
-    if int(person.patient_id) not in get_sql_data('people', 'patient_id'):
+    list_of_ids = []
+    for patient in get_sql_data('people', 'patient_id'):
+        list_of_ids.append(str(patient))
+    if person.patient_id not in list_of_ids:
         sql_input(person, session)
         self.confirm_screen('new_person_confirmed')
     else:
