@@ -10,8 +10,9 @@ class TestRecordApp(unittest.TestCase):
         database.ensure_tables_exist()
         session = database.create_session()
         new_person = People(name='Ada Lovelace', patient_id=1)
-        sql_input(new_person, url)
-        self.assertEqual(True, True)
+        session.add(new_person)
+        new_person_from_sql = session.query(People).filter(People.name == 'Ada Lovelace').one()
+        self.assertEqual(new_person.name, new_person_from_sql.name)
 
 
 if __name__ == '__main__':
