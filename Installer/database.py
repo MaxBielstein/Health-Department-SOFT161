@@ -112,7 +112,7 @@ class People(Persisted):
 class PeopleLots(Persisted):
     __tablename__ = 'people_lots'
     lot_id = Column(Integer, ForeignKey('lots.lot_id', ondelete='CASCADE'), primary_key=True)
-    patient_id = Column(Integer, ForeignKey('people.patient_id', ondelete='CASCADE'), primary_key=True)
+    patient_id = Column(String(256), ForeignKey('people.patient_id', ondelete='CASCADE'), primary_key=True)
     vaccination_date = Column(DateTime)
     patient_temperature = Column(Integer)
     lot = relationship('Lots', back_populates='people_lots')
@@ -154,9 +154,9 @@ def add_starter_data(session_to_add_to):
                              manufacturer=manufacturer2)
     polio_vaccine = Vaccines(relevant_disease='Polio', required_doses=1, vaccine_name='Polio (Ipol)',
                              manufacturer=manufacturer3)
-    walter = People(name='Walter', patient_id=1, birthdate=birthdate_walter)
-    kevin = People(name='kevin', patient_id=3, birthdate=kevin_birthdate)
-    bob = People(name='Bob', patient_id=2, birthdate=birthdate_bob)
+    walter = People(name='Walter', patient_id='1', birthdate=birthdate_walter)
+    kevin = People(name='kevin', patient_id='3', birthdate=kevin_birthdate)
+    bob = People(name='Bob', patient_id='2', birthdate=birthdate_bob)
     lot1 = Lots(vaccine=anthrax_vaccine, people_lots=[], manufacture_date=lot122_date, lot_id=1)
     lot2 = Lots(vaccine=mumps_vaccine, people_lots=[], manufacture_date=lot122_date, lot_id=2)
     lot3 = Lots(vaccine=polio_vaccine, people_lots=[], manufacture_date=lot122_date, lot_id=3)
