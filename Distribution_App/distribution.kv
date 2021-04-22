@@ -546,15 +546,19 @@
 
             Spinner:
                 size_hint: None, None
-                size: 175, 75
-                pos_hint: {'center': 'center'}
+                size: 500, 30
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
                 text: 'Select a Disease'
-                font_size: 15
+                font_size: 30
                 id: new_vaccine_disease
                 background_color: 0, 1.5, 4, 1
                 values: 'Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio'
                 on_text:
                     print("The spinner {} has text {}".format(self, self.text))
+
+            Widget:
+                size_hint_y: None
+                height: 10
 
             MDRaisedButton:
                 text: 'Add'
