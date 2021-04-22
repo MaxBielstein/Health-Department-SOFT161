@@ -44,6 +44,7 @@
             size_hint: None, None
             increment_width: 230
             on_press:
+                app.load_spinners_for_new_orders()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'order_vaccine'
 
@@ -533,12 +534,7 @@
                 font_size: 30
                 input_filter: 'int'
 
-            MDTextField:
-                hint_text: 'Associated Disease'
-                id: new_vaccine_disease
-                write_tab: False
-                multiline: False
-                font_size: 30
+
 
             MDTextField:
                 hint_text: 'Required Doses'
@@ -547,6 +543,22 @@
                 multiline: False
                 font_size: 30
                 input_filter: 'int'
+
+            Spinner:
+                size_hint: None, None
+                size: 500, 30
+                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+                text: 'Select a Disease'
+                font_size: 30
+                id: new_vaccine_disease
+                background_color: 0, 1.5, 4, 1
+                values: 'Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio'
+                on_text:
+                    print("The spinner {} has text {}".format(self, self.text))
+
+            Widget:
+                size_hint_y: None
+                height: 10
 
             MDRaisedButton:
                 text: 'Add'
@@ -629,7 +641,6 @@
                     font_size: 15
                     id: clinic_order_vaccine_spinner
                     background_color: 0, 1.5, 4, 1
-                    values: 'Clinic 1', 'Clinic 2', 'Clinic 3', 'Clinic 4'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -641,7 +652,7 @@
                     font_size: 15
                     id: order_select_disease
                     background_color: 0, 1.5, 4, 1
-                    values: 'Disease 1', 'Disease 2', 'Disease 3', 'Disease 4'
+                    values: 'Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -653,7 +664,6 @@
                     font_size: 15
                     id: order_manufacturer_spinner
                     background_color: 0, 1.5, 4, 1
-                    values: 'Manufacturer 1', 'Manufacturer 2', 'Manufacturer 3', 'Manufacturer 4'
                     on_text:
                         print("The spinner {} has text {}".format(self, self.text))
 
