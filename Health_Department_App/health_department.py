@@ -58,7 +58,7 @@ def load_visits():
                                  on_visits_not_loaded)
 
 
-def load_patients():
+def load_patient():
     get_parameters = {'limit': '100', 'startIndex': '0', 'q': '1000HU'}
     rest_connection.send_request('patient', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
                                  on_visits_not_loaded)
