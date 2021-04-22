@@ -1,3 +1,5 @@
+from json import dumps
+
 import sqlalchemy
 from kivy.app import App
 from kivy.factory import Factory
@@ -22,6 +24,12 @@ class HomeScreen(Screen):
 
 
 class Health_departmentApp(MDApp):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        load_credentials_file()
+        connect_to_databases()
+
     def build(self):
         self.theme_cls.primary_palette = "Blue"
 
@@ -42,6 +50,20 @@ def connect_to_sql():
     except DatabaseError:
         pass
         # Database connection error
+
+
+def load_visits():
+    get_parameters = {'v': 'full'}
+    rest_connection.send_request('visit', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
+                                 on_visits_not_loaded)
+
+
+def on_visits_loaded(_, response):
+    print(dumps(response, indent=4, sort_keys=True))
+
+
+def on_visits_not_loaded(_, error):
+    print(dumps(error, indent=2, sort_keys=True))
 
 
 def connect_to_openmrs():
@@ -76,6 +98,8 @@ def load_credentials_file():
 def connect_to_databases():
     connect_to_sql()
     connect_to_openmrs()
+    # TODO move to proper place, this is here for testing
+    load_visits()
 
 
 # Global variables:
@@ -90,6 +114,3 @@ global rest_connection
 if __name__ == '__main__':
     app = Health_departmentApp()
     app.run()
-    load_credentials_file()
-    # The following line will be called in kivy when fully implemented
-    connect_to_databases()
