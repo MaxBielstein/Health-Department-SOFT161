@@ -42,7 +42,7 @@ class Health_departmentApp(MDApp):
 
 def connect_to_sql():
     try:
-        url = RecordDatabase.construct_mysql_url(host, 3303, database_name, user, password)
+        url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
         record_database = RecordDatabase(url)
         record_database.ensure_tables_exist()
         global session
@@ -69,7 +69,7 @@ def on_visits_loaded(_, response):
 
 
 def on_visits_not_loaded(_, error):
-    print(dumps(error, indent=2, sort_keys=True))
+    pass
 
 
 def connect_to_openmrs():
