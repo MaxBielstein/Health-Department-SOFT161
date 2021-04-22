@@ -83,9 +83,9 @@ def add_starter_data(session_to_add_to):
     covid19_vaccine = Vaccines(relevant_disease='Covid', required_doses=2)
     measles_vaccine = Vaccines(relevant_disease='Measles', required_doses=1)
     smallpox_vaccine = Vaccines(relevant_disease='Smallpox', required_doses=1)
-    walter = People(name='Walter', patient_id=1, birthdate=birthdate_walter)
-    kevin = People(name='kevin', patient_id=3, birthdate=kevin_birthdate)
-    bob = People(name='Bob', patient_id=2, birthdate=birthdate_bob)
+    walter = People(name='Walter', patient_id='1', birthdate=birthdate_walter)
+    kevin = People(name='kevin', patient_id='3', birthdate=kevin_birthdate)
+    bob = People(name='Bob', patient_id='2', birthdate=birthdate_bob)
     lot122 = Lots(vaccine=covid19_vaccine,
                   people_lots=[PeopleLots(person=walter, vaccination_date=walter_first_vaccination_date)],
                   lot_id=122, manufacture_date=lot122_date)

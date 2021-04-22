@@ -6,7 +6,6 @@ from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
 import mysql.connector
 
-from Installer import RecordDatabase, People, Lots, PeopleLots
 
 import json
 
