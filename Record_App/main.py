@@ -11,6 +11,8 @@ import json
 
 
 # Loads the credentials to connect to the database
+from database import RecordDatabase, PeopleLots, Lots, People
+
 try:
     with open('credentials.json', 'r') as credentials_file:
         credentials = json.load(credentials_file)
