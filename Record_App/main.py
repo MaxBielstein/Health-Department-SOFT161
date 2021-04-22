@@ -257,7 +257,7 @@ def update_person_static(self):
     birthdate_day = self.new_person_birthdate_day
     birthdate_year = self.new_person_birthdate_year
     birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
-    person, session = get_person_data(self.new_person_patient_id)
+    person, mysql_session = get_person_data(self.new_person_patient_id, session)
     person.name = name
     person.birthdate = birthdate
     self.confirm_screen('person_updated')
@@ -338,10 +338,7 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
 
 
 # This returns a People object associated with the parameter patient_id as well as the session to commit the data
-def get_person_data(patient_id):
-    url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
-    record_database = RecordDatabase(url)
-    session = record_database.create_session()
+def get_person_data(patient_id, session):
     person_data = session.query(People).filter(People.patient_id == patient_id).one()
     return person_data, session
 
