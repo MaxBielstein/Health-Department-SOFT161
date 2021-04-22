@@ -298,6 +298,7 @@ except FileNotFoundError:
     print('credentials.json not found')
     exit(1)
 
+
 # if column name is None then it returns the whole table
 def get_sql_data(table_name, column_name):
     database = mysql.connector.connect(host=host, database=database_name, user=user, password=password)

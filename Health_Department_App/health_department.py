@@ -14,6 +14,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from database import *
 import mysql.connector
+from openmrs import RESTConnection
 
 
 class HomeScreen(Screen):
@@ -43,19 +44,24 @@ def connect_to_sql():
         # Database connection error
 
 
+def connect_to_openmrs():
+    global rest_connection
+    rest_connection = RESTConnection('localhost', 8080, 'admin', 'Admin123')
+
+
 def get_all_people_lots():
     vaccination_appointments = session.query(PeopleLots)
     return vaccination_appointments
 
 
 def load_credentials_file():
+    global host
+    global database_name
+    global user
+    global password
     try:
         with open('credentials.json', 'r') as credentials_file:
             credentials = json.load(credentials_file)
-            global host
-            global database_name
-            global user
-            global password
             host = credentials['host']
             database_name = credentials['database']
             user = credentials['username']
@@ -67,6 +73,11 @@ def load_credentials_file():
         exit(1)
 
 
+def connect_to_databases():
+    connect_to_sql()
+    connect_to_openmrs()
+
+
 # Global variables:
 global host
 global database_name
@@ -74,9 +85,11 @@ global user
 global password
 global database
 global session
+global rest_connection
 
 if __name__ == '__main__':
     app = Health_departmentApp()
     app.run()
     load_credentials_file()
-    connect_to_sql()
+    # The following line will be called in kivy when fully implemented
+    connect_to_databases()
