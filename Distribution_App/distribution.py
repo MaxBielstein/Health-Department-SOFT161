@@ -90,7 +90,7 @@ class DistributionApp(MDApp):
     new_clinic_ID_property = NumericProperty()
     # vaccines
     new_vaccine_name_property = StringProperty()
-    new_vaccine_disease_property = StringProperty()
+    new_vaccine_disease_property = StringProperty('Select a Disease')
     new_vaccine_ID_property = NumericProperty()
     new_vaccine_doses_property = NumericProperty()
     new_vaccine_manufacturer_ID_property = NumericProperty()
@@ -124,8 +124,9 @@ class DistributionApp(MDApp):
     def clear_new_vaccine_text(self):
         self.root.get_screen('m_for_vaccine').ids.new_vaccine_name.text = ""
         self.root.get_screen('m_for_vaccine').ids.new_vaccine_id.text = ""
-        self.root.get_screen('m_for_vaccine').ids.new_vaccine_disease.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_disease.text = "Select a Disease"
         self.root.get_screen('m_for_vaccine').ids.new_vaccine_required_doses.text = ""
+        self.new_vaccine_disease_property = "Select a Disease"
         pass
 
     # Spinner Loading Functions
@@ -146,17 +147,11 @@ class DistributionApp(MDApp):
         self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
-
-
-    # This is for later entirely
     def load_spinners_for_new_orders(self):
-        self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner = get_sql_data(
+        self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
-        self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner = get_sql_data(
-            'vaccination_clinics',
-            'clinic_name')
-        self.root.get_screen('order_vaccine').ids.order_select_disease = get_sql_data(
+        self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner.values = get_sql_data(
             'vaccination_clinics',
             'clinic_name')
 
@@ -227,7 +222,8 @@ class DistributionApp(MDApp):
         if id_path.new_vaccine_required_doses.text is not '':
             self.new_vaccine_doses_property = id_path.new_vaccine_required_doses.text
 
-        if id_path.new_vaccine_disease.text is not '':
+        if 'Select a Disease' not in id_path.new_vaccine_disease.text:
+            print("valid disease")
             self.new_vaccine_disease_property = id_path.new_vaccine_disease.text
 
         if self.check_for_required_inputs_new_vaccine():
@@ -236,6 +232,7 @@ class DistributionApp(MDApp):
                         self.new_vaccine_manufacturer_ID_property)
 
     def check_for_required_inputs_new_vaccine(self):
+        print(self.new_vaccine_disease_property)
         if self.new_vaccine_name_property is '':
             self.input_error_message = 'Name field must be filled'
             # Factory.NewInputError().open()
@@ -252,7 +249,7 @@ class DistributionApp(MDApp):
             self.input_error_message = 'Vaccine with this ID already exists'
             # Factory.NewInputError().open()
             return False
-        if self.new_vaccine_disease_property is '':
+        if self.new_vaccine_disease_property == 'Select a Disease':
             self.input_error_message = 'Disease field must be filled'
             # Factory.NewInputError().open()
             return False
