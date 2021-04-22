@@ -40,11 +40,13 @@
 
                 MDTextField:
                     hint_text: 'Authority'
+                    text: app.host
                     font_size: 30
                     id: database_host
 
                 MDTextField:
                     hint_text: 'Authority'
+                    text: app.openmrs_host
                     font_size: 30
                     id: openmrs_host
 
@@ -56,11 +58,13 @@
 
                 MDTextField:
                     hint_text: 'Port Number'
+                    text: app.port
                     font_size: 30
                     id: database_port
 
                 MDTextField:
                     hint_text: 'Port Number'
+                    text: app.openmrs_port
                     font_size: 30
                     id: openmrs_port
 
@@ -72,11 +76,13 @@
 
                 MDTextField:
                     hint_text: 'Username'
+                    text: app.user
                     font_size: 30
                     id: database_username
 
                 MDTextField:
                     hint_text: 'Username'
+                    text: app.openmrs_user
                     font_size: 30
                     id: openmrs_username
 
@@ -88,11 +94,13 @@
 
                 MDTextField:
                     hint_text: 'Password'
+                    text: app.password
                     font_size: 30
                     id: database_password
 
                 MDTextField:
                     hint_text: 'Password'
+                    text: app.openmrs_password
                     font_size: 30
                     id: openmrs_password
 
@@ -104,6 +112,7 @@
 
                 MDTextField:
                     hint_text: 'Database'
+                    text: app.database_name
                     font_size: 30
                     id: database_database
 
@@ -129,6 +138,8 @@
             MDRaisedButton:
                 text: 'Login'
                 font_size: 30
+                on_press:
+                    app.login_button()
 
         Widget:
             size_hint_y: None
