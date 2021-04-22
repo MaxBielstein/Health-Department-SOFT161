@@ -102,7 +102,7 @@ class Lots(Persisted):
 
 class People(Persisted):
     __tablename__ = 'people'
-    patient_id = Column(Integer, primary_key=True)
+    patient_id = Column(String(256), primary_key=True)
     name = Column(String(256), nullable=False)
     birthdate = Column(DateTime)
     people_lots = relationship('PeopleLots', uselist=True, back_populates='person')
