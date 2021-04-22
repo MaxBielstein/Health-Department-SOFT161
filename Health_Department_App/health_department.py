@@ -42,7 +42,7 @@ class Health_departmentApp(MDApp):
 
 def connect_to_sql():
     try:
-        url = RecordDatabase.construct_mysql_url(host, 3303, database_name, user, password)
+        url = RecordDatabase.construct_mysql_url(host, 3306, database_name, user, password)
         record_database = RecordDatabase(url)
         record_database.ensure_tables_exist()
         global session
@@ -58,12 +58,18 @@ def load_visits():
                                  on_visits_not_loaded)
 
 
+def load_patients():
+    get_parameters = {'limit': '100', 'startIndex': '0', 'q': '1000HU'}
+    rest_connection.send_request('patient', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
+                                 on_visits_not_loaded)
+
+
 def on_visits_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
 
 
 def on_visits_not_loaded(_, error):
-    print(dumps(error, indent=2, sort_keys=True))
+    pass
 
 
 def connect_to_openmrs():
@@ -99,7 +105,8 @@ def connect_to_databases():
     connect_to_sql()
     connect_to_openmrs()
     # TODO move to proper place, this is here for testing
-    load_visits()
+    # load_visits()
+    load_patients()
 
 
 # Global variables:
