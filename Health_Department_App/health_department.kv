@@ -1,7 +1,7 @@
 <HomeScreen>
     MDCard:
         size_hint: None, None
-        size: 600, 800
+        size: 900, 800
         pos_hint: {'center_x': 0.5, 'center_y': 0.5}
         elevation: 5
         padding: 25
@@ -129,12 +129,60 @@
             MDRaisedButton:
                 text: 'Login'
                 font_size: 30
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'LoadingLogin'
 
         Widget:
             size_hint_y: None
             height: 10
 
 
+<LoadingLogin>
 
+    MDCard:
+        size_hint: None, None
+        size: 900, 800
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+
+            MDLabel:
+                text: 'Logging in'
+                halign: 'center'
+                font_size: 45
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+
+                MDSpinner:
+                    size_hint: None, None
+                    size: dp(26), dp(26)
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    active: True
+
+                MDProgressBar:
+                    value: 0
+                    id: loading_login_progress_bar
+
+                Widget:
+                    size_hint_x: None
+                    width: 10
+
+            MDRaisedButton:
+                text: '(Dev button temp) Increase progress bar'
+                font_size: 30
+                on_release:
+                    root.ids.loading_login_progress_bar.value += 10
 
 

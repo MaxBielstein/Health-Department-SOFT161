@@ -2,9 +2,9 @@ from json import dumps
 
 import sqlalchemy
 from kivy import Config
-Config.set('graphics', 'width', '800')
-Config.set('graphics', 'height', '1200')
-Config.set('graphics', 'minimum_width', '800')
+Config.set('graphics', 'width', '1200')
+Config.set('graphics', 'height', '1000')
+Config.set('graphics', 'minimum_width', '1200')
 Config.set('graphics', 'minimum_height', '1000')
 
 from kivy.app import App
@@ -28,6 +28,9 @@ from openmrs import RESTConnection
 class HomeScreen(Screen):
     pass
 
+class LoadingLogin(Screen):
+    pass
+
 
 class Health_departmentApp(MDApp):
 
@@ -42,6 +45,7 @@ class Health_departmentApp(MDApp):
         inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
         sm = ScreenManager()
         sm.add_widget(HomeScreen(name='home'))
+        sm.add_widget(LoadingLogin(name='LoadingLogin'))
 
         return sm
 
