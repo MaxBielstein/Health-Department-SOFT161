@@ -121,6 +121,13 @@ class DistributionApp(MDApp):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
+    def clear_new_vaccine_text(self):
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_name.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_id.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_disease.text = ""
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_required_doses.text = ""
+        pass
+
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
         self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
@@ -268,6 +275,7 @@ with open('credentials.json', 'r') as credentials_file:
     database_name = data['database']
     user = data['username']
     password = data['password']
+
 
 # These methods below query data from the database and return the specified data
 
