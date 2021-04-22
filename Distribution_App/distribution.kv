@@ -55,6 +55,7 @@
             size_hint: None, None
             increment_width: 230
             on_press:
+                app.load_spinners_for_orders()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'review_orders_clinic'
 
