@@ -224,6 +224,8 @@ def remove_old_import_records():
         for record2 in records_to_import:
             if record.vaccination_date < record2.vaccination_date:
                 records_to_remove.append(record)
+            if record.patient_temperature is None:
+                records_to_remove.append(record)
     for record in records_to_remove:
         if record in records_to_import:
             records_to_import.remove(record)
@@ -285,6 +287,7 @@ def add_data_to_records(record_type, record):
 
 def populate_data_preview_screen(root):
     path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
+    path_to_scrollview_right = root.get_screen('DataPreview').ids.scrollview_right
     global unmatched_records
     print('unmatched records below')
     print(len(unmatched_records))
@@ -294,12 +297,19 @@ def populate_data_preview_screen(root):
         date = f'\nVaccination Date: {split_date}'
         path_to_scrollview_left.add_widget(
             MDLabel(
-                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nVaccine Lot: {record.lot_id}\n Vaccine: {record.lot.vaccine.vaccine_name}{date}\n-----------------\n',
-                halign="center",)
+                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature Taken During Vaccination: {record.patient_temperature}{date}\n-----------------\n',
+                halign="center", )
         )
 
-    print(records_to_import)
-
+    for record in records_to_import:
+        date_as_string = f'{record.vaccination_date}'
+        split_date = date_as_string.split(' ')[0]
+        date = f'\nVaccination Date: {split_date}'
+        path_to_scrollview_right.add_widget(
+            MDLabel(
+                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
+                halign="center", )
+        )   
     root.current = 'DataPreview'
     root.transition.direction = 'left'
 
