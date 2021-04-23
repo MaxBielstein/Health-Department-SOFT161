@@ -119,6 +119,7 @@ class DistributionApp(MDApp):
     new_order_doses_property = NumericProperty()
     new_order_current_clinic = StringProperty()
     new_order_current_manufacturer = StringProperty()
+    new_order_manufacturer_ids = set()
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -224,21 +225,35 @@ class DistributionApp(MDApp):
         self.root.get_screen('order_vaccine').ids.order_select_disease.values = []
 
     def load_diseases_for_new_orders(self):
-        manufacturer_ids = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
-                                                 self.root.get_screen(
-                                                     'order_vaccine').ids.order_manufacturer_spinner.text)
-        print(manufacturer_ids)
-        if len(manufacturer_ids) > 0:
-            print(manufacturer_ids[0])
-            filter_by_manufacturer = get_specific_sql_data('vaccines', 'relevant_disease', 'manufacturer_id',
-                                                           manufacturer_ids[0])
-            self.root.get_screen('order_vaccine').ids.order_select_disease.values = filter_by_manufacturer
+        self.new_order_manufacturer_ids = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
+                                                                self.root.get_screen(
+                                                                    'order_vaccine').ids.order_manufacturer_spinner.text)
+        if len(self.new_order_manufacturer_ids) > 0:
+            print(self.new_order_manufacturer_ids[0])
+            new_order_disease_list = get_specific_sql_data('vaccines', 'relevant_disease', 'manufacturer_id',
+                                                           self.new_order_manufacturer_ids[0])
+            self.root.get_screen('order_vaccine').ids.order_select_disease.values = new_order_disease_list
         else:
             self.root.get_screen(
                 'order_vaccine').ids.order_select_disease.text = 'No diseases \n        available\n for selected manufacturer'
             self.root.get_screen('order_vaccine').ids.order_select_disease.values = []
 
         self.root.get_screen('order_vaccine').ids.order_select_disease.text = 'Select a Disease'
+
+    def select_vaccine_for_new_order(self):
+        disease = self.root.get_screen('order_vaccine').ids.order_select_disease.text
+        if disease != 'No diseases \n        available\n for selected manufacturer' and disease != 'Not Available' and \
+                disease != '' and disease != 'Select a Disease':
+            vaccines_filtered_by_manufacturer = set(get_specific_sql_data('vaccines', 'vaccine_name', 'manufacturer_id',
+                                                                          self.new_order_manufacturer_ids[0]))
+
+            vaccines_filtered_by_disease = set(get_specific_sql_data('vaccines', 'vaccine_name', 'relevant_disease',
+                                                                     self.root.get_screen(
+                                                                         'order_vaccine').ids.order_select_disease.text))
+            approved_vaccines = vaccines_filtered_by_manufacturer.intersection(vaccines_filtered_by_disease)
+            print(vaccines_filtered_by_manufacturer)
+            print(vaccines_filtered_by_disease)
+            print(approved_vaccines)
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
