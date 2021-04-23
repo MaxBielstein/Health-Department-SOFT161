@@ -228,12 +228,14 @@
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
+
             MDBoxLayout:
                 orientation: 'vertical'
-                spacing: -55
-                padding: -350
+                size_hint: 1, None
+                height: sum(child.height+10 for child in self.children)
                 id: scrollview_left
-                size_hint: (1, None)
+
+
 
     MDCard:
         size_hint: None, None
@@ -245,19 +247,20 @@
         orientation: 'vertical'
 
         MDLabel:
-            text: 'Records to import'
+            text: 'Records To Import'
             font_size: 45
             halign: 'center'
 
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
+            
             MDBoxLayout:
                 orientation: 'vertical'
-                spacing: -55
-                padding: -25
+                size_hint: 1, None
+                height: sum(child.height+10 for child in self.children)
                 id: scrollview_right
-                size_hint: (1, None)
+
 
 
     MDBoxLayout:
@@ -277,6 +280,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+                    app.abort_button()
 
             MDRaisedButton:
                 text: 'Import'
@@ -287,6 +291,6 @@
             height: 10
 
 
-
+<ImportingLoading>
 
 

@@ -43,6 +43,10 @@ class DataPreview(Screen):
     pass
 
 
+class ImportingLoading(Screen):
+    pass
+
+
 class RecordType(enum.Enum):
     OLD_RECORD = 'OLD_RECORD'
     IMPORT_RECORD = 'IMPORT_RECORD'
@@ -73,6 +77,7 @@ class Health_departmentApp(MDApp):
         sm.add_widget(HomeScreen(name='home'))
         sm.add_widget(LoadingLogin(name='LoadingLogin'))
         sm.add_widget(DataPreview(name='DataPreview'))
+        sm.add_widget(ImportingLoading(name='ImportingLoading'))
 
         return sm
 
@@ -105,6 +110,21 @@ class Health_departmentApp(MDApp):
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
         Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+
+    def abort_button(self):
+        global number_of_records_to_load
+        global number_of_records_loaded
+        global patient_uuids
+        global unmatched_records
+        global old_records
+        global location_to_import_records
+        number_of_records_to_load = 0
+        number_of_records_loaded = 0
+        patient_uuids = {}
+        unmatched_records = []
+        old_records = []
+        location_to_import_records = []
+        self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
 
     def load_credentials_file(self):
         try:
@@ -159,7 +179,7 @@ def add_patient_uuid(_, response):
         load_visits(uuid)
     else:
         print('unmatched')
-        add_data_to_records(RecordType.UNMATCHED_RECORD, currently_checking)
+        add_data_to_records(RecordType.UNMATCHED_RECORD, None)
 
 
 def patient_not_loaded(_, response):
@@ -175,16 +195,16 @@ def on_visits_loaded(_, response):
                     if len(result['encounters'][-1]['obs']) is not 0:
                         for observation in result['encounters'][-1]['obs']:
                             if 'Temperature' in observation['display']:
-                                remove_from_unmatched_records(result)
+                                remove_from_unmatched_records(result, False)
                                 add_data_to_records(RecordType.OLD_RECORD, result)
                                 print('to old records')
                                 return
-            remove_from_unmatched_records(result)
+            remove_from_unmatched_records(result, True)
             add_data_to_records(RecordType.IMPORT_RECORD, result)
             print('to import')
 
 
-def remove_from_unmatched_records(result):
+def remove_from_unmatched_records(result, to_import):
     record_to_remove = None
     for record in unmatched_records:
         print(result['patient']['display'].split(' - ')[0])
@@ -194,7 +214,19 @@ def remove_from_unmatched_records(result):
             record_to_remove = record
     if record_to_remove in unmatched_records:
         unmatched_records.remove(record_to_remove)
+        if to_import:
+            records_to_import.append(record_to_remove)
 
+
+def remove_old_import_records():
+    records_to_remove = []
+    for record in records_to_import:
+        for record2 in records_to_import:
+            if record.vaccination_date < record2.vaccination_date:
+                records_to_remove.append(record)
+    for record in records_to_remove:
+        if record in records_to_import:
+            records_to_import.remove(record)
 
 
 def on_visits_not_loaded(_, error):
@@ -221,7 +253,6 @@ def update_records():
 
 
 def load_records_into_app(loading_bar):
-    global currently_checking
     global session
     people_lots = session.query(PeopleLots)
     global number_of_records_to_load
@@ -237,18 +268,19 @@ def add_data_to_records(record_type, record):
     if record_type is RecordType.OLD_RECORD:
         old_records.append(record)
     elif record_type is RecordType.IMPORT_RECORD:
-        records_to_import.append(record)
+        location_to_import_records.append(record)
     global number_of_records_loaded
     global number_of_records_to_load
     number_of_records_loaded += 1
+    if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
+    else:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
+                                                                                                      100 - app_reference.root.get_screen(
+                                                                                                  'LoadingLogin').ids.loading_login_progress_bar.value) / 4
     if number_of_records_loaded is number_of_records_to_load:
+        remove_old_import_records()
         populate_data_preview_screen(app_reference.root)
-        if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
-            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
-        else:
-            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
-                                                                                                          100 - app_reference.root.get_screen(
-                                                                                                      'LoadingLogin').ids.loading_login_progress_bar.value) / 4
 
 
 def populate_data_preview_screen(root):
@@ -256,19 +288,20 @@ def populate_data_preview_screen(root):
     global unmatched_records
     print('unmatched records below')
     print(len(unmatched_records))
-
     for record in unmatched_records:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
         date = f'\nVaccination Date: {split_date}'
         path_to_scrollview_left.add_widget(
             MDLabel(
-                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nVaccine Lot: {record.lot_id}\n Vaccine: {record.lot.vaccine.vaccine_name}{date}',
-                halign="center", )
+                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nVaccine Lot: {record.lot_id}\n Vaccine: {record.lot.vaccine.vaccine_name}{date}\n-----------------\n',
+                halign="center",)
         )
+
+    print(records_to_import)
+
     root.current = 'DataPreview'
     root.transition.direction = 'left'
-
 
 
 # Global variables:
@@ -276,7 +309,6 @@ def populate_data_preview_screen(root):
 global database
 global session
 global rest_connection
-currently_checking = []
 
 # Assuming only one app runs at once so we can make a static reference to the app
 global app_reference
@@ -284,8 +316,9 @@ number_of_records_to_load = 0
 number_of_records_loaded = 0
 patient_uuids = {}
 unmatched_records = []
-old_records = []
 records_to_import = []
+old_records = []
+location_to_import_records = []
 
 if __name__ == '__main__':
     app = Health_departmentApp()

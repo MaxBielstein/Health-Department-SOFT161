@@ -616,7 +616,7 @@
 
         MDLabel:
             text: 'Fill out information for the order'
-            font_size: 45
+            font_size: 30
             halign: 'center'
 
 
@@ -667,11 +667,20 @@
                     id: order_select_disease
                     background_color: 0, 1.5, 4, 1
                     on_text:
-
+                        app.select_vaccine_for_new_order()
                         print("The spinner {} has text {}".format(self, self.text))
 
 
-
+            MDLabel:
+                text: 'Chosen Clinic: '
+                font_size: 15
+                halign: 'center'
+                id: new_order_clinic
+            MDLabel:
+                text: 'Assigned Vaccine: '
+                font_size: 15
+                halign: 'center'
+                id: new_order_vaccine
             MDTextField:
                 hint_text: 'Number of Doses'
                 id: order_doses
