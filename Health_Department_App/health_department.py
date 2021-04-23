@@ -175,11 +175,26 @@ def on_visits_loaded(_, response):
                     if len(result['encounters'][-1]['obs']) is not 0:
                         for observation in result['encounters'][-1]['obs']:
                             if 'Temperature' in observation['display']:
+                                remove_from_unmatched_records(result)
                                 add_data_to_records(RecordType.OLD_RECORD, result)
                                 print('to old records')
                                 return
+            remove_from_unmatched_records(result)
             add_data_to_records(RecordType.IMPORT_RECORD, result)
             print('to import')
+
+
+def remove_from_unmatched_records(result):
+    record_to_remove = None
+    for record in unmatched_records:
+        print(result['patient']['display'].split(' - ')[0])
+        print(record.patient_id)
+        print(str(result['patient']['display'].split(' - ')[0]) in record.patient_id)
+        if str(result['patient']['display'].split(' - ')[0]) in record.patient_id:
+            record_to_remove = record
+    if record_to_remove in unmatched_records:
+        unmatched_records.remove(record_to_remove)
+
 
 
 def on_visits_not_loaded(_, error):
@@ -212,17 +227,10 @@ def load_records_into_app(loading_bar):
     global number_of_records_to_load
     loading_bar.value = 0
     for appointment in people_lots:
-        currently_checking = appointment
-        if appointment.patient_id not in patient_uuids:
-            print('in in in')
-            patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
-            number_of_records_to_load += 1
-            load_patient(appointment.patient_id)
-        elif appointment.vaccination_date is not None:
-            if appointment.vaccination_date > patient_uuids[appointment.patient_id]['latest_appointment']:
-                patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
-                number_of_records_to_load += 1
-                load_patient(appointment.patient_id)
+        unmatched_records.append(appointment)
+        patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+        number_of_records_to_load += 1
+        load_patient(appointment.patient_id)
 
 
 def add_data_to_records(record_type, record):
@@ -230,8 +238,6 @@ def add_data_to_records(record_type, record):
         old_records.append(record)
     elif record_type is RecordType.IMPORT_RECORD:
         records_to_import.append(record)
-    elif record_type is RecordType.UNMATCHED_RECORD:
-        unmatched_records.append(record)
     global number_of_records_loaded
     global number_of_records_to_load
     number_of_records_loaded += 1
@@ -252,12 +258,17 @@ def populate_data_preview_screen(root):
     print(len(unmatched_records))
 
     for record in unmatched_records:
+        date_as_string = f'{record.vaccination_date}'
+        split_date = date_as_string.split(' ')[0]
+        date = f'\nVaccination Date: {split_date}'
         path_to_scrollview_left.add_widget(
-            MDLabel(text=record.patient_id,
-                    halign="center", )
+            MDLabel(
+                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nVaccine Lot: {record.lot_id}\n Vaccine: {record.lot.vaccine.vaccine_name}{date}',
+                halign="center", )
         )
     root.current = 'DataPreview'
     root.transition.direction = 'left'
+
 
 
 # Global variables:
@@ -265,7 +276,7 @@ def populate_data_preview_screen(root):
 global database
 global session
 global rest_connection
-global currently_checking
+currently_checking = []
 
 # Assuming only one app runs at once so we can make a static reference to the app
 global app_reference
