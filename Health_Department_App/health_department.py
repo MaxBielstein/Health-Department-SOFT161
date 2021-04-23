@@ -106,6 +106,21 @@ class Health_departmentApp(MDApp):
         connect_to_databases(self)
         Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
 
+    def abort_button(self):
+        global number_of_records_to_load
+        global number_of_records_loaded
+        global patient_uuids
+        global unmatched_records
+        global old_records
+        global records_to_import
+        number_of_records_to_load = 0
+        number_of_records_loaded = 0
+        patient_uuids = {}
+        unmatched_records = []
+        old_records = []
+        records_to_import = []
+        self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
+
     def load_credentials_file(self):
         try:
             with open('credentials.json', 'r') as credentials_file:
@@ -159,7 +174,6 @@ def add_patient_uuid(_, response):
         load_visits(uuid)
     else:
         print('unmatched')
-        add_data_to_records(RecordType.UNMATCHED_RECORD, currently_checking)
 
 
 def patient_not_loaded(_, response):
@@ -195,7 +209,12 @@ def remove_from_unmatched_records(result):
     if record_to_remove in unmatched_records:
         unmatched_records.remove(record_to_remove)
 
-
+def remove_old_records_to_import():
+    records_to_remove = []
+    for record in records_to_import:
+        for record2 in records_to_import:
+            if record['display'] is record2['display']:
+                if
 
 def on_visits_not_loaded(_, error):
     print(error)
@@ -221,7 +240,6 @@ def update_records():
 
 
 def load_records_into_app(loading_bar):
-    global currently_checking
     global session
     people_lots = session.query(PeopleLots)
     global number_of_records_to_load
@@ -276,7 +294,6 @@ def populate_data_preview_screen(root):
 global database
 global session
 global rest_connection
-currently_checking = []
 
 # Assuming only one app runs at once so we can make a static reference to the app
 global app_reference
