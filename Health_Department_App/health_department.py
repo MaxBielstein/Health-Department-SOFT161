@@ -90,6 +90,8 @@ class Health_departmentApp(MDApp):
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
 
+        update_patient_uuid_list()
+
     def load_credentials_file(self):
         try:
             with open('credentials.json', 'r') as credentials_file:
@@ -117,8 +119,8 @@ def connect_to_sql(self):
         # Database connection error
 
 
-def load_visits():
-    get_parameters = {'v': 'full'}
+def load_visits(patient_uuid):
+    get_parameters = {'v': 'full', 'patient': patient_uuid}
     rest_connection.send_request('visit', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
                                  on_visits_not_loaded)
 
@@ -127,21 +129,6 @@ def load_patient(patient_id):
     get_parameters = {'limit': '100', 'startIndex': '0', 'q': patient_id}
     rest_connection.send_request('patient', get_parameters, None, add_patient_uuid, patient_not_loaded,
                                  patient_not_loaded)
-
-
-def load_patient_ids_from_database():
-    global session
-    people = session.query(People)
-    patient_ids = []
-    for person in people:
-        patient_ids.append(person.patient_id)
-
-    load_patient_uuids_from_openmrs(patient_ids)
-
-
-def load_patient_uuids_from_openmrs(patient_ids):
-    for patient_id in patient_ids:
-        load_patient(patient_id)
 
 
 def add_patient_uuid(_, response):
@@ -153,8 +140,9 @@ def add_patient_uuid(_, response):
         name = id_and_name[1]
         uuid = response['results'][0]['uuid']
         global patient_uuids
-        patient_uuids[id] = {'Name': name, 'UUID': uuid}
-        print(patient_uuids)
+        patient_uuids[id]['Name'] = name
+        patient_uuids[id]['UUID'] = uuid
+        load_visits(uuid)
 
 
 def patient_not_loaded(_, response):
@@ -163,9 +151,23 @@ def patient_not_loaded(_, response):
 
 def on_visits_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
+    for result in response['results']:
+        if result['stopDatetime'] is None:
+            if len(result['encounters']) is not 0:
+                if len(result['encounters']) is not 0:
+                    if len(result['encounters'][-1]['obs']) is not 0:
+                        for observation in result['encounters'][-1]['obs']:
+                            if 'Temperature' in observation['display']:
+                                unmatched_records.append(result)
+                                print('to unmatched')
+                                return
+            records_to_import.append(result)
+            print('to import')
+
 
 
 def on_visits_not_loaded(_, error):
+    print(error)
     pass
 
 
@@ -182,9 +184,28 @@ def get_all_people_lots():
 def connect_to_databases(self):
     connect_to_sql(self)
     connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user, self.openmrs_password)
-    # TODO move to proper place, this is here for testing
-    load_visits()
-    load_patient_ids_from_database()
+
+
+def update_records():
+    print('ran')
+    print(len(patient_uuids))
+    for id in patient_uuids:
+        print('loading')
+        load_visits(patient_uuids[id]['UUID'])
+
+
+def update_patient_uuid_list():
+    global session
+    people_lots = session.query(PeopleLots)
+    for appointment in people_lots:
+        if appointment.patient_id not in patient_uuids:
+            print('in in in')
+            patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+            load_patient(appointment.patient_id)
+        elif appointment.vaccination_date is not None:
+            if appointment.vaccination_date > patient_uuids[appointment.patient_id]['latest_appointment']:
+                patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+                load_patient(appointment.patient_id)
 
 
 # Global variables:
@@ -193,6 +214,8 @@ global database
 global session
 global rest_connection
 patient_uuids = {}
+unmatched_records = []
+records_to_import = []
 
 if __name__ == '__main__':
     app = Health_departmentApp()

@@ -129,6 +129,18 @@ class DistributionApp(MDApp):
         self.new_vaccine_disease_property = "Select a Disease"
         pass
 
+    def prefill_existing_clinic(self):
+        if 'Select a Clinic' not in self.root.get_screen(
+                'ExistingClinic').ids.clinics_spinner.text:
+            self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = self.root.get_screen(
+                        'ExistingClinic').ids.clinics_spinner.text
+            self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = \
+                get_specific_sql_data('vaccination_clinics', 'clinic_address',
+                                      'clinic_name', self.root.get_screen(
+                        'ExistingClinic').ids.clinics_spinner.text)[0]
+
+
+
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
         self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
@@ -144,8 +156,9 @@ class DistributionApp(MDApp):
         self.root.get_screen('review_orders_manufacturer').ids.select_manufacturer_review_order.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
-        self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.values = get_sql_data('vaccination_clinics',
-                                                                                         'clinic_name')
+        self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.values = get_sql_data(
+            'vaccination_clinics',
+            'clinic_name')
 
     def load_spinners_for_new_orders(self):
         self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = get_sql_data(
