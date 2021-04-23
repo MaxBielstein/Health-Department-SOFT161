@@ -327,7 +327,48 @@
 
 
             MDRaisedButton:
-                text: '(Dev button temp) Next screen'
+                text: '(Dev button temp) Enable buttons'
                 font_size: 30
+                on_release:
+                    root.ids.back_to_login_button.disabled=False
+                    root.ids.view_symptomatic_patients_button.disabled=False
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back to Login'
+                font_size: 30
+                disabled: True
+                id: back_to_login_button
+                on_release:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+                    root.ids.back_to_login_button.disabled=True
+                    root.ids.view_symptomatic_patients_button.disabled=True
+                    app.abort_button()
+
+            MDRaisedButton:
+                text: 'View Symptomatic Patients'
+                font_size: 30
+                disabled: True
+                id: view_symptomatic_patients_button
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'ImportingLoading'
+                    root.ids.back_to_login_button.disabled=True
+                    root.ids.view_symptomatic_patients_button.disabled=True
+
+        Widget:
+            size_hint_y: None
+            height: 10
 
 
