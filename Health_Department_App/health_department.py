@@ -3,14 +3,15 @@ from time import sleep
 
 import sqlalchemy
 from kivy import Config
-from kivy.clock import Clock
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'minimum_width', '1200')
-
 Config.set('graphics', 'minimum_height', '1000')
 
+from kivy.uix.widget import Widget
+from kivy.clock import Clock
+from kivymd.uix.label import MDLabel
 from kivy.app import App
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
@@ -96,9 +97,6 @@ class Health_departmentApp(MDApp):
         connect_to_databases(self)
         Clock.schedule_once(lambda dt: load_records_into_app(loading_bar, self.root), 2)
 
-
-
-
     def load_credentials_file(self):
         try:
             with open('credentials.json', 'r') as credentials_file:
@@ -151,6 +149,8 @@ def add_patient_uuid(_, response):
         patient_uuids[id]['UUID'] = uuid
         load_visits(uuid)
     else:
+        print('unmatched')
+        global unmatched_records
         unmatched_records.append(currently_checking)
 
 
@@ -218,8 +218,23 @@ def load_records_into_app(loading_bar, root):
             if appointment.vaccination_date > patient_uuids[appointment.patient_id]['latest_appointment']:
                 patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
                 load_patient(appointment.patient_id)
+    Clock.schedule_once(lambda dt: populate_data_preview_screen(root), 5)
+
+
+def populate_data_preview_screen(root):
+    path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
+    global unmatched_records
+    print('unmatched records below')
+    print(len(unmatched_records))
+
+    for record in unmatched_records:
+        path_to_scrollview_left.add_widget(
+            MDLabel(text=record.patient_id,
+                    halign="center", )
+        )
     root.current = 'DataPreview'
     root.transition.direction = 'left'
+
 
 
 # Global variables:
@@ -228,6 +243,7 @@ global database
 global session
 global rest_connection
 global currently_checking
+global number_of_records_loaded
 patient_uuids = {}
 unmatched_records = []
 old_records = []
