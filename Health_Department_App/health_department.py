@@ -1,4 +1,5 @@
 from json import dumps
+from time import sleep
 
 import sqlalchemy
 from kivy import Config
@@ -30,11 +31,14 @@ from openmrs import RESTConnection
 class HomeScreen(Screen):
     pass
 
+
 class LoadingLogin(Screen):
     pass
 
+
 class DataPreview(Screen):
     pass
+
 
 class Health_departmentApp(MDApp):
     host = StringProperty()
@@ -77,6 +81,7 @@ class Health_departmentApp(MDApp):
 
     def login_button(self):
         path = self.root.get_screen('home').ids
+        loading_bar = self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
 
         self.host = path.database_host.text
         self.database_name = path.database_database.text
@@ -89,8 +94,7 @@ class Health_departmentApp(MDApp):
         self.openmrs_port = path.openmrs_port.text
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
-
-        update_patient_uuid_list()
+        load_records_into_app(loading_bar)
 
     def load_credentials_file(self):
         try:
@@ -143,6 +147,8 @@ def add_patient_uuid(_, response):
         patient_uuids[id]['Name'] = name
         patient_uuids[id]['UUID'] = uuid
         load_visits(uuid)
+    else:
+        unmatched_records.append(currently_checking)
 
 
 def patient_not_loaded(_, response):
@@ -158,12 +164,11 @@ def on_visits_loaded(_, response):
                     if len(result['encounters'][-1]['obs']) is not 0:
                         for observation in result['encounters'][-1]['obs']:
                             if 'Temperature' in observation['display']:
-                                unmatched_records.append(result)
-                                print('to unmatched')
+                                old_records.append(result)
+                                print('to old records')
                                 return
             records_to_import.append(result)
             print('to import')
-
 
 
 def on_visits_not_loaded(_, error):
@@ -174,11 +179,6 @@ def on_visits_not_loaded(_, error):
 def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_password):
     global rest_connection
     rest_connection = RESTConnection(openmrs_host, openmrs_port, openmrs_user, openmrs_password)
-
-
-def get_all_people_lots():
-    vaccination_appointments = session.query(PeopleLots)
-    return vaccination_appointments
 
 
 def connect_to_databases(self):
@@ -194,10 +194,17 @@ def update_records():
         load_visits(patient_uuids[id]['UUID'])
 
 
-def update_patient_uuid_list():
+def load_records_into_app(loading_bar):
+    global currently_checking
     global session
     people_lots = session.query(PeopleLots)
+    length_of_query = 0
+    for query in people_lots:
+        length_of_query += 1
+    loading_bar_increment_amount = (100 / length_of_query)
     for appointment in people_lots:
+        currently_checking = appointment
+        loading_bar.value += loading_bar_increment_amount
         if appointment.patient_id not in patient_uuids:
             print('in in in')
             patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
@@ -213,8 +220,10 @@ def update_patient_uuid_list():
 global database
 global session
 global rest_connection
+global currently_checking
 patient_uuids = {}
 unmatched_records = []
+old_records = []
 records_to_import = []
 
 if __name__ == '__main__':

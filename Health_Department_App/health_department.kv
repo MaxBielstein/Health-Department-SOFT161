@@ -135,10 +135,12 @@
                 text: 'Login'
                 font_size: 30
                 on_press:
-                    app.login_button()
-                on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'LoadingLogin'
+                    app.login_button()
+                on_release:
+                    app.login_button()
+
 
 
         Widget:
