@@ -229,9 +229,10 @@
             do_scroll_x: False
             do_scroll_y: True
 
-            MDStackLayout:
+            MDBoxLayout:
+                orientation: 'vertical'
                 size_hint: 1, None
-                height: sum(child.height for child in self.children)
+                height: sum(child.height+10 for child in self.children)
                 id: scrollview_left
 
 
@@ -246,7 +247,7 @@
         orientation: 'vertical'
 
         MDLabel:
-            text: 'Records to import'
+            text: 'Records To Import'
             font_size: 45
             halign: 'center'
 
@@ -254,9 +255,10 @@
             do_scroll_x: False
             do_scroll_y: True
             
-            MDStackLayout:
+            MDBoxLayout:
+                orientation: 'vertical'
                 size_hint: 1, None
-                height: sum(child.height for child in self.children)
+                height: sum(child.height+10 for child in self.children)
                 id: scrollview_right
 
 

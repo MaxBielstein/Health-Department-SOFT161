@@ -294,9 +294,10 @@ def populate_data_preview_screen(root):
         date = f'\nVaccination Date: {split_date}'
         path_to_scrollview_left.add_widget(
             MDLabel(
-                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nVaccine Lot: {record.lot_id}\n Vaccine: {record.lot.vaccine.vaccine_name}{date}',
-                halign="center", )
+                text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nVaccine Lot: {record.lot_id}\n Vaccine: {record.lot.vaccine.vaccine_name}{date}\n-----------------\n',
+                halign="center",)
         )
+
     print(records_to_import)
 
     root.current = 'DataPreview'
