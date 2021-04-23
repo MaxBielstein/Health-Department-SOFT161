@@ -42,6 +42,7 @@ class LoadingLogin(Screen):
 class DataPreview(Screen):
     pass
 
+
 class ImportingLoading(Screen):
     pass
 
@@ -178,6 +179,7 @@ def add_patient_uuid(_, response):
         load_visits(uuid)
     else:
         print('unmatched')
+        add_data_to_records(RecordType.UNMATCHED_RECORD, None)
 
 
 def patient_not_loaded(_, response):
@@ -213,12 +215,18 @@ def remove_from_unmatched_records(result):
     if record_to_remove in unmatched_records:
         unmatched_records.remove(record_to_remove)
 
+
 def remove_old_records_to_import():
     records_to_remove = []
     for record in records_to_import:
         for record2 in records_to_import:
             if record['display'] is record2['display']:
-                pass
+                if record['startDatetime'] < record2['startDatetime']:
+                    records_to_remove.append(record)
+    for record in records_to_remove:
+        if record in records_to_import:
+            records_to_import.remove(record)
+
 
 def on_visits_not_loaded(_, error):
     print(error)
@@ -278,7 +286,6 @@ def populate_data_preview_screen(root):
     global unmatched_records
     print('unmatched records below')
     print(len(unmatched_records))
-
     for record in unmatched_records:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
@@ -290,7 +297,6 @@ def populate_data_preview_screen(root):
         )
     root.current = 'DataPreview'
     root.transition.direction = 'left'
-
 
 
 # Global variables:
