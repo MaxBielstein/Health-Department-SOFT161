@@ -138,8 +138,6 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'LoadingLogin'
                     app.login_button()
-                on_release:
-                    app.login_button()
 
 
 
@@ -185,6 +183,7 @@
                     size_hint: None, None
                     size: dp(26), dp(26)
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    id: loading_spinner
                     active: True
 
                 MDProgressBar:

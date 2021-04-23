@@ -3,6 +3,7 @@ from time import sleep
 
 import sqlalchemy
 from kivy import Config
+from kivy.clock import Clock
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
@@ -55,7 +56,6 @@ class Health_departmentApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.load_defaults()
-        connect_to_databases(self)
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -94,7 +94,10 @@ class Health_departmentApp(MDApp):
         self.openmrs_port = path.openmrs_port.text
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
-        load_records_into_app(loading_bar)
+        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar, self.root), 2)
+
+
+
 
     def load_credentials_file(self):
         try:
@@ -194,7 +197,7 @@ def update_records():
         load_visits(patient_uuids[id]['UUID'])
 
 
-def load_records_into_app(loading_bar):
+def load_records_into_app(loading_bar, root):
     global currently_checking
     global session
     people_lots = session.query(PeopleLots)
@@ -202,6 +205,8 @@ def load_records_into_app(loading_bar):
     for query in people_lots:
         length_of_query += 1
     loading_bar_increment_amount = (100 / length_of_query)
+    print(loading_bar_increment_amount)
+    loading_bar.value = 0
     for appointment in people_lots:
         currently_checking = appointment
         loading_bar.value += loading_bar_increment_amount
@@ -213,6 +218,8 @@ def load_records_into_app(loading_bar):
             if appointment.vaccination_date > patient_uuids[appointment.patient_id]['latest_appointment']:
                 patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
                 load_patient(appointment.patient_id)
+    root.current = 'DataPreview'
+    root.transition.direction = 'left'
 
 
 # Global variables:
