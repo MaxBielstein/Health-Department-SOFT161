@@ -228,12 +228,13 @@
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
-            MDBoxLayout:
-                orientation: 'vertical'
-                spacing: -55
-                padding: -350
+
+            MDStackLayout:
+                size_hint: 1, None
+                height: sum(child.height for child in self.children)
                 id: scrollview_left
-                size_hint: (1, None)
+
+
 
     MDCard:
         size_hint: None, None
@@ -252,12 +253,12 @@
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
-            MDBoxLayout:
-                orientation: 'vertical'
-                spacing: -55
-                padding: -25
+            
+            MDStackLayout:
+                size_hint: 1, None
+                height: sum(child.height for child in self.children)
                 id: scrollview_right
-                size_hint: (1, None)
+
 
 
     MDBoxLayout:
