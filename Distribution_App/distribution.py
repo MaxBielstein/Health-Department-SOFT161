@@ -251,9 +251,10 @@ class DistributionApp(MDApp):
                                                                      self.root.get_screen(
                                                                          'order_vaccine').ids.order_select_disease.text))
             approved_vaccines = vaccines_filtered_by_manufacturer.intersection(vaccines_filtered_by_disease)
-            print(vaccines_filtered_by_manufacturer)
-            print(vaccines_filtered_by_disease)
-            print(approved_vaccines)
+            if len(approved_vaccines) != 0:
+                self.new_order_vaccine_ID_property = get_specific_sql_data('vaccines', 'vaccine_id', 'vaccine_name',
+                                                                           list(approved_vaccines)[0])[0]
+                self.root.get_screen('order_vaccine').ids.new_order_vaccine.text = 'Assigned Vaccine: ' + list(approved_vaccines)[0]
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
@@ -390,7 +391,7 @@ class DistributionApp(MDApp):
             # Factory.NewInputError().open()
             return False
         if self.new_order_vaccine_ID_property is '':
-            self.input_error_message = 'Vaccine ID field must be filled'
+            self.input_error_message = 'No Vaccine found'
             # Factory.NewInputError().open()
             return False
         if self.new_order_manufacturer_ID_property is '':
