@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         sql_input(new_manufacturer, session)
         new_vaccine = Vaccines(vaccine_id=1, required_doses=5, relevant_disease='Polio', vaccine_name='Test_name', manufacturer_id=1)
         sql_input(new_vaccine, session)
-        new_vaccine_from_sql = session.query(Vaccines).filter(Vaccines.name == 'Test_name').one()
+        new_vaccine_from_sql = session.query(Vaccines).filter(Vaccines.vaccine_name == 'Test_name').one()
         self.assertEqual(new_vaccine.relevant_disease, new_vaccine_from_sql.relevant_disease)
 
 
