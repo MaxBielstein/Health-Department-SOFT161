@@ -119,6 +119,7 @@ class DistributionApp(MDApp):
     new_order_doses_property = NumericProperty()
     new_order_current_clinic = StringProperty()
     new_order_current_manufacturer = StringProperty()
+    new_order_manufacturer_ids = set()
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -224,21 +225,36 @@ class DistributionApp(MDApp):
         self.root.get_screen('order_vaccine').ids.order_select_disease.values = []
 
     def load_diseases_for_new_orders(self):
-        manufacturer_ids = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
-                                                 self.root.get_screen(
-                                                     'order_vaccine').ids.order_manufacturer_spinner.text)
-        print(manufacturer_ids)
-        if len(manufacturer_ids) > 0:
-            print(manufacturer_ids[0])
-            filter_by_manufacturer = get_specific_sql_data('vaccines', 'relevant_disease', 'manufacturer_id',
-                                                           manufacturer_ids[0])
-            self.root.get_screen('order_vaccine').ids.order_select_disease.values = filter_by_manufacturer
+        self.new_order_manufacturer_ids = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
+                                                                self.root.get_screen(
+                                                                    'order_vaccine').ids.order_manufacturer_spinner.text)
+        if len(self.new_order_manufacturer_ids) > 0:
+            print(self.new_order_manufacturer_ids[0])
+            new_order_disease_list = get_specific_sql_data('vaccines', 'relevant_disease', 'manufacturer_id',
+                                                           self.new_order_manufacturer_ids[0])
+            self.root.get_screen('order_vaccine').ids.order_select_disease.values = new_order_disease_list
         else:
             self.root.get_screen(
                 'order_vaccine').ids.order_select_disease.text = 'No diseases \n        available\n for selected manufacturer'
             self.root.get_screen('order_vaccine').ids.order_select_disease.values = []
 
         self.root.get_screen('order_vaccine').ids.order_select_disease.text = 'Select a Disease'
+
+    def select_vaccine_for_new_order(self):
+        disease = self.root.get_screen('order_vaccine').ids.order_select_disease.text
+        if disease != 'No diseases \n        available\n for selected manufacturer' and disease != 'Not Available' and \
+                disease != '' and disease != 'Select a Disease':
+            vaccines_filtered_by_manufacturer = set(get_specific_sql_data('vaccines', 'vaccine_name', 'manufacturer_id',
+                                                                          self.new_order_manufacturer_ids[0]))
+
+            vaccines_filtered_by_disease = set(get_specific_sql_data('vaccines', 'vaccine_name', 'relevant_disease',
+                                                                     self.root.get_screen(
+                                                                         'order_vaccine').ids.order_select_disease.text))
+            approved_vaccines = vaccines_filtered_by_manufacturer.intersection(vaccines_filtered_by_disease)
+            if len(approved_vaccines) != 0:
+                self.new_order_vaccine_ID_property = get_specific_sql_data('vaccines', 'vaccine_id', 'vaccine_name',
+                                                                           list(approved_vaccines)[0])[0]
+                self.root.get_screen('order_vaccine').ids.new_order_vaccine.text = 'Assigned Vaccine: ' + list(approved_vaccines)[0]
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
@@ -375,7 +391,7 @@ class DistributionApp(MDApp):
             # Factory.NewInputError().open()
             return False
         if self.new_order_vaccine_ID_property is '':
-            self.input_error_message = 'Vaccine ID field must be filled'
+            self.input_error_message = 'No Vaccine found'
             # Factory.NewInputError().open()
             return False
         if self.new_order_manufacturer_ID_property is '':
@@ -397,7 +413,7 @@ class DistributionApp(MDApp):
 def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
-        sql_input(clinic)
+        sql_input(clinic, session)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -408,7 +424,7 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
     vaccine = Vaccines(vaccine_id=id, required_doses=doses, relevant_disease=disease, vaccine_name=name,
                        manufacturer_id=manufacturer_id)
     if int(vaccine.vaccine_id) not in get_sql_data('vaccines', 'vaccine_id'):
-        sql_input(vaccine)
+        sql_input(vaccine, session)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -419,7 +435,7 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
     order = VaccinationClinics(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
                                vaccine_id=vaccine_id, doses_in_order=doses)
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
-        sql_input(order)
+        sql_input(order, session)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -468,11 +484,14 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
         return []
 
 
+# Temporary Location
+url = DistributionDatabase.construct_mysql_url(host, 3306, database_name, user, password)
+record_database = DistributionDatabase(url)
+session = record_database.create_session()
+
+
 # This is a simple method for adding data to the sql database
-def sql_input(data):
-    url = DistributionDatabase.construct_mysql_url(host, 3306, database_name, user, password)
-    record_database = DistributionDatabase(url)
-    session = record_database.create_session()
+def sql_input(data, session):
     session.add(data)
     session.commit()
 
