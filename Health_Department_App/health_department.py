@@ -125,7 +125,11 @@ class Health_departmentApp(MDApp):
         old_records = []
         location_to_import_records = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
-        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value=1
+        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
+
+    def import_button(self):
+        import_data_into_openmrs()
+
 
     def load_credentials_file(self):
         try:
@@ -164,6 +168,28 @@ def load_patient(patient_id):
     get_parameters = {'limit': '100', 'startIndex': '0', 'q': patient_id}
     rest_connection.send_request('patient', get_parameters, None, add_patient_uuid, patient_not_loaded,
                                  patient_not_loaded)
+
+
+def post_temperature_to_visit(visit, record):
+    encounterProvider = {
+      "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
+      "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
+    }
+    post_parameters = {'encounterDatetime': f'{record.vaccination_date}', 'patient': visit['patient']['uuid'],
+                       'encounterType': '7b0f5697-27e3-40c4-8bae-f4049abfb4ed', 'location': visit['location']['uuid'],
+                       'visit': visit['uuid'], 'encounterProviders': encounterProvider}
+    rest_connection.send_request('encounter', None, post_parameters, temperature_posted, temperature_not_posted,
+                                 temperature_not_posted)
+
+
+def temperature_posted(_, results):
+    print('it worked, it posted')
+    print('results')
+
+
+def temperature_not_posted(_, error):
+    print(error)
+    print('it didnt work')
 
 
 def add_patient_uuid(_, response):
@@ -225,8 +251,7 @@ def remove_old_import_records():
         for record2 in records_to_import:
             if record.vaccination_date < record2.vaccination_date:
                 records_to_remove.append(record)
-            if record.patient_temperature is None:
-                records_to_remove.append(record)
+
     for record in records_to_remove:
         if record in records_to_import:
             records_to_import.remove(record)
@@ -284,6 +309,17 @@ def add_data_to_records(record_type, record):
     if number_of_records_loaded is number_of_records_to_load:
         remove_old_import_records()
         populate_data_preview_screen(app_reference.root)
+
+
+def import_data_into_openmrs():
+    print('ok')
+    for record in records_to_import:
+        print(record)
+        for visit in location_to_import_records:
+            print(visit)
+            if visit['patient']['display'].split(' - ')[0] in record.patient_id:
+                post_temperature_to_visit(visit, record)
+                print('in')
 
 
 def populate_data_preview_screen(root):
