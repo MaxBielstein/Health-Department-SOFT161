@@ -641,18 +641,6 @@
                     id: clinic_order_vaccine_spinner
                     background_color: 0, 1.5, 4, 1
                     on_text:
-                        app.load_diseases_for_new_orders()
-                        print("The spinner {} has text {}".format(self, self.text))
-
-                Spinner:
-                    size_hint: None, None
-                    size: 175, 75
-                    pos_hint: {'center': 'center'}
-                    text: 'Select a Disease'
-                    font_size: 15
-                    id: order_select_disease
-                    background_color: 0, 1.5, 4, 1
-                    on_text:
                         app.load_manufacturers_for_new_orders()
                         print("The spinner {} has text {}".format(self, self.text))
 
@@ -660,12 +648,27 @@
                     size_hint: None, None
                     size: 175, 75
                     pos_hint: {'center': 'center'}
-                    text: 'Select a Manufacturer'
+                    text: 'Not Available'
                     font_size: 15
                     id: order_manufacturer_spinner
                     background_color: 0, 1.5, 4, 1
                     on_text:
+                        app.load_diseases_for_new_orders()
                         print("The spinner {} has text {}".format(self, self.text))
+
+                Spinner:
+                    size_hint: None, None
+                    size: 175, 75
+                    pos_hint: {'center': 'center'}
+                    text: 'Not Available'
+                    font_size: 15
+                    id: order_select_disease
+                    background_color: 0, 1.5, 4, 1
+                    on_text:
+
+                        print("The spinner {} has text {}".format(self, self.text))
+
+
 
             MDTextField:
                 hint_text: 'Number of Doses'
