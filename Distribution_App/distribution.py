@@ -88,6 +88,7 @@ class DistributionApp(MDApp):
     new_clinic_name_property = StringProperty()
     new_clinic_address_property = StringProperty()
     new_clinic_ID_property = NumericProperty()
+    new_clinic_current_clinic = StringProperty()
     # vaccines
     new_vaccine_name_property = StringProperty()
     new_vaccine_disease_property = StringProperty('Select a Disease')
@@ -138,12 +139,18 @@ class DistributionApp(MDApp):
     def prefill_existing_clinic(self):
         if 'Select a Clinic' not in self.root.get_screen(
                 'ExistingClinic').ids.clinics_spinner.text:
-            self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = self.root.get_screen(
+            self.new_clinic_current_clinic = self.root.get_screen(
                 'ExistingClinic').ids.clinics_spinner.text
+            self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = self.new_clinic_current_clinic
+
             self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = \
                 get_specific_sql_data('vaccination_clinics', 'clinic_address',
                                       'clinic_name', self.root.get_screen(
                         'ExistingClinic').ids.clinics_spinner.text)[0]
+
+    def load_edit_clinic(self):
+        self.root.get_screen(
+            'm_for_clinic').ids.edit_clinic_label.text = "Add or Remove Manufacturers for: " + self.new_clinic_current_clinic
 
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
@@ -168,7 +175,7 @@ class DistributionApp(MDApp):
         self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner.values = get_sql_data(
             'vaccination_clinics',
             'clinic_name')
-        #self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = ''
+        # self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = ''
         self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
@@ -183,9 +190,8 @@ class DistributionApp(MDApp):
 
     def load_diseases_for_new_orders(self):
         self.root.get_screen('order_vaccine').ids.order_select_disease.text = 'Select a Disease'
-        self.root.get_screen('order_vaccine').ids.order_select_disease.values = ['Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio']
-
-
+        self.root.get_screen('order_vaccine').ids.order_select_disease.values = ['Covid', 'Measles', 'Smallpox',
+                                                                                 'Anthrax', 'Mumps', 'Polio']
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
@@ -205,6 +211,7 @@ class DistributionApp(MDApp):
         id_path = self.root.get_screen('clinic').ids
         if id_path.new_clinic_name.text is not '':
             self.new_clinic_name_property = id_path.new_clinic_name.text
+            self.new_clinic_current_clinic = id_path.new_clinic_name.text
 
         if id_path.new_clinic_id.text is not '':
             self.new_clinic_ID_property = id_path.new_clinic_id.text

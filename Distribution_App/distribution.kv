@@ -157,6 +157,7 @@
                     root.manager.current = 'm_for_clinic'
                     app.create_new_clinic()
                     app.load_manufacturer_spinners_for_clinics()
+                    app.load_edit_clinic()
 
         Widget:
             size_hint_y: None
@@ -280,6 +281,7 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'm_for_clinic'
                     app.load_manufacturer_spinners_for_clinics()
+                    app.load_edit_clinic()
 
 
         Widget:
@@ -305,7 +307,7 @@
             pos_hint: {'center_x': 0.5,}
 
             MDLabel:
-                text: "Add/Remove Manufacturers from clinic"
+                id: edit_clinic_label
                 font_size: 35
 
 
