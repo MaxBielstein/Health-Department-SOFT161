@@ -125,6 +125,7 @@ class Health_departmentApp(MDApp):
         old_records = []
         location_to_import_records = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
+        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value=1
 
     def load_credentials_file(self):
         try:
