@@ -210,14 +210,20 @@
 
 <DataPreview>
 
+
     MDCard:
         size_hint: None, None
-        size: 900, 800
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size: 450, 800
+        pos_hint: {'center_x': 0.3, 'center_y': 0.5}
         elevation: 5
         padding: 25
         spacing: 25
         orientation: 'vertical'
+
+        MDLabel:
+            text: 'Unmatched Records'
+            font_size: 45
+            halign: 'center'
 
         ScrollView:
             do_scroll_x: False
@@ -227,6 +233,30 @@
                 spacing: -55
                 padding: -25
                 id: scrollview_left
+                size_hint: (1, None)
+
+    MDCard:
+        size_hint: None, None
+        size: 450, 800
+        pos_hint: {'center_x': 0.7, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        MDLabel:
+            text: 'Records to import'
+            font_size: 45
+            halign: 'center'
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: -55
+                padding: -25
+                id: scrollview_right
                 size_hint: (1, None)
 
 
