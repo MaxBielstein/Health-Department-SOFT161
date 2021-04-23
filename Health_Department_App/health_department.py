@@ -104,7 +104,7 @@ class Health_departmentApp(MDApp):
         self.openmrs_port = path.openmrs_port.text
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
-        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar, self.root), 2)
+        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
 
     def load_credentials_file(self):
         try:
@@ -205,20 +205,14 @@ def update_records():
         load_visits(patient_uuids[id]['UUID'])
 
 
-def load_records_into_app(loading_bar, root):
+def load_records_into_app(loading_bar):
     global currently_checking
     global session
     people_lots = session.query(PeopleLots)
-    length_of_query = 0
     global number_of_records_to_load
-    for query in people_lots:
-        length_of_query += 1
-    loading_bar_increment_amount = (100 / length_of_query)
-    print(loading_bar_increment_amount)
     loading_bar.value = 0
     for appointment in people_lots:
         currently_checking = appointment
-        loading_bar.value += loading_bar_increment_amount
         if appointment.patient_id not in patient_uuids:
             print('in in in')
             patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
@@ -243,6 +237,12 @@ def add_data_to_records(record_type, record):
     number_of_records_loaded += 1
     if number_of_records_loaded is number_of_records_to_load:
         populate_data_preview_screen(app_reference.root)
+        if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
+            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
+        else:
+            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
+                                                                                                          100 - app_reference.root.get_screen(
+                                                                                                      'LoadingLogin').ids.loading_login_progress_bar.value) / 4
 
 
 def populate_data_preview_screen(root):
