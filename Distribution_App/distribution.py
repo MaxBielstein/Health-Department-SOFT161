@@ -204,13 +204,11 @@ class DistributionApp(MDApp):
 
     def load_manufacturers_for_new_orders(self):
         self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = 'Select a Manufacturer'
-        clinics_manufacturers = get_manufacturers_for_clinic(
-            get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
-                                  self.root.get_screen(
-                                      'order_vaccine').ids.clinic_order_vaccine_spinner.text)[0])
+        clinics_manufacturers = get_manufacturers_for_clinic(self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner.text)
         if len(clinics_manufacturers) == 0:
             self.root.get_screen(
                 'order_vaccine').ids.order_manufacturer_spinner.text = 'No manufacturers \n        available\nfor selected clinic'
+            self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = set()
         else:
             self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = clinics_manufacturers
 
