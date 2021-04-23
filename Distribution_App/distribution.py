@@ -208,7 +208,9 @@ class DistributionApp(MDApp):
             'manufacturer_name')
 
     def load_manufacturers_for_new_orders(self):
-
+        self.new_order_clinic_ID_property = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                                                  self.root.get_screen(
+                                                                      'order_vaccine').ids.clinic_order_vaccine_spinner.text)[0]
         self.root.get_screen('order_vaccine').ids.new_order_clinic.text = 'Chosen Clinic: ' + self.root.get_screen(
             'order_vaccine').ids.clinic_order_vaccine_spinner.text
         self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = 'Select a Manufacturer'
@@ -229,9 +231,9 @@ class DistributionApp(MDApp):
                                                                 self.root.get_screen(
                                                                     'order_vaccine').ids.order_manufacturer_spinner.text)
         if len(self.new_order_manufacturer_ids) > 0:
-            print(self.new_order_manufacturer_ids[0])
+            self.new_order_manufacturer_ID_property = self.new_order_manufacturer_ids[0]
             new_order_disease_list = get_specific_sql_data('vaccines', 'relevant_disease', 'manufacturer_id',
-                                                           self.new_order_manufacturer_ids[0])
+                                                           self.new_order_manufacturer_ID_property)
             self.root.get_screen('order_vaccine').ids.order_select_disease.values = new_order_disease_list
         else:
             self.root.get_screen(
@@ -254,7 +256,8 @@ class DistributionApp(MDApp):
             if len(approved_vaccines) != 0:
                 self.new_order_vaccine_ID_property = get_specific_sql_data('vaccines', 'vaccine_id', 'vaccine_name',
                                                                            list(approved_vaccines)[0])[0]
-                self.root.get_screen('order_vaccine').ids.new_order_vaccine.text = 'Assigned Vaccine: ' + list(approved_vaccines)[0]
+                self.root.get_screen('order_vaccine').ids.new_order_vaccine.text = 'Assigned Vaccine: ' + \
+                                                                                   list(approved_vaccines)[0]
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
@@ -308,19 +311,17 @@ class DistributionApp(MDApp):
     def create_new_order(self):
         # This one is incorrect and incomplete for now
         id_path = self.root.get_screen('order_vaccine').ids
-        if 'Select a Clinic' not in id_path.clinic_order_vaccine_spinner.text:
-            self.new_order_clinic_ID_property = get_specific_sql_data('vaccination_clinics', 'clinic_id',
-                                                                      'clinic_name', self.root.get_screen(
-                    'order_vaccine').ids.clinic_order_vaccine_spinner.text)[0]
 
-        if 'Select a Disease' not in id_path.order_select_disease.text:
-            self.new_order_clinic_ID_property = get_specific_sql_data('vaccination_clinics', 'clinic_id',
-                                                                      'clinic_name', self.root.get_screen(
-                    'order_vaccine').ids.clinic_order_vaccine_spinner.text)[0]
+        if id_path.order_id.text != '':
+            self.new_order_ID_property = id_path.order_id.text
+
+        if id_path.order_doses.text != '':
+            self.new_order_doses_property = id_path.order_id.text
 
         if self.check_for_required_inputs_new_order():
-            new_order(self, self.new_clinic_name_property, self.new_clinic_address_property,
-                      self.new_clinic_ID_property)
+            new_order(self, self.new_order_ID_property, self.new_order_manufacturer_ID_property,
+                      self.new_order_clinic_ID_property, self.new_order_vaccine_ID_property,
+                      self.new_order_doses_property)
 
     # Methods to check if all the needed fields to create new table entries are filled
     def check_for_required_inputs_new_clinic(self):
@@ -432,8 +433,8 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
 
 
 def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
-    order = VaccinationClinics(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
-                               vaccine_id=vaccine_id, doses_in_order=doses)
+    order = Orders(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
+                   vaccine_id=vaccine_id, doses_in_order=doses)
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
         sql_input(order, session)
         # self.confirm_screen('new_person_confirmed')
