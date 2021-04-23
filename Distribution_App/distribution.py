@@ -154,9 +154,13 @@ class DistributionApp(MDApp):
 
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
+        clinics_manufacturers = []
         self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
+        for manufacturer in get_sql_data('manufacturers','manufacturer_name'):
+            pass
+
 
     def load_manufacturer_spinners_for_vaccines(self):
         self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
