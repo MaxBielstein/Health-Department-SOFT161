@@ -1,8 +1,16 @@
 <HomeScreen>
+
+
+    MDLabel:
+        text: 'Health Department App'
+        font_size: 45
+        halign: 'center'
+        pos_hint: {'center_x': 0.5, 'center_y': .95}
+
     MDCard:
         size_hint: None, None
-        size: 900, 800
-        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size: 450, 800
+        pos_hint: {'center_x': 0.3, 'center_y': 0.5}
         elevation: 5
         padding: 25
         spacing: 25
@@ -10,111 +18,94 @@
 
         MDBoxLayout:
             orientation: 'vertical'
+            pos_hint: {'center_x': 0.5,}
+            padding: 25
+            spacing: 25
 
             MDLabel:
-                text: 'Health Department App'
-                font_size: 45
-                halign: 'center'
+                text: 'Enter Credentials for Database'
+                font_size: 30
+                halign: 'left'
+
+            MDTextField:
+                hint_text: 'Authority'
+                text: app.host
+                font_size: 30
+                id: database_host
+
+            MDTextField:
+                hint_text: 'Port Number'
+                text: app.port
+                font_size: 30
+                id: database_port
+
+            MDTextField:
+                hint_text: 'Username'
+                text: app.user
+                font_size: 30
+                id: database_username
+
+            MDTextField:
+                hint_text: 'Password'
+                text: app.password
+                font_size: 30
+                id: database_password
+
+            MDTextField:
+                hint_text: 'Database'
+                text: app.database_name
+                font_size: 30
+                id: database_database
 
 
-            MDBoxLayout:
-                orientation: 'horizontal'
-                pos_hint: {'center_x': 0.5,}
 
-                MDLabel:
-                    text: 'Enter Credentials for Database'
-                    font_size: 30
-                    halign: 'left'
+    MDCard:
+        size_hint: None, None
+        size: 450, 800
+        pos_hint: {'center_x': 0.7, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
 
-                MDLabel:
-                    text: 'Enter Credentials for OpenMRS'
-                    font_size: 30
-                    halign: 'left'
+        MDBoxLayout:
+            orientation: 'vertical'
+            pos_hint: {'center_x': 0.5,}
+            padding: 25
+            spacing: 25
 
+            MDLabel:
+                text: 'Enter Credentials for OpenMRS'
+                font_size: 30
+                halign: 'left'
 
-            MDBoxLayout:
-                orientation: 'horizontal'
-                pos_hint: {'center_x': 0.5,}
-                padding: 25
-                spacing: 25
+            MDTextField:
+                hint_text: 'Authority'
+                text: app.openmrs_host
+                font_size: 30
+                id: openmrs_host
 
-                MDTextField:
-                    hint_text: 'Authority'
-                    text: app.host
-                    font_size: 30
-                    id: database_host
+            MDTextField:
+                hint_text: 'Port Number'
+                text: app.openmrs_port
+                font_size: 30
+                id: openmrs_port
 
-                MDTextField:
-                    hint_text: 'Authority'
-                    text: app.openmrs_host
-                    font_size: 30
-                    id: openmrs_host
+            MDTextField:
+                hint_text: 'Username'
+                text: app.openmrs_user
+                font_size: 30
+                id: openmrs_username
 
-            MDBoxLayout:
-                orientation: 'horizontal'
-                pos_hint: {'center_x': 0.5,}
-                padding: 25
-                spacing: 25
+            MDTextField:
+                hint_text: 'Password'
+                text: app.openmrs_password
+                font_size: 30
+                id: openmrs_password
 
-                MDTextField:
-                    hint_text: 'Port Number'
-                    text: app.port
-                    font_size: 30
-                    id: database_port
-
-                MDTextField:
-                    hint_text: 'Port Number'
-                    text: app.openmrs_port
-                    font_size: 30
-                    id: openmrs_port
-
-            MDBoxLayout:
-                orientation: 'horizontal'
-                pos_hint: {'center_x': 0.5,}
-                padding: 25
-                spacing: 25
-
-                MDTextField:
-                    hint_text: 'Username'
-                    text: app.user
-                    font_size: 30
-                    id: database_username
-
-                MDTextField:
-                    hint_text: 'Username'
-                    text: app.openmrs_user
-                    font_size: 30
-                    id: openmrs_username
-
-            MDBoxLayout:
-                orientation: 'horizontal'
-                pos_hint: {'center_x': 0.5,}
-                padding: 25
-                spacing: 25
-
-                MDTextField:
-                    hint_text: 'Password'
-                    text: app.password
-                    font_size: 30
-                    id: database_password
-
-                MDTextField:
-                    hint_text: 'Password'
-                    text: app.openmrs_password
-                    font_size: 30
-                    id: openmrs_password
-
-            MDBoxLayout:
-                orientation: 'horizontal'
-                pos_hint: {'center_x': 0.5,}
-                padding: 25
-                spacing: 25
-
-                MDTextField:
-                    hint_text: 'Database'
-                    text: app.database_name
-                    font_size: 30
-                    id: database_database
+            Widget:
+                size_hint_y: None
+                height: 70
 
     Widget:
         size_hint_y: None
@@ -187,26 +178,12 @@
                     active: True
 
                 MDProgressBar:
-                    value: 0
+                    value: 1
                     id: loading_login_progress_bar
 
                 Widget:
                     size_hint_x: None
                     width: 10
-
-            MDRaisedButton:
-                text: '(Dev button temp) Increase progress bar'
-                font_size: 30
-                on_release:
-                    root.ids.loading_login_progress_bar.value += 10
-
-
-            MDRaisedButton:
-                text: '(Dev button temp) Next screen'
-                font_size: 30
-                on_release:
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'DataPreview'
 
 <DataPreview>
 
@@ -285,6 +262,9 @@
             MDRaisedButton:
                 text: 'Import'
                 font_size: 30
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'ImportingLoading'
 
         Widget:
             size_hint_y: None
@@ -292,5 +272,62 @@
 
 
 <ImportingLoading>
+
+    MDCard:
+        size_hint: None, None
+        size: 900, 800
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+
+        MDBoxLayout:
+            orientation: 'vertical'
+            padding: 25
+            spacing: 25
+
+            MDLabel:
+                text: 'Importing'
+                halign: 'center'
+                font_size: 45
+
+            MDLabel:
+                text: 'Current Action'
+                font_size: 30
+                halign: 'center'
+                id: current_action_loading_importing
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+
+                MDSpinner:
+                    size_hint: None, None
+                    size: dp(26), dp(26)
+                    pos_hint: {'center_x': .5, 'center_y': .5}
+                    id: importing_spinner
+                    active: True
+
+                MDProgressBar:
+                    value: 0
+                    id: loading_importing_progress_bar
+
+                Widget:
+                    size_hint_x: None
+                    width: 10
+
+            MDRaisedButton:
+                text: '(Dev button temp) Increase progress bar'
+                font_size: 30
+                on_release:
+                    root.ids.loading_importing_progress_bar.value += 10
+
+
+            MDRaisedButton:
+                text: '(Dev button temp) Next screen'
+                font_size: 30
 
 
