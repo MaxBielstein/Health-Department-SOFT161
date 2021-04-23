@@ -44,7 +44,7 @@
             size_hint: None, None
             increment_width: 230
             on_press:
-                app.load_spinners_for_new_orders()
+                app.load_clinics_for_new_orders()
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'order_vaccine'
 
@@ -641,6 +641,7 @@
                     id: clinic_order_vaccine_spinner
                     background_color: 0, 1.5, 4, 1
                     on_text:
+                        app.load_diseases_for_new_orders()
                         print("The spinner {} has text {}".format(self, self.text))
 
                 Spinner:
@@ -651,8 +652,8 @@
                     font_size: 15
                     id: order_select_disease
                     background_color: 0, 1.5, 4, 1
-                    values: 'Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio'
                     on_text:
+                        app.load_manufacturers_for_new_orders()
                         print("The spinner {} has text {}".format(self, self.text))
 
                 Spinner:

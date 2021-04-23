@@ -164,13 +164,18 @@ class DistributionApp(MDApp):
             'vaccination_clinics',
             'clinic_name')
 
-    def load_spinners_for_new_orders(self):
-        self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = get_sql_data(
-            'manufacturers',
-            'manufacturer_name')
+    def load_clinics_for_new_orders(self):
         self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner.values = get_sql_data(
             'vaccination_clinics',
             'clinic_name')
+
+    def load_diseases_for_new_orders(self):
+        self.root.get_screen('order_vaccine').ids.order_select_disease.values = ['Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio']
+
+    def load_manufacturers_for_new_orders(self):
+        self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.values = get_sql_data(
+            'manufacturers',
+            'manufacturer_name')
 
     # Selection Getting Methods
     def get_selected_manufacturer_for_vaccines(self):
