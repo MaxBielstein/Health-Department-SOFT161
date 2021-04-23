@@ -94,6 +94,12 @@ class DistributionApp(MDApp):
     new_vaccine_ID_property = NumericProperty()
     new_vaccine_doses_property = NumericProperty()
     new_vaccine_manufacturer_ID_property = NumericProperty()
+    # Orders
+    new_order_ID_property = NumericProperty()
+    new_order_manufacturer_ID_property = NumericProperty()
+    new_order_vaccine_ID_property = NumericProperty()
+    new_order_clinic_ID_property = NumericProperty()
+    new_order_doses_property = NumericProperty()
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -133,13 +139,11 @@ class DistributionApp(MDApp):
         if 'Select a Clinic' not in self.root.get_screen(
                 'ExistingClinic').ids.clinics_spinner.text:
             self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = self.root.get_screen(
-                        'ExistingClinic').ids.clinics_spinner.text
+                'ExistingClinic').ids.clinics_spinner.text
             self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = \
                 get_specific_sql_data('vaccination_clinics', 'clinic_address',
                                       'clinic_name', self.root.get_screen(
                         'ExistingClinic').ids.clinics_spinner.text)[0]
-
-
 
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
@@ -276,6 +280,48 @@ class DistributionApp(MDApp):
             return False
         return True
 
+    def create_new_order(self):
+        id_path = self.root.get_screen('clinic').ids
+        if id_path.new_clinic_name.text is not '':
+            self.new_clinic_name_property = id_path.new_clinic_name.text
+
+        if id_path.new_clinic_id.text is not '':
+            self.new_clinic_ID_property = id_path.new_clinic_id.text
+
+        if id_path.new_clinic_address.text is not '':
+            self.new_clinic_address_property = id_path.new_clinic_address.text
+
+        if self.check_for_required_inputs_new_clinic():
+            new_clinic(self, self.new_clinic_name_property, self.new_clinic_address_property,
+                       self.new_clinic_ID_property)
+
+    def check_for_required_inputs_new_order(self):
+        if self.new_order_ID_property is '':
+            self.input_error_message = 'Order ID field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        elif self.new_order_ID_property in get_sql_data('orders', 'order_id'):
+            self.input_error_message = 'Order with this ID already exists'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_order_vaccine_ID_property is '':
+            self.input_error_message = 'Vaccine ID field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_order_manufacturer_ID_property is '':
+            self.input_error_message = 'Manufacturer ID field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_order_clinic_ID_property is '':
+            self.input_error_message = 'Clinic ID field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        if self.new_order_doses_property is '':
+            self.input_error_message = 'Doses field must be filled'
+            # Factory.NewInputError().open()
+            return False
+        return True
+
 
 # These methods enter the table entries from the previous methods into the actual database.
 def new_clinic(self, name, address, id):
@@ -293,6 +339,17 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
                        manufacturer_id=manufacturer_id)
     if int(vaccine.vaccine_id) not in get_sql_data('vaccines', 'vaccine_id'):
         sql_input(vaccine)
+        # self.confirm_screen('new_person_confirmed')
+    else:
+        pass
+        # Factory.MatchingIDError().open()
+
+
+def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
+    order = VaccinationClinics(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
+                               vaccine_id=vaccine_id, doses_in_order=doses)
+    if int(order.order_id) not in get_sql_data('orders', 'order_id'):
+        sql_input(order)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
