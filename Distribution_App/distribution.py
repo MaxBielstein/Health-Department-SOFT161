@@ -379,7 +379,7 @@ class DistributionApp(MDApp):
 def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
-        sql_input(clinic)
+        sql_input(clinic, session)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -390,7 +390,7 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
     vaccine = Vaccines(vaccine_id=id, required_doses=doses, relevant_disease=disease, vaccine_name=name,
                        manufacturer_id=manufacturer_id)
     if int(vaccine.vaccine_id) not in get_sql_data('vaccines', 'vaccine_id'):
-        sql_input(vaccine)
+        sql_input(vaccine, session)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -401,7 +401,7 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
     order = VaccinationClinics(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
                                vaccine_id=vaccine_id, doses_in_order=doses)
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
-        sql_input(order)
+        sql_input(order, session)
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -450,11 +450,14 @@ def get_specific_sql_data(table_name, column, identifier_column, oracle):
         return []
 
 
+# Temporary Location
+url = DistributionDatabase.construct_mysql_url(host, 3306, database_name, user, password)
+record_database = DistributionDatabase(url)
+session = record_database.create_session()
+
+
 # This is a simple method for adding data to the sql database
-def sql_input(data):
-    url = DistributionDatabase.construct_mysql_url(host, 3306, database_name, user, password)
-    record_database = DistributionDatabase(url)
-    session = record_database.create_session()
+def sql_input(data, session):
     session.add(data)
     session.commit()
 
