@@ -309,7 +309,7 @@ def populate_data_preview_screen(root):
             MDLabel(
                 text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                 halign="center", )
-        )   
+        )
     root.current = 'DataPreview'
     root.transition.direction = 'left'
 
