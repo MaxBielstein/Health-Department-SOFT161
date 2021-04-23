@@ -154,13 +154,21 @@ class DistributionApp(MDApp):
 
     # Spinner Loading Functions
     def load_manufacturer_spinners_for_clinics(self):
-        clinics_manufacturers = []
+        clinics_manufacturers = set()
         self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
             'manufacturers',
             'manufacturer_name')
-        for manufacturer in get_sql_data('manufacturers','manufacturer_name'):
-            pass
-
+        for clinic_id in get_sql_data('manufacturer_clinics', 'clinic_id'):
+            if clinic_id == get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                                  self.new_clinic_current_clinic)[0]:
+                # print(clinic_id)
+                for manufacturer_id in (get_specific_sql_data('manufacturer_clinics', 'manufacturer_id',
+                                                              'clinic_id', clinic_id)):
+                    clinics_manufacturers.add(
+                        get_specific_sql_data('manufacturers', 'manufacturer_name', 'manufacturer_id',
+                                              manufacturer_id)[0])
+        self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.values = clinics_manufacturers
+        print(clinics_manufacturers)
 
     def load_manufacturer_spinners_for_vaccines(self):
         self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
