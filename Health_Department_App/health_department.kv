@@ -135,10 +135,10 @@
                 text: 'Login'
                 font_size: 30
                 on_press:
-                    app.login_button()
-                on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'LoadingLogin'
+                    app.login_button()
+
 
 
         Widget:
@@ -183,6 +183,7 @@
                     size_hint: None, None
                     size: dp(26), dp(26)
                     pos_hint: {'center_x': .5, 'center_y': .5}
+                    id: loading_spinner
                     active: True
 
                 MDProgressBar:
@@ -221,14 +222,13 @@
         ScrollView:
             do_scroll_x: False
             do_scroll_y: True
+            MDBoxLayout:
+                orientation: 'vertical'
+                spacing: -55
+                padding: -25
+                id: scrollview_left
+                size_hint: (1, None)
 
-
-            MDLabel:
-                size_hint_y: None
-                height: self.texture_size[1]
-                text_size: self.width, None
-                padding: 10, 10
-                text: 'really some amazing text\n' * 100
 
     MDBoxLayout:
         orientation: 'vertical'

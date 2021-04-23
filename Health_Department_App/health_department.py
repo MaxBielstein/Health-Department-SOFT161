@@ -1,4 +1,6 @@
+import enum
 from json import dumps
+from time import sleep
 
 import sqlalchemy
 from kivy import Config
@@ -6,9 +8,11 @@ from kivy import Config
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'minimum_width', '1200')
-
 Config.set('graphics', 'minimum_height', '1000')
 
+from kivy.uix.widget import Widget
+from kivy.clock import Clock
+from kivymd.uix.label import MDLabel
 from kivy.app import App
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
@@ -30,11 +34,20 @@ from openmrs import RESTConnection
 class HomeScreen(Screen):
     pass
 
+
 class LoadingLogin(Screen):
     pass
 
+
 class DataPreview(Screen):
     pass
+
+
+class RecordType(enum.Enum):
+    OLD_RECORD = 'OLD_RECORD'
+    IMPORT_RECORD = 'IMPORT_RECORD'
+    UNMATCHED_RECORD = 'UNMATCHED_RECORD'
+
 
 class Health_departmentApp(MDApp):
     host = StringProperty()
@@ -51,7 +64,6 @@ class Health_departmentApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.load_defaults()
-        connect_to_databases(self)
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -76,7 +88,10 @@ class Health_departmentApp(MDApp):
         self.openmrs_password = 'Admin123'
 
     def login_button(self):
+        global app_reference
+        app_reference = self
         path = self.root.get_screen('home').ids
+        loading_bar = self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
 
         self.host = path.database_host.text
         self.database_name = path.database_database.text
@@ -89,8 +104,7 @@ class Health_departmentApp(MDApp):
         self.openmrs_port = path.openmrs_port.text
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
-
-        update_patient_uuid_list()
+        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
 
     def load_credentials_file(self):
         try:
@@ -143,6 +157,9 @@ def add_patient_uuid(_, response):
         patient_uuids[id]['Name'] = name
         patient_uuids[id]['UUID'] = uuid
         load_visits(uuid)
+    else:
+        print('unmatched')
+        add_data_to_records(RecordType.UNMATCHED_RECORD, currently_checking)
 
 
 def patient_not_loaded(_, response):
@@ -158,12 +175,11 @@ def on_visits_loaded(_, response):
                     if len(result['encounters'][-1]['obs']) is not 0:
                         for observation in result['encounters'][-1]['obs']:
                             if 'Temperature' in observation['display']:
-                                unmatched_records.append(result)
-                                print('to unmatched')
+                                add_data_to_records(RecordType.OLD_RECORD, result)
+                                print('to old records')
                                 return
-            records_to_import.append(result)
+            add_data_to_records(RecordType.IMPORT_RECORD, result)
             print('to import')
-
 
 
 def on_visits_not_loaded(_, error):
@@ -174,11 +190,6 @@ def on_visits_not_loaded(_, error):
 def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_password):
     global rest_connection
     rest_connection = RESTConnection(openmrs_host, openmrs_port, openmrs_user, openmrs_password)
-
-
-def get_all_people_lots():
-    vaccination_appointments = session.query(PeopleLots)
-    return vaccination_appointments
 
 
 def connect_to_databases(self):
@@ -194,18 +205,59 @@ def update_records():
         load_visits(patient_uuids[id]['UUID'])
 
 
-def update_patient_uuid_list():
+def load_records_into_app(loading_bar):
+    global currently_checking
     global session
     people_lots = session.query(PeopleLots)
+    global number_of_records_to_load
+    loading_bar.value = 0
     for appointment in people_lots:
+        currently_checking = appointment
         if appointment.patient_id not in patient_uuids:
             print('in in in')
             patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+            number_of_records_to_load += 1
             load_patient(appointment.patient_id)
         elif appointment.vaccination_date is not None:
             if appointment.vaccination_date > patient_uuids[appointment.patient_id]['latest_appointment']:
                 patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+                number_of_records_to_load += 1
                 load_patient(appointment.patient_id)
+
+
+def add_data_to_records(record_type, record):
+    if record_type is RecordType.OLD_RECORD:
+        old_records.append(record)
+    elif record_type is RecordType.IMPORT_RECORD:
+        records_to_import.append(record)
+    elif record_type is RecordType.UNMATCHED_RECORD:
+        unmatched_records.append(record)
+    global number_of_records_loaded
+    global number_of_records_to_load
+    number_of_records_loaded += 1
+    if number_of_records_loaded is number_of_records_to_load:
+        populate_data_preview_screen(app_reference.root)
+        if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
+            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
+        else:
+            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
+                                                                                                          100 - app_reference.root.get_screen(
+                                                                                                      'LoadingLogin').ids.loading_login_progress_bar.value) / 4
+
+
+def populate_data_preview_screen(root):
+    path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
+    global unmatched_records
+    print('unmatched records below')
+    print(len(unmatched_records))
+
+    for record in unmatched_records:
+        path_to_scrollview_left.add_widget(
+            MDLabel(text=record.patient_id,
+                    halign="center", )
+        )
+    root.current = 'DataPreview'
+    root.transition.direction = 'left'
 
 
 # Global variables:
@@ -213,8 +265,15 @@ def update_patient_uuid_list():
 global database
 global session
 global rest_connection
+global currently_checking
+
+# Assuming only one app runs at once so we can make a static reference to the app
+global app_reference
+number_of_records_to_load = 0
+number_of_records_loaded = 0
 patient_uuids = {}
 unmatched_records = []
+old_records = []
 records_to_import = []
 
 if __name__ == '__main__':
