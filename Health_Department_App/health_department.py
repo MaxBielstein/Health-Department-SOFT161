@@ -42,6 +42,9 @@ class LoadingLogin(Screen):
 class DataPreview(Screen):
     pass
 
+class ImportingLoading(Screen):
+    pass
+
 
 class RecordType(enum.Enum):
     OLD_RECORD = 'OLD_RECORD'
@@ -73,6 +76,7 @@ class Health_departmentApp(MDApp):
         sm.add_widget(HomeScreen(name='home'))
         sm.add_widget(LoadingLogin(name='LoadingLogin'))
         sm.add_widget(DataPreview(name='DataPreview'))
+        sm.add_widget(ImportingLoading(name='ImportingLoading'))
 
         return sm
 
