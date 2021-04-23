@@ -218,7 +218,7 @@ def remove_old_records_to_import():
     for record in records_to_import:
         for record2 in records_to_import:
             if record['display'] is record2['display']:
-                if
+                pass
 
 def on_visits_not_loaded(_, error):
     print(error)
