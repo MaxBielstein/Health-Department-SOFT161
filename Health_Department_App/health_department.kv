@@ -122,11 +122,7 @@
 
     MDBoxLayout:
         orientation: 'vertical'
-        pos_hint: {'center_x': 0.5,}
-        padding: 25
         spacing: 25
-
-
 
         MDBoxLayout:
             orientation: 'horizontal'
@@ -172,6 +168,12 @@
                 halign: 'center'
                 font_size: 45
 
+            MDLabel:
+                text: 'Current Action'
+                font_size: 30
+                halign: 'center'
+                id: current_action_loading_login
+
             MDBoxLayout:
                 orientation: 'horizontal'
                 padding: 25
@@ -196,5 +198,65 @@
                 font_size: 30
                 on_release:
                     root.ids.loading_login_progress_bar.value += 10
+
+
+            MDRaisedButton:
+                text: '(Dev button temp) Next screen'
+                font_size: 30
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'DataPreview'
+
+<DataPreview>
+
+    MDCard:
+        size_hint: None, None
+        size: 900, 800
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        elevation: 5
+        padding: 25
+        spacing: 25
+        orientation: 'vertical'
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+
+            MDLabel:
+                size_hint_y: None
+                height: self.texture_size[1]
+                text_size: self.width, None
+                padding: 10, 10
+                text: 'really some amazing text\n' * 100
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Abort'
+                font_size: 30
+                on_release:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+
+            MDRaisedButton:
+                text: 'Import'
+                font_size: 30
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
+
+
 
 

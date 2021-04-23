@@ -30,10 +30,11 @@ from openmrs import RESTConnection
 class HomeScreen(Screen):
     pass
 
-
 class LoadingLogin(Screen):
     pass
 
+class DataPreview(Screen):
+    pass
 
 class Health_departmentApp(MDApp):
     host = StringProperty()
@@ -58,8 +59,8 @@ class Health_departmentApp(MDApp):
         inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
         sm = ScreenManager()
         sm.add_widget(HomeScreen(name='home'))
-
         sm.add_widget(LoadingLogin(name='LoadingLogin'))
+        sm.add_widget(DataPreview(name='DataPreview'))
 
         return sm
 
