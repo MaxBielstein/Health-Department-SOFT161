@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
+from kivy.factory import Factory
 
 from database import *
 
@@ -87,14 +88,16 @@ class DistributionDatabase(object):
 def get_manufacturers_for_clinic(clinic_name):
     clinics_manufacturers = set()
     for clinic_id in get_sql_data('manufacturer_clinics', 'clinic_id'):
-        if clinic_id == get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
-                                              clinic_name)[0]:
+        if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                              clinic_name)):
+            if clinic_id == get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                                  clinic_name)[0]:
 
-            for manufacturer_id in (get_specific_sql_data('manufacturer_clinics', 'manufacturer_id',
-                                                          'clinic_id', clinic_id)):
-                clinics_manufacturers.add(
-                    get_specific_sql_data('manufacturers', 'manufacturer_name', 'manufacturer_id', manufacturer_id)[
-                        0])
+                for manufacturer_id in (get_specific_sql_data('manufacturer_clinics', 'manufacturer_id',
+                                                              'clinic_id', clinic_id)):
+                    clinics_manufacturers.add(
+                        get_specific_sql_data('manufacturers', 'manufacturer_name', 'manufacturer_id', manufacturer_id)[
+                            0])
     return clinics_manufacturers
 
 
@@ -286,6 +289,7 @@ class DistributionApp(MDApp):
             self.new_clinic_address_property = id_path.new_clinic_address.text
 
         if self.check_for_required_inputs_new_clinic():
+            self.root.current = 'm_for_clinic'
             new_clinic(self, self.new_clinic_name_property, self.new_clinic_address_property,
                        self.new_clinic_ID_property)
 
@@ -327,85 +331,85 @@ class DistributionApp(MDApp):
     def check_for_required_inputs_new_clinic(self):
         if self.new_clinic_name_property is '':
             self.input_error_message = 'Name field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         elif self.new_clinic_name_property in get_sql_data('vaccination_clinics', 'clinic_name'):
             self.input_error_message = 'Clinic with this name already exists'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_clinic_ID_property is '':
             self.input_error_message = 'no id found'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         elif self.new_clinic_ID_property in get_sql_data('vaccination_clinics', 'clinic_id'):
             self.input_error_message = 'Clinic with this ID already exists'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_clinic_address_property is '':
             self.input_error_message = 'Address field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         elif self.new_clinic_address_property in get_sql_data('vaccination_clinics', 'clinic_address'):
             self.input_error_message = 'Clinic with this address already exists'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         return True
 
     def check_for_required_inputs_new_vaccine(self):
         if self.new_vaccine_name_property is '':
             self.input_error_message = 'Name field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         elif self.new_vaccine_name_property in get_sql_data('vaccines', 'vaccine_name'):
             self.input_error_message = 'Vaccine with this name already exists'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_vaccine_ID_property is '':
             self.input_error_message = 'No ID for the vaccine was provided'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         elif self.new_vaccine_ID_property in get_sql_data('vaccines', 'vaccine_id'):
             self.input_error_message = 'Vaccine with this ID already exists'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_vaccine_disease_property == 'Select a Disease':
             self.input_error_message = 'Disease field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_vaccine_doses_property is '':
             self.input_error_message = 'Required Doses field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_vaccine_manufacturer_ID_property is '':
             self.input_error_message = 'A Manufacturer ID was not correctly passed in'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         return True
 
     def check_for_required_inputs_new_order(self):
         if self.new_order_ID_property is '':
             self.input_error_message = 'Order ID field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         elif self.new_order_ID_property in get_sql_data('orders', 'order_id'):
             self.input_error_message = 'Order with this ID already exists'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_order_vaccine_ID_property is '':
             self.input_error_message = 'No Vaccine found'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_order_manufacturer_ID_property is '':
             self.input_error_message = 'Manufacturer ID field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_order_clinic_ID_property is '':
             self.input_error_message = 'Clinic ID field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         if self.new_order_doses_property is '':
             self.input_error_message = 'Doses field must be filled'
-            # Factory.NewInputError().open()
+            Factory.NewInputError().open()
             return False
         return True
 
@@ -418,7 +422,7 @@ def new_clinic(self, name, address, id):
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
-        # Factory.MatchingIDError().open()
+        Factory.MatchingIDError().open()
 
 
 def new_vaccine(self, id, doses, disease, name, manufacturer_id):
@@ -429,7 +433,7 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
-        # Factory.MatchingIDError().open()
+        Factory.MatchingIDError().open()
 
 
 def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
@@ -440,7 +444,7 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
-        # Factory.MatchingIDError().open()
+        Factory.MatchingIDError().open()
 
 
 # Loads the database credentials from the credentials.json file
