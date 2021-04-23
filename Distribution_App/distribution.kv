@@ -721,6 +721,7 @@
                 id: add_new_order
                 font_size: 30
                 on_press:
+                    app.create_new_order()
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
 
