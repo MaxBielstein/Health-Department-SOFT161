@@ -1,3 +1,4 @@
+import enum
 from json import dumps
 from time import sleep
 
@@ -42,6 +43,12 @@ class DataPreview(Screen):
     pass
 
 
+class RecordType(enum.Enum):
+    OLD_RECORD = 'OLD_RECORD'
+    IMPORT_RECORD = 'IMPORT_RECORD'
+    UNMATCHED_RECORD = 'UNMATCHED_RECORD'
+
+
 class Health_departmentApp(MDApp):
     host = StringProperty()
     database_name = StringProperty()
@@ -81,6 +88,8 @@ class Health_departmentApp(MDApp):
         self.openmrs_password = 'Admin123'
 
     def login_button(self):
+        global app_reference
+        app_reference = self
         path = self.root.get_screen('home').ids
         loading_bar = self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
 
@@ -95,7 +104,7 @@ class Health_departmentApp(MDApp):
         self.openmrs_port = path.openmrs_port.text
         self.openmrs_password = path.openmrs_password.text
         connect_to_databases(self)
-        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar, self.root), 2)
+        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
 
     def load_credentials_file(self):
         try:
@@ -150,8 +159,7 @@ def add_patient_uuid(_, response):
         load_visits(uuid)
     else:
         print('unmatched')
-        global unmatched_records
-        unmatched_records.append(currently_checking)
+        add_data_to_records(RecordType.UNMATCHED_RECORD, currently_checking)
 
 
 def patient_not_loaded(_, response):
@@ -167,10 +175,10 @@ def on_visits_loaded(_, response):
                     if len(result['encounters'][-1]['obs']) is not 0:
                         for observation in result['encounters'][-1]['obs']:
                             if 'Temperature' in observation['display']:
-                                old_records.append(result)
+                                add_data_to_records(RecordType.OLD_RECORD, result)
                                 print('to old records')
                                 return
-            records_to_import.append(result)
+            add_data_to_records(RecordType.IMPORT_RECORD, result)
             print('to import')
 
 
@@ -197,28 +205,44 @@ def update_records():
         load_visits(patient_uuids[id]['UUID'])
 
 
-def load_records_into_app(loading_bar, root):
+def load_records_into_app(loading_bar):
     global currently_checking
     global session
     people_lots = session.query(PeopleLots)
-    length_of_query = 0
-    for query in people_lots:
-        length_of_query += 1
-    loading_bar_increment_amount = (100 / length_of_query)
-    print(loading_bar_increment_amount)
+    global number_of_records_to_load
     loading_bar.value = 0
     for appointment in people_lots:
         currently_checking = appointment
-        loading_bar.value += loading_bar_increment_amount
         if appointment.patient_id not in patient_uuids:
             print('in in in')
             patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+            number_of_records_to_load += 1
             load_patient(appointment.patient_id)
         elif appointment.vaccination_date is not None:
             if appointment.vaccination_date > patient_uuids[appointment.patient_id]['latest_appointment']:
                 patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+                number_of_records_to_load += 1
                 load_patient(appointment.patient_id)
-    Clock.schedule_once(lambda dt: populate_data_preview_screen(root), 5)
+
+
+def add_data_to_records(record_type, record):
+    if record_type is RecordType.OLD_RECORD:
+        old_records.append(record)
+    elif record_type is RecordType.IMPORT_RECORD:
+        records_to_import.append(record)
+    elif record_type is RecordType.UNMATCHED_RECORD:
+        unmatched_records.append(record)
+    global number_of_records_loaded
+    global number_of_records_to_load
+    number_of_records_loaded += 1
+    if number_of_records_loaded is number_of_records_to_load:
+        populate_data_preview_screen(app_reference.root)
+        if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
+            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
+        else:
+            app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
+                                                                                                          100 - app_reference.root.get_screen(
+                                                                                                      'LoadingLogin').ids.loading_login_progress_bar.value) / 4
 
 
 def populate_data_preview_screen(root):
@@ -236,14 +260,17 @@ def populate_data_preview_screen(root):
     root.transition.direction = 'left'
 
 
-
 # Global variables:
 
 global database
 global session
 global rest_connection
 global currently_checking
-global number_of_records_loaded
+
+# Assuming only one app runs at once so we can make a static reference to the app
+global app_reference
+number_of_records_to_load = 0
+number_of_records_loaded = 0
 patient_uuids = {}
 unmatched_records = []
 old_records = []
