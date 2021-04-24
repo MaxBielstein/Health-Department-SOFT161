@@ -89,7 +89,7 @@ def get_manufacturers_for_clinic(clinic_name):
     clinics_manufacturers = set()
     for clinic_id in get_sql_data('manufacturer_clinics', 'clinic_id'):
         if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
-                                              clinic_name)):
+                                     clinic_name)):
             if clinic_id == get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
                                                   clinic_name)[0]:
 
@@ -150,13 +150,75 @@ class DistributionApp(MDApp):
         self.root.get_screen('ExistingClinic').ids.clinics_spinner.values = get_sql_data('vaccination_clinics',
                                                                                          'clinic_name')
 
-    def clear_new_vaccine_text(self):
-        self.root.get_screen('m_for_vaccine').ids.new_vaccine_name.text = ""
-        self.root.get_screen('m_for_vaccine').ids.new_vaccine_id.text = ""
-        self.root.get_screen('m_for_vaccine').ids.new_vaccine_disease.text = "Select a Disease"
-        self.root.get_screen('m_for_vaccine').ids.new_vaccine_required_doses.text = ""
-        self.new_vaccine_disease_property = "Select a Disease"
-        pass
+    def existing_clinic_select_clinic(self):
+        if self.root.get_screen('ExistingClinic').ids.clinics_spinner.text != "Clinics":
+            self.root.current = 'm_for_clinic'
+        else:
+            self.input_error_message = 'Clinic must be selected'
+            Factory.NewInputError().open()
+            self.on_done()
+
+    def on_done(self):
+
+        self.new_vaccine_name_property = ''
+        self.new_vaccine_ID_property = 0
+        self.new_vaccine_disease_property = 'Select a Disease'
+        self.new_vaccine_doses_property = 0
+        self.new_vaccine_manufacturer_ID_property = 0
+        self.new_order_ID_property = 0
+        self.new_order_manufacturer_ID_property = 0
+        self.new_order_vaccine_ID_property = 0
+        self.new_order_clinic_ID_property = 0
+        self.new_order_doses_property = 0
+        self.new_order_current_clinic = ''
+        self.new_order_current_manufacturer = ''
+        self.new_clinic_name_property = ''
+        self.new_clinic_address_property = ''
+        self.new_clinic_ID_property = 0
+        self.new_clinic_current_clinic = ''
+
+        self.root.get_screen('clinic').ids.new_clinic_name.text = ''
+        self.root.get_screen('clinic').ids.new_clinic_address.text = ''
+        self.root.get_screen('clinic').ids.new_clinic_id.text = ''
+
+        self.root.get_screen('ExistingClinic').ids.clinics_spinner.text = 'Clinics'
+        self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = ''
+        self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = ''
+
+        self.root.get_screen('m_for_clinic').ids.edit_clinic_label.text = ''
+        self.root.get_screen(
+            'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.text = 'Current Manufacturers'
+        self.root.get_screen(
+            'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.text = 'Available Manufacturers'
+
+        self.root.get_screen(
+            'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text = 'Select a Manufacturer'
+
+        self.root.get_screen('m_for_vaccine').ids.manufacturer_chosen_for_new_vaccine.text = ''
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_name.text = ''
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_id.text = ''
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_required_doses.text = ''
+        self.root.get_screen('m_for_vaccine').ids.new_vaccine_disease.text = 'Select a Disease'
+
+        self.root.get_screen('order_vaccine').ids.clinic_order_vaccine_spinner.text = 'Select a Clinic'
+        self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = 'Not Available'
+        self.root.get_screen('order_vaccine').ids.order_select_disease.text = 'Not Available'
+        self.root.get_screen('order_vaccine').ids.new_order_clinic.text = 'Chosen Clinic: '
+        self.root.get_screen('order_vaccine').ids.new_order_vaccine.text = 'Assigned Vaccine: '
+        self.root.get_screen('order_vaccine').ids.order_doses.text = ''
+        self.root.get_screen('order_vaccine').ids.order_id.text = ''
+
+        self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text = 'Select a Clinic'
+
+        self.root.get_screen(
+            'review_orders_manufacturer').ids.select_manufacturer_review_order.text = 'Select a Manufacturer'
+
+        self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
+
+        self.root.get_screen('order_information').ids.order_information_order_id.text = ''
+        self.root.get_screen('order_information').ids.order_information_clinic.text = ''
+        self.root.get_screen('order_information').ids.order_information_manufacturer.text = ''
+        self.root.get_screen('order_information').ids.order_information_doses.text = ''
 
     def prefill_existing_clinic(self):
         if 'Select a Clinic' not in self.root.get_screen(
@@ -165,10 +227,13 @@ class DistributionApp(MDApp):
                 'ExistingClinic').ids.clinics_spinner.text
             self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = self.new_clinic_current_clinic
 
-            self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = \
-                get_specific_sql_data('vaccination_clinics', 'clinic_address',
+            if len(get_specific_sql_data('vaccination_clinics', 'clinic_address',
                                       'clinic_name', self.root.get_screen(
-                        'ExistingClinic').ids.clinics_spinner.text)[0]
+                        'ExistingClinic').ids.clinics_spinner.text)) > 0:
+                self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = \
+                    get_specific_sql_data('vaccination_clinics', 'clinic_address',
+                                          'clinic_name', self.root.get_screen(
+                            'ExistingClinic').ids.clinics_spinner.text)[0]
 
     def load_edit_clinic(self):
         self.root.get_screen(
@@ -185,8 +250,6 @@ class DistributionApp(MDApp):
 
             self.root.get_screen(
                 'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.values = clinics_manufacturers
-        else:
-            print('this will be an error message')
 
     def load_manufacturer_spinners_for_vaccines(self):
         self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
@@ -213,7 +276,8 @@ class DistributionApp(MDApp):
     def load_manufacturers_for_new_orders(self):
         self.new_order_clinic_ID_property = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
                                                                   self.root.get_screen(
-                                                                      'order_vaccine').ids.clinic_order_vaccine_spinner.text)[0]
+                                                                      'order_vaccine').ids.clinic_order_vaccine_spinner.text)[
+            0]
         self.root.get_screen('order_vaccine').ids.new_order_clinic.text = 'Chosen Clinic: ' + self.root.get_screen(
             'order_vaccine').ids.clinic_order_vaccine_spinner.text
         self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = 'Select a Manufacturer'
@@ -266,7 +330,9 @@ class DistributionApp(MDApp):
     def get_selected_manufacturer_for_vaccines(self):
         if 'Select a Manufacturer' in self.root.get_screen(
                 'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text:
-            print("no selection made(this will be an error message)")
+            self.input_error_message = 'You must select a manufacturer'
+            Factory.NewInputError().open()
+            self.on_done()
         else:
             self.new_vaccine_manufacturer_ID_property = get_specific_sql_data('manufacturers', 'manufacturer_id',
                                                                               'manufacturer_name', self.root.get_screen(
@@ -274,6 +340,8 @@ class DistributionApp(MDApp):
             self.root.get_screen('m_for_vaccine').ids.manufacturer_chosen_for_new_vaccine.text = \
                 get_specific_sql_data('manufacturers', 'manufacturer_name',
                                       'manufacturer_id', self.new_vaccine_manufacturer_ID_property)[0]
+
+            self.root.current = 'm_for_vaccine'
 
     # Methods called to start the process of creating new table entries
     def create_new_clinic(self):
@@ -332,26 +400,32 @@ class DistributionApp(MDApp):
         if self.new_clinic_name_property is '':
             self.input_error_message = 'Name field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         elif self.new_clinic_name_property in get_sql_data('vaccination_clinics', 'clinic_name'):
             self.input_error_message = 'Clinic with this name already exists'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_clinic_ID_property is '':
+        if self.new_clinic_ID_property is 0:
             self.input_error_message = 'no id found'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         elif self.new_clinic_ID_property in get_sql_data('vaccination_clinics', 'clinic_id'):
             self.input_error_message = 'Clinic with this ID already exists'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         if self.new_clinic_address_property is '':
             self.input_error_message = 'Address field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         elif self.new_clinic_address_property in get_sql_data('vaccination_clinics', 'clinic_address'):
             self.input_error_message = 'Clinic with this address already exists'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         return True
 
@@ -359,57 +433,71 @@ class DistributionApp(MDApp):
         if self.new_vaccine_name_property is '':
             self.input_error_message = 'Name field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         elif self.new_vaccine_name_property in get_sql_data('vaccines', 'vaccine_name'):
             self.input_error_message = 'Vaccine with this name already exists'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_vaccine_ID_property is '':
+        if self.new_vaccine_ID_property is 0:
             self.input_error_message = 'No ID for the vaccine was provided'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         elif self.new_vaccine_ID_property in get_sql_data('vaccines', 'vaccine_id'):
             self.input_error_message = 'Vaccine with this ID already exists'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         if self.new_vaccine_disease_property == 'Select a Disease':
             self.input_error_message = 'Disease field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_vaccine_doses_property is '':
+        if self.new_vaccine_doses_property is 0:
             self.input_error_message = 'Required Doses field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_vaccine_manufacturer_ID_property is '':
+        if self.new_vaccine_manufacturer_ID_property is 0:
             self.input_error_message = 'A Manufacturer ID was not correctly passed in'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         return True
 
     def check_for_required_inputs_new_order(self):
-        if self.new_order_ID_property is '':
+        print('checking')
+        if self.new_order_ID_property is 0:
             self.input_error_message = 'Order ID field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         elif self.new_order_ID_property in get_sql_data('orders', 'order_id'):
             self.input_error_message = 'Order with this ID already exists'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_order_vaccine_ID_property is '':
+        if self.new_order_vaccine_ID_property is 0:
             self.input_error_message = 'No Vaccine found'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_order_manufacturer_ID_property is '':
+        if self.new_order_manufacturer_ID_property is 0:
             self.input_error_message = 'Manufacturer ID field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_order_clinic_ID_property is '':
-            self.input_error_message = 'Clinic ID field must be filled'
+        if self.new_order_clinic_ID_property is 0:
+            self.input_error_message = 'No Clinic Selected'
             Factory.NewInputError().open()
+            self.on_done()
             return False
-        if self.new_order_doses_property is '':
+        if self.new_order_doses_property is 0:
             self.input_error_message = 'Doses field must be filled'
             Factory.NewInputError().open()
+            self.on_done()
             return False
         return True
 
@@ -419,10 +507,12 @@ def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
         sql_input(clinic, session)
+        self.on_done()
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
         Factory.MatchingIDError().open()
+        self.on_done()
 
 
 def new_vaccine(self, id, doses, disease, name, manufacturer_id):
@@ -430,10 +520,12 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
                        manufacturer_id=manufacturer_id)
     if int(vaccine.vaccine_id) not in get_sql_data('vaccines', 'vaccine_id'):
         sql_input(vaccine, session)
+        self.on_done()
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
         Factory.MatchingIDError().open()
+        self.on_done()
 
 
 def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
@@ -441,10 +533,13 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
                    vaccine_id=vaccine_id, doses_in_order=doses)
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
         sql_input(order, session)
+        self.on_done()
+        self.root.current = 'home'
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
         Factory.MatchingIDError().open()
+        self.on_done()
 
 
 # Loads the database credentials from the credentials.json file
