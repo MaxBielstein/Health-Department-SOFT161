@@ -112,21 +112,26 @@ class Health_departmentApp(MDApp):
         Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
 
     def abort_button(self):
+        self.clear_data_preview_screen()
+        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
+
+    def clear_data_preview_screen(self):
         global number_of_records_to_load
         global number_of_records_loaded
         global patient_uuids
         global unmatched_records
         global old_records
         global location_to_import_records
+        global records_to_import
         number_of_records_to_load = 0
         number_of_records_loaded = 0
         patient_uuids = {}
         unmatched_records = []
         old_records = []
         location_to_import_records = []
+        records_to_import = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
-        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
-
+        self.root.get_screen('DataPreview').ids.scrollview_right.clear_widgets()
 
     def import_button(self):
         import_data_into_openmrs()
