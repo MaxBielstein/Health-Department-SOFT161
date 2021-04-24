@@ -163,37 +163,21 @@ class Health_departmentApp(MDApp):
             exit(1)
 
 
-def connect_to_sql(self):
-    try:
-        url = RecordDatabase.construct_mysql_url(self.host, self.port, self.database_name, self.user, self.password)
-        record_database = RecordDatabase(url)
-        record_database.ensure_tables_exist()
-        global session
-        session = record_database.create_session()
-        return True
-    except DatabaseError:
-        print('database error')
-        return False
-    except NameError:
-        print('name error')
-        return False
-    except ValueError:
-        print('SQL connection value error')
-        return False
-
-
+# Queries for all visits of a certain patient given their UUID
 def load_visits(patient_uuid):
     get_parameters = {'v': 'full', 'patient': patient_uuid}
     rest_connection.send_request('visit', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
                                  on_visits_not_loaded)
 
 
+# Queries for a single patient given a patient ID
 def load_patient(patient_id):
     get_parameters = {'limit': '100', 'startIndex': '0', 'q': patient_id}
     rest_connection.send_request('patient', get_parameters, None, add_patient_uuid, patient_not_loaded,
                                  patient_not_loaded)
 
 
+# *INCOMPLETE* Posts a patient's given temperature record to one of their given visits
 def post_temperature_to_visit(visit, record):
     encounterProvider = {
         "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
@@ -206,28 +190,37 @@ def post_temperature_to_visit(visit, record):
                                  temperature_not_posted)
 
 
+# Temperature posted correctly callback
 def temperature_posted(_, results):
     print('it worked, it posted')
     print('results')
 
 
+# Temperature did not post correctly callback
 def temperature_not_posted(_, error):
     print(error)
     print('it didnt work')
 
 
+# Patient was not loaded correctly callback
 def patient_not_loaded(_, response):
     print('not loaded')
     global openmrs_disconnected
     openmrs_disconnected = True
 
 
+# Patient's visits were not loaded correctly callback
 def on_visits_not_loaded(_, error):
     print(error)
     global openmrs_disconnected
     openmrs_disconnected = True
 
 
+# Patient was loaded correctly callback
+# Adds a patient UUID to a dictionary of patient ids and their information.
+# Also queries to load their visits to determine if they have records that need to be imported.
+# If the patient was loaded correctly, but there doesn't not exist a patient with that ID, the method that counts to make sure all
+# patient callbacks came through is called to insure that the app knows that this callback did come back
 def add_patient_uuid(_, response):
     if len(response['results']) is not 0:
         print('in')
@@ -245,6 +238,9 @@ def add_patient_uuid(_, response):
         add_data_to_records(RecordType.UNMATCHED_RECORD, None)
 
 
+# Visits of a patient loaded correctly callback
+# Checks to see if the patient has a current visit with the latest encounter not having their temperature as an observation
+# If this is the case, this visit is added to the locations in which we will later import their records into.
 def on_visits_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
     for result in response['results']:
@@ -263,6 +259,9 @@ def on_visits_loaded(_, response):
             print('to import')
 
 
+# This method keeps track of all patient records that are queried for and makes sure that each one comes back.
+# It also adds the data into its correct list
+# It moves the loading bar up a bit when this method is called
 def add_data_to_records(record_type, record):
     if record_type is RecordType.OLD_RECORD:
         old_records.append(record)
@@ -282,6 +281,7 @@ def add_data_to_records(record_type, record):
         populate_data_preview_screen(app_reference.root)
 
 
+# This method removes any records which are currently in the unmatched records list which been determined to be matched
 def remove_from_unmatched_records(result, to_import):
     record_to_remove = None
     for record in unmatched_records:
@@ -296,6 +296,7 @@ def remove_from_unmatched_records(result, to_import):
             records_to_import.append(record_to_remove)
 
 
+# THis removes old records when the sql database which have already been imported into openmrs
 def remove_old_import_records():
     app_reference.root.get_screen(
         'LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
@@ -309,6 +310,7 @@ def remove_old_import_records():
             records_to_import.remove(record)
 
 
+# Returns false if something goes wrong while trying to connect to OpenMRS server
 def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_password):
     global rest_connection
     try:
@@ -318,6 +320,27 @@ def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_passwor
         return False
 
 
+# Returns false if something goes wrong while connecting to the sql databsae
+def connect_to_sql(self):
+    try:
+        url = RecordDatabase.construct_mysql_url(self.host, self.port, self.database_name, self.user, self.password)
+        record_database = RecordDatabase(url)
+        record_database.ensure_tables_exist()
+        global session
+        session = record_database.create_session()
+        return True
+    except DatabaseError:
+        print('database error')
+        return False
+    except NameError:
+        print('name error')
+        return False
+    except ValueError:
+        print('SQL connection value error')
+        return False
+
+
+# Returns false if one of the databases fails to connect
 def connect_to_databases(self):
     if connect_to_sql(self) and connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user,
                                                    self.openmrs_password):
@@ -326,6 +349,7 @@ def connect_to_databases(self):
         return False
 
 
+# *INCOMPLETE* this method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
     for record in records_to_import:
@@ -337,14 +361,7 @@ def import_data_into_openmrs():
                 print('in')
 
 
-def update_records():
-    print('ran')
-    print(len(patient_uuids))
-    for id in patient_uuids:
-        print('loading')
-        load_visits(patient_uuids[id]['UUID'])
-
-
+# This method loads all needed records from openMRS into the app
 def load_records_into_app(loading_bar):
     global session
     people_lots = session.query(PeopleLots)
