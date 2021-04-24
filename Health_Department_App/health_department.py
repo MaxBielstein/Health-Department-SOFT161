@@ -95,37 +95,58 @@ class Health_departmentApp(MDApp):
     def login_button(self):
         global app_reference
         app_reference = self
-        path = self.root.get_screen('home').ids
         loading_bar = self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
 
-        self.host = path.database_host.text
-        self.database_name = path.database_database.text
-        self.user = path.database_username.text
-        self.password = path.database_password.text
-        self.port = path.database_port.text
+        if self.load_login_credentials():
+            if connect_to_databases(self):
+                Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+                self.root.transition.direction = 'left'
+                self.root.current = 'LoadingLogin'
 
-        self.openmrs_user = path.openmrs_username.text
-        self.openmrs_host = path.openmrs_host.text
-        self.openmrs_port = path.openmrs_port.text
-        self.openmrs_password = path.openmrs_password.text
-        connect_to_databases(self)
-        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+    def load_login_credentials(self):
+        try:
+            path = self.root.get_screen('home').ids
+            self.host = path.database_host.text
+            self.database_name = path.database_database.text
+            self.user = path.database_username.text
+            self.password = path.database_password.text
+
+            self.port = path.database_port.text
+
+            self.openmrs_port = path.openmrs_port.text
+
+            self.openmrs_user = path.openmrs_username.text
+            self.openmrs_host = path.openmrs_host.text
+            self.openmrs_password = path.openmrs_password.text
+            return True
+        except ValueError:
+            print('value error')
+            return False
 
     def abort_button(self):
+        self.clear_data_preview_screen()
+        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
+
+    def clear_data_preview_screen(self):
         global number_of_records_to_load
         global number_of_records_loaded
         global patient_uuids
         global unmatched_records
         global old_records
         global location_to_import_records
+        global records_to_import
         number_of_records_to_load = 0
         number_of_records_loaded = 0
         patient_uuids = {}
         unmatched_records = []
         old_records = []
         location_to_import_records = []
+        records_to_import = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
-        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value=1
+        self.root.get_screen('DataPreview').ids.scrollview_right.clear_widgets()
+
+    def import_button(self):
+        import_data_into_openmrs()
 
     def load_credentials_file(self):
         try:
@@ -142,30 +163,64 @@ class Health_departmentApp(MDApp):
             exit(1)
 
 
-def connect_to_sql(self):
-    try:
-        url = RecordDatabase.construct_mysql_url(self.host, self.port, self.database_name, self.user, self.password)
-        record_database = RecordDatabase(url)
-        record_database.ensure_tables_exist()
-        global session
-        session = record_database.create_session()
-    except DatabaseError:
-        pass
-        # Database connection error
-
-
+# Queries for all visits of a certain patient given their UUID
 def load_visits(patient_uuid):
     get_parameters = {'v': 'full', 'patient': patient_uuid}
     rest_connection.send_request('visit', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
                                  on_visits_not_loaded)
 
 
+# Queries for a single patient given a patient ID
 def load_patient(patient_id):
     get_parameters = {'limit': '100', 'startIndex': '0', 'q': patient_id}
     rest_connection.send_request('patient', get_parameters, None, add_patient_uuid, patient_not_loaded,
                                  patient_not_loaded)
 
 
+# *INCOMPLETE* Posts a patient's given temperature record to one of their given visits
+def post_temperature_to_visit(visit, record):
+    encounterProvider = {
+        "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
+        "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
+    }
+    post_parameters = {'encounterDatetime': f'{record.vaccination_date}', 'patient': visit['patient']['uuid'],
+                       'encounterType': '7b0f5697-27e3-40c4-8bae-f4049abfb4ed', 'location': visit['location']['uuid'],
+                       'visit': visit['uuid'], 'encounterProviders': encounterProvider}
+    rest_connection.send_request('encounter', None, post_parameters, temperature_posted, temperature_not_posted,
+                                 temperature_not_posted)
+
+
+# Temperature posted correctly callback
+def temperature_posted(_, results):
+    print('it worked, it posted')
+    print('results')
+
+
+# Temperature did not post correctly callback
+def temperature_not_posted(_, error):
+    print(error)
+    print('it didnt work')
+
+
+# Patient was not loaded correctly callback
+def patient_not_loaded(_, response):
+    print('not loaded')
+    global openmrs_disconnected
+    openmrs_disconnected = True
+
+
+# Patient's visits were not loaded correctly callback
+def on_visits_not_loaded(_, error):
+    print(error)
+    global openmrs_disconnected
+    openmrs_disconnected = True
+
+
+# Patient was loaded correctly callback
+# Adds a patient UUID to a dictionary of patient ids and their information.
+# Also queries to load their visits to determine if they have records that need to be imported.
+# If the patient was loaded correctly, but there doesn't not exist a patient with that ID, the method that counts to make sure all
+# patient callbacks came through is called to insure that the app knows that this callback did come back
 def add_patient_uuid(_, response):
     if len(response['results']) is not 0:
         print('in')
@@ -183,10 +238,9 @@ def add_patient_uuid(_, response):
         add_data_to_records(RecordType.UNMATCHED_RECORD, None)
 
 
-def patient_not_loaded(_, response):
-    print('not loaded')
-
-
+# Visits of a patient loaded correctly callback
+# Checks to see if the patient has a current visit with the latest encounter not having their temperature as an observation
+# If this is the case, this visit is added to the locations in which we will later import their records into.
 def on_visits_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
     for result in response['results']:
@@ -205,6 +259,29 @@ def on_visits_loaded(_, response):
             print('to import')
 
 
+# This method keeps track of all patient records that are queried for and makes sure that each one comes back.
+# It also adds the data into its correct list
+# It moves the loading bar up a bit when this method is called
+def add_data_to_records(record_type, record):
+    if record_type is RecordType.OLD_RECORD:
+        old_records.append(record)
+    elif record_type is RecordType.IMPORT_RECORD:
+        location_to_import_records.append(record)
+    global number_of_records_loaded
+    global number_of_records_to_load
+    number_of_records_loaded += 1
+    if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
+    else:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
+            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
+    if number_of_records_loaded is number_of_records_to_load:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
+        remove_old_import_records()
+        populate_data_preview_screen(app_reference.root)
+
+
+# This method removes any records which are currently in the unmatched records list which been determined to be matched
 def remove_from_unmatched_records(result, to_import):
     record_to_remove = None
     for record in unmatched_records:
@@ -219,47 +296,78 @@ def remove_from_unmatched_records(result, to_import):
             records_to_import.append(record_to_remove)
 
 
+# THis removes old records when the sql database which have already been imported into openmrs
 def remove_old_import_records():
+    app_reference.root.get_screen(
+        'LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
     records_to_remove = []
     for record in records_to_import:
         for record2 in records_to_import:
             if record.vaccination_date < record2.vaccination_date:
-                records_to_remove.append(record)
-            if record.patient_temperature is None:
                 records_to_remove.append(record)
     for record in records_to_remove:
         if record in records_to_import:
             records_to_import.remove(record)
 
 
-def on_visits_not_loaded(_, error):
-    print(error)
-    pass
-
-
+# Returns false if something goes wrong while trying to connect to OpenMRS server
 def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_password):
     global rest_connection
-    rest_connection = RESTConnection(openmrs_host, openmrs_port, openmrs_user, openmrs_password)
+    try:
+        rest_connection = RESTConnection(openmrs_host, openmrs_port, openmrs_user, openmrs_password)
+        return True
+    except NameError:
+        return False
 
 
+# Returns false if something goes wrong while connecting to the sql databsae
+def connect_to_sql(self):
+    try:
+        url = RecordDatabase.construct_mysql_url(self.host, self.port, self.database_name, self.user, self.password)
+        record_database = RecordDatabase(url)
+        record_database.ensure_tables_exist()
+        global session
+        session = record_database.create_session()
+        return True
+    except DatabaseError:
+        print('database error')
+        return False
+    except NameError:
+        print('name error')
+        return False
+    except ValueError:
+        print('SQL connection value error')
+        return False
+
+
+# Returns false if one of the databases fails to connect
 def connect_to_databases(self):
-    connect_to_sql(self)
-    connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user, self.openmrs_password)
+    if connect_to_sql(self) and connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user,
+                                                   self.openmrs_password):
+        return True
+    else:
+        return False
 
 
-def update_records():
-    print('ran')
-    print(len(patient_uuids))
-    for id in patient_uuids:
-        print('loading')
-        load_visits(patient_uuids[id]['UUID'])
+# *INCOMPLETE* this method imports the 'records to import' into open_mrs
+def import_data_into_openmrs():
+    print('ok')
+    for record in records_to_import:
+        print(record)
+        for visit in location_to_import_records:
+            print(visit)
+            if visit['patient']['display'].split(' - ')[0] in record.patient_id:
+                post_temperature_to_visit(visit, record)
+                print('in')
 
 
+# This method loads all needed records from openMRS into the app
 def load_records_into_app(loading_bar):
     global session
     people_lots = session.query(PeopleLots)
     global number_of_records_to_load
     loading_bar.value = 0
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
         unmatched_records.append(appointment)
         patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
@@ -267,26 +375,9 @@ def load_records_into_app(loading_bar):
         load_patient(appointment.patient_id)
 
 
-def add_data_to_records(record_type, record):
-    if record_type is RecordType.OLD_RECORD:
-        old_records.append(record)
-    elif record_type is RecordType.IMPORT_RECORD:
-        location_to_import_records.append(record)
-    global number_of_records_loaded
-    global number_of_records_to_load
-    number_of_records_loaded += 1
-    if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
-    else:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
-                                                                                                      100 - app_reference.root.get_screen(
-                                                                                                  'LoadingLogin').ids.loading_login_progress_bar.value) / 4
-    if number_of_records_loaded is number_of_records_to_load:
-        remove_old_import_records()
-        populate_data_preview_screen(app_reference.root)
-
-
 def populate_data_preview_screen(root):
+    app_reference.root.get_screen(
+        'LoadingLogin').ids.current_action_loading_login.text = 'Populating unmatched records into data preview screen'
     path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
     path_to_scrollview_right = root.get_screen('DataPreview').ids.scrollview_right
     global unmatched_records
@@ -302,6 +393,8 @@ def populate_data_preview_screen(root):
                 halign="center", )
         )
 
+    app_reference.root.get_screen(
+        'LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
     for record in records_to_import:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
@@ -310,7 +403,7 @@ def populate_data_preview_screen(root):
             MDLabel(
                 text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                 halign="center", )
-        )   
+        )
     root.current = 'DataPreview'
     root.transition.direction = 'left'
 
@@ -330,6 +423,7 @@ unmatched_records = []
 records_to_import = []
 old_records = []
 location_to_import_records = []
+openmrs_disconnected = False
 
 if __name__ == '__main__':
     app = Health_departmentApp()

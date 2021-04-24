@@ -248,6 +248,13 @@ class VaccineRecordApp(MDApp):
     def update_person(self):
         update_person_static(self)
 
+    def get_vaccination_record(self, patient_id):
+        person, _ = get_person_data(patient_id, session)
+        lots = person.lots
+        vaccines = []
+        for lot in lots:
+            vaccines += lot.vaccine
+        
 
 # These methods below where made static so that tests could but run on them
 # with a different sql database
