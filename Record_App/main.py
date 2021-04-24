@@ -43,6 +43,7 @@ class VaccineRecordApp(MDApp):
     new_lot_manufacture_date_day = NumericProperty()
     new_lot_manufacture_date_month = NumericProperty()
     new_vaccination_name = StringProperty()
+    new_vaccination_temperature = NumericProperty()
     new_vaccination_date_month = NumericProperty()
     new_vaccination_date_year = NumericProperty()
     new_vaccination_date_day = NumericProperty()
@@ -89,6 +90,7 @@ class VaccineRecordApp(MDApp):
     def clear_new_vaccination_screen(self):
         id_path = self.root.ids
         id_path.name_input_new_vaccination.text = ''
+        id_path.temperature_input_new_vaccination.text = ''
         id_path.day_entry_new_vaccination.text = str(datetime.now().day)
         id_path.year_entry_new_vaccination.text = str(datetime.now().year)
         id_path.month_entry_new_vaccination.text = str(datetime.now().month)
@@ -104,6 +106,8 @@ class VaccineRecordApp(MDApp):
     def create_vaccination_record(self):
         id_path = self.root.ids
         self.new_vaccination_name = id_path.name_input_new_vaccination.text
+        if id_path.temperature_input_new_vaccination.text is not '':
+            self.new_vaccination_temperature = id_path.temperature_input_new_vaccination.text
         if id_path.day_entry_new_vaccination.text is not '':
             self.new_vaccination_date_day = id_path.day_entry_new_vaccination.text
         if id_path.month_entry_new_vaccination.text is not '':
@@ -112,13 +116,17 @@ class VaccineRecordApp(MDApp):
             self.new_vaccination_date_year = id_path.year_entry_new_vaccination.text
 
         if self.check_for_required_inputs_new_vaccination():
-            new_vaccination_record(self, int(str(id_path.lot_dropdown.text)), self.new_vaccination_name,
+            new_vaccination_record(self, int(str(id_path.lot_dropdown.text)), self.new_vaccination_name, self.new_vaccination_temperature,
                                    self.new_vaccination_date_month, self.new_vaccination_date_day,
                                    self.new_vaccination_date_year)
 
     def check_for_required_inputs_new_vaccination(self):
         if self.new_vaccination_name is '':
             self.input_error_message = 'Name field must be filled'
+            Factory.NewInputError().open()
+            return False
+        elif self.new_vaccination_temperature is '':
+            self.input_error_message = 'Temperature field must be filled'
             Factory.NewInputError().open()
             return False
         elif self.new_vaccination_date_month < 1 or self.new_vaccination_date_month > 12 or self.new_vaccination_date_day < 1 \
@@ -273,10 +281,10 @@ def update_person_static(self):
     session.commit()
 
 
-def new_vaccination_record(self, lot_id, name, vaccine_month, vaccine_day, vaccine_year):
+def new_vaccination_record(self, lot_id, name, temperature, vaccine_month, vaccine_day, vaccine_year):
     vaccination_date = datetime(year=int(vaccine_year), day=int(vaccine_day), month=int(vaccine_month))
     patient_id = get_specific_sql_data('people', 'patient_id', 'name', name)[0]
-    record = PeopleLots(vaccination_date=vaccination_date, lot_id=lot_id, patient_id=patient_id)
+    record = PeopleLots(vaccination_date=vaccination_date, lot_id=lot_id, patient_id=patient_id, patient_temperature=temperature)
     if record.lot_id not in get_specific_sql_data('people_lots', 'lot_id', 'patient_id', record.patient_id):
         sql_input(record, session)
         self.confirm_screen('new_vaccination_confirmed')
