@@ -95,13 +95,10 @@ class Health_departmentApp(MDApp):
     def login_button(self):
         global app_reference
         app_reference = self
-        loading_bar = self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
 
         if self.load_login_credentials():
             if connect_to_databases(self):
-                Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
-                self.root.transition.direction = 'left'
-                self.root.current = 'LoadingLogin'
+                test_openmrs_connection()
 
     def load_login_credentials(self):
         try:
@@ -163,6 +160,13 @@ class Health_departmentApp(MDApp):
             exit(1)
 
 
+# Sends a test query to openmrs to check that the connection worked
+def test_openmrs_connection():
+    get_parameters = {'limit': '100', 'startIndex': '0', 'q': 'TestConnection'}
+    rest_connection.send_request('patient', get_parameters, None, connection_verified, connection_failed,
+                                 connection_failed)
+
+
 # Queries for all visits of a certain patient given their UUID
 def load_visits(patient_uuid):
     get_parameters = {'v': 'full', 'patient': patient_uuid}
@@ -198,10 +202,22 @@ def temperature_posted(_, results):
     print('results')
 
 
+def connection_verified(_, response):
+    global openmrs_disconnected
+    openmrs_disconnected = False
+    loading_bar = app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
+    Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+    app_reference.root.transition.direction = 'left'
+    app_reference.root.current = 'LoadingLogin'
+
+
 # Temperature did not post correctly callback
 def temperature_not_posted(_, error):
     print(dumps(error, indent=2, sort_keys=True))
     print('it didnt work')
+    global openmrs_disconnected
+    openmrs_disconnected = True
+    on_openmrs_disconnect()
 
 
 # Patient was not loaded correctly callback
@@ -209,6 +225,7 @@ def patient_not_loaded(_, response):
     print('not loaded')
     global openmrs_disconnected
     openmrs_disconnected = True
+    on_openmrs_disconnect()
 
 
 # Patient's visits were not loaded correctly callback
@@ -216,7 +233,19 @@ def on_visits_not_loaded(_, error):
     print(error)
     global openmrs_disconnected
     openmrs_disconnected = True
+    on_openmrs_disconnect()
 
+
+def connection_failed(_, error):
+    print('Connection failed')
+    # Launch window saying the connection to openmrs failed
+
+
+def on_openmrs_disconnect():
+    print('openmrs disconnected error')
+    app_reference.root.transition.direction = 'right'
+    app_reference.root.current = 'home'
+    # Show popup saying openmrs disconnected
 
 # Patient was loaded correctly callback
 # Adds a patient UUID to a dictionary of patient ids and their information.
@@ -366,15 +395,19 @@ def import_data_into_openmrs():
 # This method loads all needed records from openMRS into the app
 def load_records_into_app(loading_bar):
     global session
-    people_lots = session.query(PeopleLots)
     global number_of_records_to_load
+    people_lots = session.query(PeopleLots)
     loading_bar.value = 0
     app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
-        unmatched_records.append(appointment)
-        patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
-        number_of_records_to_load += 1
-        load_patient(appointment.patient_id)
+        if openmrs_disconnected is False:
+            unmatched_records.append(appointment)
+            patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
+            number_of_records_to_load += 1
+            load_patient(appointment.patient_id)
+        else:
+            on_openmrs_disconnect()
+            break
 
 
 def populate_data_preview_screen(root):
