@@ -17,12 +17,11 @@ ScreenManager:
                 halign: 'center'
 
             MDFillRoundFlatButton:
-                text: 'New Person'
+                text: 'New/Edit Person'
                 font_size: 30
                 pos_hint: {'center_x': 0.5,}
                 size: 0, 60
                 size_hint: None, None
-                increment_width: 100
                 on_press:
                     root.current = 'new_person'
                     root.transition.direction = 'left'
@@ -56,6 +55,11 @@ ScreenManager:
                 MDLabel:
                     text: 'Create A New Person'
                     font_size: 30
+
+                MDLabel:
+                    text: 'To edit a person put their Patient ID in the textfield'
+                    font_size: 20
+                    color: 0, 0, 0, .5
 
                 MDTextField:
                     id: name_entry_new_person
@@ -292,163 +296,275 @@ ScreenManager:
     Screen:
         name: 'new_vaccination_continued'
 
-        BoxLayout:
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
             orientation: 'vertical'
-            Label:
-                text: 'Name'
-                font_size: sp(40)
-            TextInput:
-                id: name_input_new_vaccination
-                font_size: sp(40)
-                multiline: False
-                focus_next: month_entry_new_person
-                write_tab: False
-            Label:
-                text: 'Vaccination Date'
-                font_size: sp(40)
-            BoxLayout:
-                orientation: 'horizontal'
-                Label:
-                    text: 'MM'
-                    font_size: sp(20)
-                Label:
-                    text: 'DD'
-                    font_size: sp(20)
-                Label:
-                    text: 'YYYY'
-                    font_size: sp(20)
-            BoxLayout:
-                orientation: 'horizontal'
-                TextInput:
-                    id: month_entry_new_vaccination
-                    font_size: sp(40)
+
+            MDBoxLayout:
+                orientation: 'vertical'
+
+                MDLabel:
+                    text: 'New Vaccination'
+                    font_size: 45
+
+                MDTextField:
+                    hint_text: 'Name'
+                    id: name_input_new_vaccination
+                    font_size: 30
                     multiline: False
-                    focus_next: day_entry_new_vaccination
-                    input_filter: 'int'
+                    focus_next: month_entry_new_person
                     write_tab: False
-                TextInput:
-                    id: day_entry_new_vaccination
-                    font_size: sp(40)
-                    multiline: False
-                    focus_next: year_entry_new_vaccination
-                    input_filter: 'int'
-                    write_tab: False
-                TextInput:
-                    id: year_entry_new_vaccination
-                    font_size: sp(40)
-                    multiline: False
-                    input_filter: 'int'
-                    write_tab: False
-            BoxLayout:
+
+                MDLabel:
+                    text: 'Vaccination Date'
+                    font_size: 20
+
+                MDBoxLayout:
+                    orientation: 'horizontal'
+
+                    MDTextField:
+                        hint_text: 'MM'
+                        id: month_entry_new_vaccination
+                        font_size: 30
+                        multiline: False
+                        focus_next: day_entry_new_vaccination
+                        input_filter: 'int'
+                        write_tab: False
+
+                    MDTextField:
+                        hint_text: 'DD'
+                        id: day_entry_new_vaccination
+                        font_size: 30
+                        multiline: False
+                        focus_next: year_entry_new_vaccination
+                        input_filter: 'int'
+                        write_tab: False
+
+                    MDTextField:
+                        hint_text: 'YYYY'
+                        id: year_entry_new_vaccination
+                        font_size: sp(40)
+                        multiline: False
+                        input_filter: 'int'
+                        write_tab: False
+
+                MDRaisedButton:
+                    text: 'Confirm'
+                    font_size: 30
+                    on_press:
+                        app.create_vaccination_record()
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
                 orientation: 'horizontal'
-                Button:
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
                     text: 'Cancel'
-                    font_size: sp(40)
+                    font_size: 30
                     on_press:
                         root.current = 'menu'
                         root.transition.direction = 'right'
-                Button:
+
+                MDRaisedButton:
                     text: 'Back'
-                    font_size: sp(40)
+                    font_size: 30
                     on_press:
                         root.current = 'new_vaccination'
                         root.transition.direction = 'right'
-                Button:
-                    text: 'Confirm'
-                    font_size: sp(40)
-                    on_press:
-                        app.create_vaccination_record()
+
+            Widget:
+                size_hint_y: None
+                height: 20
+
 
     Screen:
         name: 'new_person_confirmed'
 
-        BoxLayout:
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
             orientation: 'vertical'
-            Label:
-                text: 'Success!'
-                font_size: sp(40)
-            BoxLayout:
+
+            MDBoxLayout:
                 orientation: 'vertical'
-                Label:
+
+                MDLabel:
+                    text: 'Success!'
+                    font_size: 60
+                    halign: 'center'
+
+                MDLabel:
                     text: 'A new person as been created'
-                    font_size: sp(18)
-                Label:
+                    font_size: 30
+                    halign: 'center'
+
+                MDLabel:
                     text: 'Would you like to record a vaccine for this person now?'
-                    font_size: sp(18)
-            Button:
-                text: 'Yes'
-                font_size: sp(40)
-                on_press:
-                    app.clear_new_vaccination_screen()
-                    app.fill_in_person_name_new_vaccination()
-                    root.current = 'new_vaccination'
-                    root.transition.direction = 'left'
-            Button:
-                text: 'Not right now'
-                font_size: sp(40)
-                on_press:
-                    root.current = 'menu'
-                    root.transition.direction = 'right'
+                    font_size: 30
+                    halign: 'center'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
+                    text: 'Yes'
+                    font_size: 30
+                    on_press:
+                        app.clear_new_vaccination_screen()
+                        app.fill_in_person_name_new_vaccination()
+                        root.current = 'new_vaccination'
+                        root.transition.direction = 'left'
+
+                MDRaisedButton:
+                    text: 'Not right now'
+                    font_size: 30
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+
+            Widget:
+                size_hint_y: None
+                height: 20
 
     Screen:
         name: 'new_vaccination_confirmed'
 
-        BoxLayout:
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
             orientation: 'vertical'
-            Label:
-                text: 'Success!'
-                font_size: sp(40)
-            BoxLayout:
+
+            MDBoxLayout:
                 orientation: 'vertical'
-                Label:
-                    text: 'Vaccination Recorded!'
-                    font_size: sp(18)
-                Label:
+
+                MDLabel:
+                    text: 'Success!'
+                    font_size: 60
+                    halign: 'center'
+
+                MDLabel:
+                    text: 'Vaccination Recorded'
+                    font_size: 30
+                    halign: 'center'
+
+                MDLabel:
                     text: 'Would you like to record another vaccination?'
-                    font_size: sp(18)
-            Button:
-                text: 'Yes'
-                font_size: sp(40)
-                on_press:
-                    root.current = 'new_vaccination'
-                    root.transition.direction = 'left'
-            Button:
-                text: 'Not right now'
-                font_size: sp(40)
-                on_press:
-                    root.current = 'menu'
-                    root.transition.direction = 'right'
+                    font_size: 30
+                    halign: 'center'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
+                    text: 'Yes'
+                    font_size: 30
+                    on_press:
+                        root.current = 'new_vaccination'
+                        root.transition.direction = 'left'
+
+                MDRaisedButton:
+                    text: 'Not right now'
+                    font_size: 30
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+
+            Widget:
+                size_hint_y: None
+                height: 20
 
     Screen:
         name: 'person_updated'
 
-        BoxLayout:
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
             orientation: 'vertical'
-            Label:
-                text: 'Success!'
-                font_size: sp(40)
-            BoxLayout:
+
+            MDBoxLayout:
                 orientation: 'vertical'
-                Label:
-                    text: 'This person has been updated!'
-                    font_size: sp(18)
-                Label:
+
+                MDLabel:
+                    text: 'Success!'
+                    font_size: 60
+                    halign: 'center'
+
+                MDLabel:
+                    text: 'This person has been updated'
+                    font_size: 30
+                    halign: 'center'
+
+                MDLabel:
                     text: 'Would you like to record a vaccine for this person now?'
-                    font_size: sp(18)
-            Button:
-                text: 'Yes'
-                font_size: sp(40)
-                on_press:
-                    app.clear_new_vaccination_screen()
-                    app.fill_in_person_name_new_vaccination()
-                    root.current = 'new_vaccination'
-                    root.transition.direction = 'left'
-            Button:
-                text: 'Not right now'
-                font_size: sp(40)
-                on_press:
-                    root.current = 'menu'
-                    root.transition.direction = 'right'
+                    font_size: 30
+                    halign: 'center'
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
+                    text: 'Yes'
+                    font_size: 30
+                    on_press:
+                        app.clear_new_vaccination_screen()
+                        app.fill_in_person_name_new_vaccination()
+                        root.current = 'new_vaccination'
+                        root.transition.direction = 'left'
+
+                MDRaisedButton:
+                    text: 'Not right now'
+                    font_size: 30
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+
+            Widget:
+                size_hint_y: None
+                height: 20
 
 <NewInputError@Popup>:
     title: 'Input Error'
