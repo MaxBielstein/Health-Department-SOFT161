@@ -125,7 +125,11 @@ class Health_departmentApp(MDApp):
         old_records = []
         location_to_import_records = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
-        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value=1
+        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
+
+
+    def import_button(self):
+        import_data_into_openmrs()
 
     def load_credentials_file(self):
         try:
@@ -164,6 +168,28 @@ def load_patient(patient_id):
     get_parameters = {'limit': '100', 'startIndex': '0', 'q': patient_id}
     rest_connection.send_request('patient', get_parameters, None, add_patient_uuid, patient_not_loaded,
                                  patient_not_loaded)
+
+
+def post_temperature_to_visit(visit, record):
+    encounterProvider = {
+        "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
+        "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
+    }
+    post_parameters = {'encounterDatetime': f'{record.vaccination_date}', 'patient': visit['patient']['uuid'],
+                       'encounterType': '7b0f5697-27e3-40c4-8bae-f4049abfb4ed', 'location': visit['location']['uuid'],
+                       'visit': visit['uuid'], 'encounterProviders': encounterProvider}
+    rest_connection.send_request('encounter', None, post_parameters, temperature_posted, temperature_not_posted,
+                                 temperature_not_posted)
+
+
+def temperature_posted(_, results):
+    print('it worked, it posted')
+    print('results')
+
+
+def temperature_not_posted(_, error):
+    print(error)
+    print('it didnt work')
 
 
 def add_patient_uuid(_, response):
@@ -220,13 +246,13 @@ def remove_from_unmatched_records(result, to_import):
 
 
 def remove_old_import_records():
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
     records_to_remove = []
     for record in records_to_import:
         for record2 in records_to_import:
             if record.vaccination_date < record2.vaccination_date:
                 records_to_remove.append(record)
-            if record.patient_temperature is None:
-                records_to_remove.append(record)
+
     for record in records_to_remove:
         if record in records_to_import:
             records_to_import.remove(record)
@@ -260,6 +286,7 @@ def load_records_into_app(loading_bar):
     people_lots = session.query(PeopleLots)
     global number_of_records_to_load
     loading_bar.value = 0
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
         unmatched_records.append(appointment)
         patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
@@ -278,15 +305,27 @@ def add_data_to_records(record_type, record):
     if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
         app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
     else:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
-                                                                                                      100 - app_reference.root.get_screen(
-                                                                                                  'LoadingLogin').ids.loading_login_progress_bar.value) / 4
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
+            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
     if number_of_records_loaded is number_of_records_to_load:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
         remove_old_import_records()
         populate_data_preview_screen(app_reference.root)
 
 
+def import_data_into_openmrs():
+    print('ok')
+    for record in records_to_import:
+        print(record)
+        for visit in location_to_import_records:
+            print(visit)
+            if visit['patient']['display'].split(' - ')[0] in record.patient_id:
+                post_temperature_to_visit(visit, record)
+                print('in')
+
+
 def populate_data_preview_screen(root):
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Populating unmatched records into data preview screen'
     path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
     path_to_scrollview_right = root.get_screen('DataPreview').ids.scrollview_right
     global unmatched_records
@@ -302,6 +341,7 @@ def populate_data_preview_screen(root):
                 halign="center", )
         )
 
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
     for record in records_to_import:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
@@ -310,7 +350,7 @@ def populate_data_preview_screen(root):
             MDLabel(
                 text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                 halign="center", )
-        )   
+        )
     root.current = 'DataPreview'
     root.transition.direction = 'left'
 
