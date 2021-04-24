@@ -179,13 +179,15 @@ def load_patient(patient_id):
 
 # *INCOMPLETE* Posts a patient's given temperature record to one of their given visits
 def post_temperature_to_visit(visit, record):
+    print(dumps(visit, indent=2, sort_keys=True))
+    print(record)
     encounterProvider = {
         "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
         "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
     }
     post_parameters = {'encounterDatetime': f'{record.vaccination_date}', 'patient': visit['patient']['uuid'],
-                       'encounterType': '7b0f5697-27e3-40c4-8bae-f4049abfb4ed', 'location': visit['location']['uuid'],
-                       'visit': visit['uuid'], 'encounterProviders': encounterProvider}
+                       'encounterType': '67a71486-1a54-468f-ac3e-7091a9a79584', 'location': visit['location']['uuid'],
+                       'visit': visit['uuid'], 'encounterProviders': [encounterProvider]}
     rest_connection.send_request('encounter', None, post_parameters, temperature_posted, temperature_not_posted,
                                  temperature_not_posted)
 
@@ -198,7 +200,7 @@ def temperature_posted(_, results):
 
 # Temperature did not post correctly callback
 def temperature_not_posted(_, error):
-    print(error)
+    print(dumps(error, indent=2, sort_keys=True))
     print('it didnt work')
 
 
