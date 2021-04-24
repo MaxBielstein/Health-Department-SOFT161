@@ -130,7 +130,6 @@ class Health_departmentApp(MDApp):
     def import_button(self):
         import_data_into_openmrs()
 
-
     def load_credentials_file(self):
         try:
             with open('credentials.json', 'r') as credentials_file:
@@ -172,8 +171,8 @@ def load_patient(patient_id):
 
 def post_temperature_to_visit(visit, record):
     encounterProvider = {
-      "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
-      "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
+        "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
+        "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
     }
     post_parameters = {'encounterDatetime': f'{record.vaccination_date}', 'patient': visit['patient']['uuid'],
                        'encounterType': '7b0f5697-27e3-40c4-8bae-f4049abfb4ed', 'location': visit['location']['uuid'],
@@ -303,10 +302,10 @@ def add_data_to_records(record_type, record):
     if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
         app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
     else:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += (
-                                                                                                      100 - app_reference.root.get_screen(
-                                                                                                  'LoadingLogin').ids.loading_login_progress_bar.value) / 4
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
+            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
     if number_of_records_loaded is number_of_records_to_load:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
         remove_old_import_records()
         populate_data_preview_screen(app_reference.root)
 
