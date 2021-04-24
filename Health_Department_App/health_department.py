@@ -127,6 +127,7 @@ class Health_departmentApp(MDApp):
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
         self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
 
+
     def import_button(self):
         import_data_into_openmrs()
 
@@ -245,6 +246,7 @@ def remove_from_unmatched_records(result, to_import):
 
 
 def remove_old_import_records():
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
     records_to_remove = []
     for record in records_to_import:
         for record2 in records_to_import:
@@ -284,6 +286,7 @@ def load_records_into_app(loading_bar):
     people_lots = session.query(PeopleLots)
     global number_of_records_to_load
     loading_bar.value = 0
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
         unmatched_records.append(appointment)
         patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
@@ -322,6 +325,7 @@ def import_data_into_openmrs():
 
 
 def populate_data_preview_screen(root):
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Populating unmatched records into data preview screen'
     path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
     path_to_scrollview_right = root.get_screen('DataPreview').ids.scrollview_right
     global unmatched_records
@@ -337,6 +341,7 @@ def populate_data_preview_screen(root):
                 halign="center", )
         )
 
+    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
     for record in records_to_import:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
