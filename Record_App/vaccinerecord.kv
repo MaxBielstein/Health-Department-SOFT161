@@ -22,6 +22,7 @@ ScreenManager:
                 pos_hint: {'center_x': 0.5,}
                 size: 0, 60
                 size_hint: None, None
+                increment_width: 80
                 on_press:
                     root.current = 'new_person'
                     root.transition.direction = 'left'
@@ -33,10 +34,22 @@ ScreenManager:
                 pos_hint: {'center_x': 0.5,}
                 size: 0, 60
                 size_hint: None, None
+                increment_width: 80
                 on_press:
                     root.current = 'new_vaccination'
                     root.transition.direction = 'left'
                     app.clear_new_vaccination_screen()
+
+            MDFillRoundFlatButton:
+                text: 'Review Vaccinations'
+                font_size: 30
+                pos_hint: {'center_x': 0.5,}
+                size: 0, 60
+                size_hint: None, None
+                on_press:
+                    root.current = 'review_vaccinations'
+                    root.transition.direction = 'left'
+
     Screen:
         name: 'new_person'
 
@@ -575,6 +588,112 @@ ScreenManager:
                 size_hint_y: None
                 height: 20
 
+    Screen:
+        name: 'review_vaccinations'
+
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
+            orientation: 'vertical'
+
+            MDLabel:
+                text: 'Review Vaccinations'
+                font_size: 45
+                halign: 'center'
+
+            MDTextField:
+                hint_text: 'Patient ID'
+                font_size: '30'
+                id: patient_id_review_vaccinations
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
+                    text: 'Back'
+                    font_size: 30
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
+
+                MDRaisedButton:
+                    text: 'Get Records'
+                    font_size: 30
+                    on_press:
+                        root.current = 'review_vaccinations_continued'
+                        root.transition.direction = 'left'
+
+            Widget:
+                size_hint_y: None
+                height: 20
+
+    Screen:
+        name: 'review_vaccinations_continued'
+
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
+            orientation: 'vertical'
+
+            MDLabel:
+                text: 'Review Vaccinations'
+                font_size: 45
+                halign: 'center'
+
+            ScrollView:
+                do_scroll_x: False
+                do_scroll_y: True
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    size_hint: 1, None
+                    height: sum(child.height+10 for child in self.children)
+                    id: scrollview_review_vaccinations
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
+                    text: 'Back'
+                    font_size: 30
+                    on_press:
+                        root.current = 'review_vaccinations'
+                        root.transition.direction = 'right'
+
+                MDRaisedButton:
+                    text: 'New Vaccination'
+                    font_size: 30
+                    on_press:
+                        root.current = 'new_vaccination'
+                        root.transition.direction = 'left'
+                        app.clear_new_vaccination_screen()
+
+            Widget:
+                size_hint_y: None
+                height: 20
+
 <NewInputError@Popup>:
     title: 'Input Error'
     font_size: sp(30)
@@ -590,6 +709,7 @@ ScreenManager:
             font_size: sp(30)
             on_press:
                 root.dismiss()
+
 <MatchingIDError@Popup>:
     title: 'Input Error'
     font_size: sp(30)
