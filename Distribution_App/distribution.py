@@ -363,10 +363,12 @@ class DistributionApp(MDApp):
             'manufacturer_name')
 
     def load_manufacturers_for_new_orders(self):
-        self.new_order_clinic_ID_property = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+        if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
                                                                   self.root.get_screen(
-                                                                      'order_vaccine').ids.clinic_order_vaccine_spinner.text)[
-            0]
+                                                                      'order_vaccine').ids.clinic_order_vaccine_spinner.text)) > 0:
+            self.new_order_clinic_ID_property = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                                                      self.root.get_screen(
+                                                                          'order_vaccine').ids.clinic_order_vaccine_spinner.text)[0]
         self.root.get_screen('order_vaccine').ids.new_order_clinic.text = 'Chosen Clinic: ' + self.root.get_screen(
             'order_vaccine').ids.clinic_order_vaccine_spinner.text
         self.root.get_screen('order_vaccine').ids.order_manufacturer_spinner.text = 'Select a Manufacturer'

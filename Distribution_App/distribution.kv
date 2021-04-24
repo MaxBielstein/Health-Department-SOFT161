@@ -570,6 +570,8 @@
                 on_press:
                     app.create_new_vaccine()
                     app.on_done()
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'new_vaccine'
 
     MDBoxLayout:
         orientation: 'vertical'
