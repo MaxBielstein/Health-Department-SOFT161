@@ -95,21 +95,33 @@ class Health_departmentApp(MDApp):
     def login_button(self):
         global app_reference
         app_reference = self
-        path = self.root.get_screen('home').ids
         loading_bar = self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
 
-        self.host = path.database_host.text
-        self.database_name = path.database_database.text
-        self.user = path.database_username.text
-        self.password = path.database_password.text
-        self.port = path.database_port.text
+        if self.load_login_credentials():
+            if connect_to_databases(self):
+                Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+                self.root.transition.direction = 'left'
+                self.root.current = 'LoadingLogin'
 
-        self.openmrs_user = path.openmrs_username.text
-        self.openmrs_host = path.openmrs_host.text
-        self.openmrs_port = path.openmrs_port.text
-        self.openmrs_password = path.openmrs_password.text
-        connect_to_databases(self)
-        Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+    def load_login_credentials(self):
+        try:
+            path = self.root.get_screen('home').ids
+            self.host = path.database_host.text
+            self.database_name = path.database_database.text
+            self.user = path.database_username.text
+            self.password = path.database_password.text
+
+            self.port = path.database_port.text
+
+            self.openmrs_port = path.openmrs_port.text
+
+            self.openmrs_user = path.openmrs_username.text
+            self.openmrs_host = path.openmrs_host.text
+            self.openmrs_password = path.openmrs_password.text
+            return True
+        except ValueError:
+            print('value error')
+            return False
 
     def abort_button(self):
         self.clear_data_preview_screen()
@@ -158,9 +170,17 @@ def connect_to_sql(self):
         record_database.ensure_tables_exist()
         global session
         session = record_database.create_session()
+        return True
     except DatabaseError:
-        pass
-        # Database connection error
+        print('database error')
+        return False
+    except NameError:
+        print('name error')
+        return False
+    except ValueError:
+        print('SQL connection value error')
+        return False
+
 
 
 def load_visits(patient_uuid):
@@ -216,6 +236,8 @@ def add_patient_uuid(_, response):
 
 def patient_not_loaded(_, response):
     print('not loaded')
+    global openmrs_disconnected
+    openmrs_disconnected = True
 
 
 def on_visits_loaded(_, response):
@@ -265,17 +287,26 @@ def remove_old_import_records():
 
 def on_visits_not_loaded(_, error):
     print(error)
+    global openmrs_disconnected
+    openmrs_disconnected = True
     pass
 
 
 def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_password):
     global rest_connection
-    rest_connection = RESTConnection(openmrs_host, openmrs_port, openmrs_user, openmrs_password)
+    try:
+        rest_connection = RESTConnection(openmrs_host, openmrs_port, openmrs_user, openmrs_password)
+        return True
+    except NameError:
+        return False
 
 
 def connect_to_databases(self):
-    connect_to_sql(self)
-    connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user, self.openmrs_password)
+    if connect_to_sql(self) and connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user, self.openmrs_password):
+        return True
+    else:
+        return False
+
 
 
 def update_records():
@@ -375,6 +406,7 @@ unmatched_records = []
 records_to_import = []
 old_records = []
 location_to_import_records = []
+openmrs_disconnected = False
 
 if __name__ == '__main__':
     app = Health_departmentApp()
