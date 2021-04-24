@@ -4,6 +4,7 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
+from kivymd.app import MDApp
 import mysql.connector
 
 
@@ -31,7 +32,7 @@ database = RecordDatabase(url)
 session = database.create_session()
 
 
-class VaccineRecordApp(App):
+class VaccineRecordApp(MDApp):
     new_person_patient_id = StringProperty()
     new_person_name = StringProperty()
     new_person_birthdate_year = NumericProperty()
@@ -361,6 +362,5 @@ def sql_input(data, session):
 
 
 if __name__ == '__main__':
-    Window.size = (550, 700)
     app = VaccineRecordApp()
     app.run()
