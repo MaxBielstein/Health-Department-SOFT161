@@ -182,7 +182,6 @@ def connect_to_sql(self):
         return False
 
 
-
 def load_visits(patient_uuid):
     get_parameters = {'v': 'full', 'patient': patient_uuid}
     rest_connection.send_request('visit', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
@@ -217,6 +216,18 @@ def temperature_not_posted(_, error):
     print('it didnt work')
 
 
+def patient_not_loaded(_, response):
+    print('not loaded')
+    global openmrs_disconnected
+    openmrs_disconnected = True
+
+
+def on_visits_not_loaded(_, error):
+    print(error)
+    global openmrs_disconnected
+    openmrs_disconnected = True
+
+
 def add_patient_uuid(_, response):
     if len(response['results']) is not 0:
         print('in')
@@ -232,12 +243,6 @@ def add_patient_uuid(_, response):
     else:
         print('unmatched')
         add_data_to_records(RecordType.UNMATCHED_RECORD, None)
-
-
-def patient_not_loaded(_, response):
-    print('not loaded')
-    global openmrs_disconnected
-    openmrs_disconnected = True
 
 
 def on_visits_loaded(_, response):
@@ -258,6 +263,25 @@ def on_visits_loaded(_, response):
             print('to import')
 
 
+def add_data_to_records(record_type, record):
+    if record_type is RecordType.OLD_RECORD:
+        old_records.append(record)
+    elif record_type is RecordType.IMPORT_RECORD:
+        location_to_import_records.append(record)
+    global number_of_records_loaded
+    global number_of_records_to_load
+    number_of_records_loaded += 1
+    if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
+    else:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
+            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
+    if number_of_records_loaded is number_of_records_to_load:
+        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
+        remove_old_import_records()
+        populate_data_preview_screen(app_reference.root)
+
+
 def remove_from_unmatched_records(result, to_import):
     record_to_remove = None
     for record in unmatched_records:
@@ -273,23 +297,16 @@ def remove_from_unmatched_records(result, to_import):
 
 
 def remove_old_import_records():
-    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
+    app_reference.root.get_screen(
+        'LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
     records_to_remove = []
     for record in records_to_import:
         for record2 in records_to_import:
             if record.vaccination_date < record2.vaccination_date:
                 records_to_remove.append(record)
-
     for record in records_to_remove:
         if record in records_to_import:
             records_to_import.remove(record)
-
-
-def on_visits_not_loaded(_, error):
-    print(error)
-    global openmrs_disconnected
-    openmrs_disconnected = True
-    pass
 
 
 def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_password):
@@ -302,11 +319,22 @@ def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_passwor
 
 
 def connect_to_databases(self):
-    if connect_to_sql(self) and connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user, self.openmrs_password):
+    if connect_to_sql(self) and connect_to_openmrs(self.openmrs_host, self.openmrs_port, self.openmrs_user,
+                                                   self.openmrs_password):
         return True
     else:
         return False
 
+
+def import_data_into_openmrs():
+    print('ok')
+    for record in records_to_import:
+        print(record)
+        for visit in location_to_import_records:
+            print(visit)
+            if visit['patient']['display'].split(' - ')[0] in record.patient_id:
+                post_temperature_to_visit(visit, record)
+                print('in')
 
 
 def update_records():
@@ -330,38 +358,9 @@ def load_records_into_app(loading_bar):
         load_patient(appointment.patient_id)
 
 
-def add_data_to_records(record_type, record):
-    if record_type is RecordType.OLD_RECORD:
-        old_records.append(record)
-    elif record_type is RecordType.IMPORT_RECORD:
-        location_to_import_records.append(record)
-    global number_of_records_loaded
-    global number_of_records_to_load
-    number_of_records_loaded += 1
-    if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
-    else:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
-            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
-    if number_of_records_loaded is number_of_records_to_load:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
-        remove_old_import_records()
-        populate_data_preview_screen(app_reference.root)
-
-
-def import_data_into_openmrs():
-    print('ok')
-    for record in records_to_import:
-        print(record)
-        for visit in location_to_import_records:
-            print(visit)
-            if visit['patient']['display'].split(' - ')[0] in record.patient_id:
-                post_temperature_to_visit(visit, record)
-                print('in')
-
-
 def populate_data_preview_screen(root):
-    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Populating unmatched records into data preview screen'
+    app_reference.root.get_screen(
+        'LoadingLogin').ids.current_action_loading_login.text = 'Populating unmatched records into data preview screen'
     path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
     path_to_scrollview_right = root.get_screen('DataPreview').ids.scrollview_right
     global unmatched_records
@@ -377,7 +376,8 @@ def populate_data_preview_screen(root):
                 halign="center", )
         )
 
-    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
+    app_reference.root.get_screen(
+        'LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
     for record in records_to_import:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
