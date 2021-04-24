@@ -126,22 +126,29 @@ class DistributionApp(MDApp):
     # View orders
     view_order_manufacturer = StringProperty()
     view_order_clinic = StringProperty()
+    view_order_current_order_id = NumericProperty()
 
-    def continue_order_manufacturer(self):
-        if self.root.get_screen('review_orders_manufacturer').ids.select_manufacturer_review_order.text != "Select a Manufacturer":
-            view_order_manufacturer = self.root.get_screen('review_orders_manufacturer').ids.select_manufacturer_review_order.text
-            self.root.current = 'select_order'
-        else:
-            self.input_error_message = 'Manufacturer must be selected'
-            Factory.NewInputError().open()
+    def populate_view_orders_select_order_spinner(self):
+        values = []
+        formatted_values = list()
+        if self.view_order_manufacturer != '':
+            print('using manufacturer')
+            man_id = get_specific_sql_data('manufacturers','manufacturer_id','manufacturer_name',self.view_order_manufacturer)[0]
+            self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
+            values = get_specific_sql_data('orders','order_id','manufacturer_id',man_id)
+            for value in values:
+                formatted_values.append('Order with ID ' + str(value))
+            self.root.get_screen('select_order').ids.select_order_to_review.values = formatted_values
 
-    def continue_order_clinic(self):
-        if self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text != "Select a Clinic":
-            view_order_clinic = self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text
-            self.root.current = 'select_order'
-        else:
-            self.input_error_message = 'Clinic must be selected'
-            Factory.NewInputError().open()
+        if self.view_order_clinic != '':
+            print('using clinic')
+            clin_id = get_specific_sql_data('vaccination_clinics','clinic_id','clinic_name',self.view_order_clinic)[0]
+            print(clin_id)
+            self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
+            values = get_specific_sql_data('orders','order_id','clinic_id',clin_id)
+            for value in values:
+                formatted_values.append('Order with ID ' + str(value))
+            self.root.get_screen('select_order').ids.select_order_to_review.values = formatted_values
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
@@ -172,6 +179,7 @@ class DistributionApp(MDApp):
     def existing_clinic_select_clinic(self):
         if self.root.get_screen('ExistingClinic').ids.clinics_spinner.text != "Clinics":
             self.root.current = 'm_for_clinic'
+
         else:
             self.input_error_message = 'Clinic must be selected'
             Factory.NewInputError().open()
@@ -195,6 +203,9 @@ class DistributionApp(MDApp):
         self.new_clinic_address_property = ''
         self.new_clinic_ID_property = 0
         self.new_clinic_current_clinic = ''
+        self.view_order_manufacturer = ''
+        self.view_order_clinic = ''
+        self.view_order_current_order_id = 0
 
         self.root.get_screen('clinic').ids.new_clinic_name.text = ''
         self.root.get_screen('clinic').ids.new_clinic_address.text = ''
@@ -232,12 +243,32 @@ class DistributionApp(MDApp):
         self.root.get_screen(
             'review_orders_manufacturer').ids.select_manufacturer_review_order.text = 'Select a Manufacturer'
 
-        self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
+        self.root.get_screen('select_order').ids.select_order_to_review.text = 'Not Available'
+        self.root.get_screen('select_order').ids.select_order_to_review.values = list()
 
         self.root.get_screen('order_information').ids.order_information_order_id.text = ''
         self.root.get_screen('order_information').ids.order_information_clinic.text = ''
         self.root.get_screen('order_information').ids.order_information_manufacturer.text = ''
         self.root.get_screen('order_information').ids.order_information_doses.text = ''
+
+    def continue_order_manufacturer(self):
+        if self.root.get_screen(
+                'review_orders_manufacturer').ids.select_manufacturer_review_order.text != "Select a Manufacturer":
+            self.view_order_manufacturer = self.root.get_screen(
+                'review_orders_manufacturer').ids.select_manufacturer_review_order.text
+            self.root.current = 'select_order'
+
+        else:
+            self.input_error_message = 'Manufacturer must be selected'
+            Factory.NewInputError().open()
+
+    def continue_order_clinic(self):
+        if self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text != "Select a Clinic":
+            self.view_order_clinic = self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text
+            self.root.current = 'select_order'
+        else:
+            self.input_error_message = 'Clinic must be selected'
+            Factory.NewInputError().open()
 
     def prefill_existing_clinic(self):
         if 'Select a Clinic' not in self.root.get_screen(
@@ -247,7 +278,7 @@ class DistributionApp(MDApp):
             self.root.get_screen('ExistingClinic').ids.clinic_name_label.text = self.new_clinic_current_clinic
 
             if len(get_specific_sql_data('vaccination_clinics', 'clinic_address',
-                                      'clinic_name', self.root.get_screen(
+                                         'clinic_name', self.root.get_screen(
                         'ExistingClinic').ids.clinics_spinner.text)) > 0:
                 self.root.get_screen('ExistingClinic').ids.clinic_address_label.text = \
                     get_specific_sql_data('vaccination_clinics', 'clinic_address',

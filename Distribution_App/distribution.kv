@@ -817,6 +817,7 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     app.continue_order_clinic()
+                    app.populate_view_orders_select_order_spinner()
 
         Widget:
             size_hint_y: None
@@ -906,6 +907,7 @@
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
                     app.continue_order_manufacturer()
+                    app.populate_view_orders_select_order_spinner()
 
         Widget:
             size_hint_y: None
@@ -937,7 +939,7 @@
                 size_hint: None, None
                 size: 500, 100
                 pos_hint: {'center': 'center'}
-                text: 'Select an Order'
+                text: 'Not Available'
                 font_size: 30
                 id: select_order_to_review
                 background_color: 0, 1.5, 4, 1
@@ -962,6 +964,7 @@
                 text: 'Back'
                 font_size: 30
                 on_press:
+                    app.on_done()
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'review_orders_clinic'
 
