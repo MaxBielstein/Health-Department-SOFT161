@@ -764,6 +764,7 @@
                     text_color: 0, 0.5, 1, 1
                     font_size: 30
                     on_press:
+                        app.on_done()
                         root.manager.transition.duration = 0
                         root.manager.current = 'review_orders_manufacturer'
 
@@ -815,7 +816,7 @@
                 on_press:
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
-                    root.manager.current = 'select_order'
+                    app.continue_order_clinic()
 
         Widget:
             size_hint_y: None
@@ -856,6 +857,7 @@
                     text_color: 0, 0.5, 1, 1
                     font_size: 30
                     on_press:
+                        app.on_done()
                         root.manager.transition.duration = 0
                         root.manager.current = 'review_orders_clinic'
 
@@ -903,7 +905,7 @@
                 on_press:
                     root.manager.transition.duration = 0.4
                     root.manager.transition.direction = 'left'
-                    root.manager.current = 'select_order'
+                    app.continue_order_manufacturer()
 
         Widget:
             size_hint_y: None

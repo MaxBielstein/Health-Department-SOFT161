@@ -123,6 +123,25 @@ class DistributionApp(MDApp):
     new_order_current_clinic = StringProperty()
     new_order_current_manufacturer = StringProperty()
     new_order_manufacturer_ids = set()
+    # View orders
+    view_order_manufacturer = StringProperty()
+    view_order_clinic = StringProperty()
+
+    def continue_order_manufacturer(self):
+        if self.root.get_screen('review_orders_manufacturer').ids.select_manufacturer_review_order.text != "Select a Manufacturer":
+            view_order_manufacturer = self.root.get_screen('review_orders_manufacturer').ids.select_manufacturer_review_order.text
+            self.root.current = 'select_order'
+        else:
+            self.input_error_message = 'Manufacturer must be selected'
+            Factory.NewInputError().open()
+
+    def continue_order_clinic(self):
+        if self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text != "Select a Clinic":
+            view_order_clinic = self.root.get_screen('review_orders_clinic').ids.select_clinic_review_order.text
+            self.root.current = 'select_order'
+        else:
+            self.input_error_message = 'Clinic must be selected'
+            Factory.NewInputError().open()
 
     def build(self):
         self.theme_cls.primary_palette = "Blue"
