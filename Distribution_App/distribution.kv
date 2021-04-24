@@ -973,7 +973,7 @@
                 font_size: 30
                 on_press:
                     root.manager.transition.direction = 'left'
-                    root.manager.current = 'order_information'
+                    app.order_selected_continue()
 
         Widget:
             size_hint_y: None
@@ -1013,12 +1013,11 @@
 
                 MDLabel:
                     text: 'Order ID:'
-                    font_size: 30
+                    font_size: 15
                     halign: 'right'
 
                 MDLabel:
-                    text: 'Prefill'
-                    font_size: 30
+                    font_size: 15
                     halign: 'left'
                     id: order_information_order_id
 
@@ -1030,12 +1029,11 @@
 
                 MDLabel:
                     text: 'Clinic:'
-                    font_size: 30
+                    font_size: 15
                     halign: 'right'
 
                 MDLabel:
-                    text: 'Prefill'
-                    font_size: 30
+                    font_size: 15
                     halign: 'left'
                     id: order_information_clinic
 
@@ -1047,12 +1045,11 @@
 
                 MDLabel:
                     text: 'Manufacturer:'
-                    font_size: 30
+                    font_size: 15
                     halign: 'right'
 
                 MDLabel:
-                    text: 'Prefill'
-                    font_size: 30
+                    font_size: 15
                     halign: 'left'
                     id: order_information_manufacturer
 
@@ -1064,12 +1061,11 @@
 
                 MDLabel:
                     text: 'Doses:'
-                    font_size: 30
+                    font_size: 15
                     halign: 'right'
 
                 MDLabel:
-                    text: 'Prefill'
-                    font_size: 30
+                    font_size: 15
                     halign: 'left'
                     id: order_information_doses
 
@@ -1112,6 +1108,7 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'home'
                     app.on_done()
+                    app.open_success_message('Order Successfully Fulfilled')
 
         Widget:
             size_hint_y: None
@@ -1126,6 +1123,22 @@
         orientation: 'vertical'
         Label:
             text: f'{app.input_error_message}'
+            font_size: sp(15)
+        Button:
+            text: 'Okay'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
+
+<NewConfirmation@Popup>:
+    title: 'Success'
+    font_size: sp(30)
+    size_hint: (None,None)
+    size: (500,200)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'{app.success_message}'
             font_size: sp(15)
         Button:
             text: 'Okay'

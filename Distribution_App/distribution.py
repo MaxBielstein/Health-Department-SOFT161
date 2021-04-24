@@ -102,8 +102,9 @@ def get_manufacturers_for_clinic(clinic_name):
 
 
 class DistributionApp(MDApp):
-    # clinics
+    success_message = StringProperty('')
     input_error_message = StringProperty('')
+    # clinics
     new_clinic_name_property = StringProperty()
     new_clinic_address_property = StringProperty()
     new_clinic_ID_property = NumericProperty()
@@ -133,21 +134,28 @@ class DistributionApp(MDApp):
         formatted_values = list()
         if self.view_order_manufacturer != '':
             print('using manufacturer')
-            man_id = get_specific_sql_data('manufacturers','manufacturer_id','manufacturer_name',self.view_order_manufacturer)[0]
+            man_id = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
+                                           self.view_order_manufacturer)[0]
             self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
-            values = get_specific_sql_data('orders','order_id','manufacturer_id',man_id)
+            values = get_specific_sql_data('orders', 'order_id', 'manufacturer_id', man_id)
             for value in values:
                 formatted_values.append('Order with ID ' + str(value))
+            if len(formatted_values) == 0:
+                self.root.get_screen(
+                    'select_order').ids.select_order_to_review.text = 'No Orders for Selected Manufacturer'
             self.root.get_screen('select_order').ids.select_order_to_review.values = formatted_values
 
         if self.view_order_clinic != '':
             print('using clinic')
-            clin_id = get_specific_sql_data('vaccination_clinics','clinic_id','clinic_name',self.view_order_clinic)[0]
+            clin_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name', self.view_order_clinic)[
+                0]
             print(clin_id)
             self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
-            values = get_specific_sql_data('orders','order_id','clinic_id',clin_id)
+            values = get_specific_sql_data('orders', 'order_id', 'clinic_id', clin_id)
             for value in values:
                 formatted_values.append('Order with ID ' + str(value))
+            if len(formatted_values) == 0:
+                self.root.get_screen('select_order').ids.select_order_to_review.text = 'No Orders for Selected Clinic'
             self.root.get_screen('select_order').ids.select_order_to_review.values = formatted_values
 
     def build(self):
@@ -168,6 +176,37 @@ class DistributionApp(MDApp):
         sm.add_widget(OrderInformation(name='order_information'))
 
         return sm
+
+    def open_success_message(self, message):
+        self.success_message = message
+        Factory.NewConfirmation().open()
+
+    def order_selected_continue(self):
+        spinner_text = self.root.get_screen('select_order').ids.select_order_to_review.text
+        if spinner_text != 'No Orders for Selected Clinic' and spinner_text != 'No Orders for Selected Manufacturer' and \
+                spinner_text != 'Not Available' and spinner_text != 'Select an Order':
+            self.view_order_current_order_id = int(spinner_text.replace('Order with ID ', ''))
+            self.root.current = 'order_information'
+
+            self.root.get_screen('order_information').ids.order_information_order_id.text = str(
+                self.view_order_current_order_id)
+            self.root.get_screen('order_information').ids.order_information_clinic.text = \
+                get_specific_sql_data('vaccination_clinics', 'clinic_name', 'clinic_id',
+                                      get_specific_sql_data('orders', 'clinic_id', 'order_id',
+                                                            self.view_order_current_order_id)[0])[0]
+            self.root.get_screen('order_information').ids.order_information_manufacturer.text = \
+                get_specific_sql_data('manufacturers', 'manufacturer_name', 'manufacturer_id',
+                                      get_specific_sql_data('orders', 'manufacturer_id', 'order_id',
+                                                            self.view_order_current_order_id)[0])[0]
+            self.root.get_screen('order_information').ids.order_information_doses.text = \
+                str(get_specific_sql_data('orders', 'doses_in_order', 'order_id',
+                                      self.view_order_current_order_id)[0])
+
+
+        else:
+            self.input_error_message = 'Clinic must be selected'
+            Factory.NewInputError().open()
+
 
     def fulfillment_confirmation(self):
         self.root.get_screen('OrderInformation').ids.done_order_button.disabled = False
@@ -558,6 +597,7 @@ def new_clinic(self, name, address, id):
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
         sql_input(clinic, session)
         self.on_done()
+        self.open_success_message('Clinic Created Successfully')
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -571,6 +611,7 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
     if int(vaccine.vaccine_id) not in get_sql_data('vaccines', 'vaccine_id'):
         sql_input(vaccine, session)
         self.on_done()
+        self.open_success_message('Vaccine Created Successfully')
         # self.confirm_screen('new_person_confirmed')
     else:
         pass
@@ -584,6 +625,7 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
         sql_input(order, session)
         self.on_done()
+        self.open_success_message('Order Created Successfully')
         self.root.current = 'home'
         # self.confirm_screen('new_person_confirmed')
     else:
