@@ -1,17 +1,13 @@
 import mysql.connector
+import mysql.connector
 from kivy.core.window import Window  # For inspection.
+from kivy.factory import Factory
 from kivy.modules import inspector  # For inspection.
 from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
-from kivymd.uix.button import MDFlatButton
-from kivymd.uix.dialog import MDDialog
-from kivy.factory import Factory
 
 from database import *
-
-import mysql.connector
-import json
 
 
 # Screen Classes
