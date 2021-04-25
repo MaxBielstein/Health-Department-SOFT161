@@ -276,16 +276,19 @@ class VaccineRecordApp(MDApp):
                 vaccine_type = get_specific_sql_data('vaccines', 'relevant_disease', 'vaccine_id', lot.vaccine_id)[0]
                 path_to_scrollview.add_widget(
                     MDLabel(
-                        text=f'Vaccine Type: {vaccine_type}; Lot: {lot_id}; Vaccination Date: {vaccination_date}'
+                        text=f'Vaccine Type: {vaccine_type}; Lot: {lot_id}; Vaccination Date: {vaccination_date}',
+                        halign='center'
                     ))
             self.root.current = 'review_vaccinations_continued'
             self.root.transition.direction = 'left'
-        else:
-            pass
 
     def clear_vaccination_records(self):
         self.root.ids.scrollview_review_vaccinations.clear_widgets()
         self.root.ids.patient_id_review_vaccinations.text = ''
+
+    def new_vaccination_from_review(self):
+        name = get_specific_sql_data('people', 'name', 'patient_id', self.root.ids.patient_id_review_vaccinations.text)[0]
+        self.root.ids.name_input_new_vaccination.text = name
         
 
 # These methods below where made static so that tests could but run on them
