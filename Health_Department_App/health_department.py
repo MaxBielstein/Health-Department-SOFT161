@@ -235,11 +235,14 @@ def on_observations_not_loaded(_, error):
     print('observations not loaded')
 
 
+# Initial openmrs connection test failed, could be because of login credentials.
+# This is a callback to a test query on openmrs
 def connection_failed(_, error):
     print('Connection failed')
     # Launch window saying the connection to openmrs failed
 
 
+# This method should be called after openmrs disconnects during an operation.
 def on_openmrs_disconnect():
     print('openmrs disconnected error')
     app_reference.root.transition.direction = 'right'
@@ -268,6 +271,8 @@ def add_patient_uuid(_, response):
         print('unmatched')
 
 
+# Observations for a patient loaded callback
+# Adds their observations to the existing observations list and confirms that the query came back
 def on_observations_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
     print('got to on observations loaded')
@@ -277,10 +282,7 @@ def on_observations_loaded(_, response):
 
     global number_of_records_loaded
     number_of_records_loaded += 1
-    if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
-    else:
-        loading_bar_increment()
+    loading_bar_increment()
     if number_of_records_loaded is number_of_records_to_load:
         sort_records()
         populate_data_preview_screen(app_reference.root)
@@ -386,11 +388,13 @@ def connect_to_databases(self):
         return False
 
 
+# Increments the loading bar a small amount
 def loading_bar_increment():
     app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
-            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
+        (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
 
-# *INCOMPLETE* this method imports the 'records to import' into open_mrs
+
+# This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
     for record in import_records:
