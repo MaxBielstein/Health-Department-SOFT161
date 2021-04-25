@@ -45,6 +45,7 @@ class VaccineOrderSummary(Screen):
     pass
 
 
+
 class RecordType(enum.Enum):
     OTHER_RECORD = 'OTHER_RECORD'
     IMPORT_RECORD = 'IMPORT_RECORD'
