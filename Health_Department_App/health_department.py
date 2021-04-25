@@ -34,6 +34,15 @@ class DataPreview(Screen):
 class ImportingLoading(Screen):
     pass
 
+class SymptomaticPatients(Screen):
+    pass
+
+class VaccinationRate(Screen):
+    pass
+
+class VaccineOrderSummary(Screen):
+    pass
+
 
 class RecordType(enum.Enum):
     OTHER_RECORD = 'OTHER_RECORD'
@@ -66,6 +75,9 @@ class Health_departmentApp(MDApp):
         sm.add_widget(LoadingLogin(name='LoadingLogin'))
         sm.add_widget(DataPreview(name='DataPreview'))
         sm.add_widget(ImportingLoading(name='ImportingLoading'))
+        sm.add_widget(SymptomaticPatients(name='SymptomaticPatients'))
+        sm.add_widget(VaccinationRate(name='VaccinationRate'))
+        sm.add_widget(VaccineOrderSummary(name='VaccineOrderSummary'))
 
         return sm
 
