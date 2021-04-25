@@ -168,6 +168,17 @@ class Health_departmentApp(MDApp):
             print('credentials.json not found')
 
 
+def importing_done():
+    app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+    app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
+    app_reference.root.get_screen('ImportingLoading').ids.back_to_login_button.disabled=False
+    app_reference.root.get_screen('ImportingLoading').ids.view_symptomatic_patients_button.disabled=False
+    app_reference.root.get_screen('ImportingLoading').ids.view_vaccination_rate_button.disabled=False
+    app_reference.root.get_screen('ImportingLoading').ids.view_vaccine_order_summary_button.disabled=False
+
+def change_screen(from_screen):
+    pass
+
 
 # Sends a test query to openmrs to check that the connection worked
 def test_openmrs_connection():
@@ -448,9 +459,7 @@ def import_data_into_openmrs():
                 on_openmrs_disconnect()
                 break
     else:
-        app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
-        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
-        # TODO go to next screen
+        importing_done()
 
 
 # This method loads all needed records from openMRS into the app
