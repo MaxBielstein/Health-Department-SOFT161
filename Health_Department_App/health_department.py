@@ -133,7 +133,7 @@ class Health_departmentApp(MDApp):
         self.root.get_screen('DataPreview').ids.scrollview_right.clear_widgets()
 
     def import_button(self):
-        import_data_into_openmrs()
+        Clock.schedule_once(lambda dt: import_data_into_openmrs(), .5)
 
     def load_credentials_file(self):
         try:
@@ -183,12 +183,6 @@ def post_observation_to_patient(record):
                                  temperature_not_posted)
 
 
-# Temperature posted correctly callback
-def temperature_posted(_, results):
-    print('it worked, it posted')
-    print('results')
-
-
 # Connection to openmrs verified method.  This completes the credentials check and moves the app to the next screen
 def connection_verified(_, response):
     global openmrs_disconnected
@@ -236,6 +230,17 @@ def on_openmrs_disconnect():
     app_reference.root.transition.direction = 'right'
     app_reference.root.current = 'home'
     # Show popup saying openmrs disconnected
+
+
+# Temperature posted correctly callback
+def temperature_posted(_, results):
+    loading_bar_import_increment()
+    global number_of_records_imported
+    number_of_records_imported += 1
+    if number_of_records_imported >= number_of_records_to_import:
+         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+    print('it worked, it posted')
+    print('results')
 
 
 # Patient was loaded correctly callback
@@ -390,22 +395,29 @@ def loading_bar_login_increment():
         (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
 
 
+def loading_bar_import_increment():
+    app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value += \
+        (100 - app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value) / 4
+
+
 # This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
     if len(import_records) is not 0:
         app_reference.root.get_screen(
-            'ImportLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
+            'ImportingLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
         for record in import_records:
             if openmrs_disconnected is False:
                 print(record)
+                global number_of_records_to_import
+                number_of_records_to_import += 1
                 post_observation_to_patient(record)
             else:
                 on_openmrs_disconnect()
                 break
     else:
-        # TODO change screens as there is not data to import
-        pass
+        app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        # TODO go to next screen
 
 
 # This method loads all needed records from openMRS into the app
@@ -476,6 +488,8 @@ number_of_records_to_load = 0
 number_of_records_loaded = 0
 number_of_patients_to_load = 0
 number_of_patients_loaded = 0
+number_of_records_imported = 0
+number_of_records_to_import = 0
 patient_uuids = {}
 unmatched_records = []
 import_records = []
