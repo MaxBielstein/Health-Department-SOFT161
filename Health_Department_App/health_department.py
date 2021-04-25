@@ -1,8 +1,5 @@
 import enum
 from json import dumps
-from time import sleep
-
-import sqlalchemy
 from kivy import Config
 
 Config.set('graphics', 'width', '1200')
@@ -10,24 +7,15 @@ Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'minimum_width', '1200')
 Config.set('graphics', 'minimum_height', '1000')
 
-from kivy.uix.widget import Widget
 from kivy.clock import Clock
 from kivymd.uix.label import MDLabel
-from kivy.app import App
-from kivy.factory import Factory
-from kivy.properties import NumericProperty, StringProperty
+from kivy.properties import StringProperty
 from kivymd.app import MDApp
 from kivy.core.window import Window  # For inspection.
 from kivy.modules import inspector  # For inspection.
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivymd.uix.button import MDFlatButton
-from kivymd.uix.dialog import MDDialog
-from sqlalchemy import *
 from sqlalchemy.exc import DatabaseError
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 from database import *
-import mysql.connector
 from openmrs import RESTConnection
 
 
