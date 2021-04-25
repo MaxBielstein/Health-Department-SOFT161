@@ -1,7 +1,7 @@
 from datetime import datetime
 from sys import stderr
 
-from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import create_engine, Column, Integer, String, ForeignKey, DateTime, Boolean
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -62,6 +62,7 @@ class Orders(Persisted):
     vaccine_id = Column(Integer, ForeignKey('vaccines.vaccine_id', ondelete='CASCADE'), primary_key=False,
                         nullable=False)
     doses_in_order = Column(Integer, nullable=False)
+    order_fulfilled = Column(Boolean, nullable=False)
     vaccine = relationship('Vaccines', back_populates='orders')
     vaccination_clinic = relationship('VaccinationClinics', back_populates='orders')
     manufacturer = relationship('Manufacturers', back_populates='orders')
@@ -174,7 +175,8 @@ def add_starter_data(session_to_add_to):
     lot125 = Lots(vaccine=smallpox_vaccine,
                   people_lots=[PeopleLots(person=kevin, vaccination_date=kevin_vaccination_date)], lot_id=125,
                   manufacture_date=lot125_date)
-    order1 = Orders(manufacturer=manufacturer1, vaccination_clinic=vaccination_clinic1, vaccine=covid19_vaccine, doses_in_order=1000)
+    order1 = Orders(manufacturer=manufacturer1, vaccination_clinic=vaccination_clinic1, vaccine=covid19_vaccine,
+                    doses_in_order=1000, order_fulfilled=False)
     session_to_add_to.add(lot1)
     session_to_add_to.add(lot2)
     session_to_add_to.add(lot3)

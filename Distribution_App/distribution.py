@@ -84,7 +84,7 @@ def get_manufacturers_for_clinic(clinic_name):
     clinics_manufacturers = set()
     for clinic_id in get_sql_data('manufacturer_clinics', 'clinic_id'):
         if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
-                                     clinic_name)):
+                                     clinic_name)) > 0:
             if clinic_id == get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
                                                   clinic_name)[0]:
 
@@ -265,13 +265,30 @@ class DistributionApp(MDApp):
             self.root.current = 'm_for_vaccine'
 
     def add_manufacturer_to_clinic(self):
-        selected_manufacturer = self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.text
+        selected_manufacturer = self.root.get_screen(
+            'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.text
         if selected_manufacturer == 'Current Manufacturers':
             self.input_error_message = 'You must select a manufacturer'
             Factory.NewInputError().open()
         else:
-            pass
 
+            if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                         self.new_clinic_current_clinic)) > 0:
+                clinic_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                                  self.new_clinic_current_clinic)[0]
+                if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                             self.new_clinic_current_clinic)) > 0:
+                    manufacturer_id = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
+                                                            selected_manufacturer)[0]
+                    new_manufacturer_clinic(self, manufacturer_id, clinic_id)
+                    self.load_manufacturer_spinners_for_clinics()
+                else:
+                    self.input_error_message = 'Manufacturer ID not found'
+                    Factory.NewInputError().open()
+
+            else:
+                self.input_error_message = 'Clinic ID not found'
+                Factory.NewInputError().open()
 
     def remove_manufacturer_from_clinic(self):
         pass
@@ -324,9 +341,13 @@ class DistributionApp(MDApp):
                     unused_manufacturers.append(manufacturer)
             self.root.get_screen(
                 'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = unused_manufacturers
+            self.root.get_screen(
+                'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.text = 'Available Manufacturers'
 
             self.root.get_screen(
                 'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.values = clinics_manufacturers
+            self.root.get_screen(
+                'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.text = 'Current Manufacturers'
 
     def load_manufacturer_spinners_for_vaccines(self):
         self.root.get_screen('new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.values = get_sql_data(
@@ -626,7 +647,7 @@ class DistributionApp(MDApp):
         self.root.get_screen('order_information').ids.order_information_doses.text = ''
 
 
-# Start methods that finalize creating new table entries, and committing them to the database
+# Start methods that finalize creating or removing table entries, and committing them to the database
 
 def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
@@ -634,11 +655,16 @@ def new_clinic(self, name, address, id):
         sql_input(clinic, session)
         self.on_done()
         self.open_success_message('Clinic Created Successfully')
-        # self.confirm_screen('new_person_confirmed')
     else:
         pass
         Factory.MatchingIDError().open()
         self.on_done()
+
+
+def new_manufacturer_clinic(self, manufacturer_id, clinic_id):
+    manufacturer_clinic = ManufacturerClinics(clinic_id=clinic_id, manufacturer_id=manufacturer_id)
+    sql_input(manufacturer_clinic, session)
+    self.open_success_message('Manufacturer Clinic Created Successfully')
 
 
 def new_vaccine(self, id, doses, disease, name, manufacturer_id):
@@ -648,7 +674,6 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
         sql_input(vaccine, session)
         self.on_done()
         self.open_success_message('Vaccine Created Successfully')
-        # self.confirm_screen('new_person_confirmed')
     else:
         pass
         Factory.MatchingIDError().open()
@@ -657,13 +682,12 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
 
 def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
     order = Orders(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
-                   vaccine_id=vaccine_id, doses_in_order=doses)
+                   vaccine_id=vaccine_id, doses_in_order=doses, order_fulfilled=False)
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
         sql_input(order, session)
         self.on_done()
         self.open_success_message('Order Created Successfully')
         self.root.current = 'home'
-        # self.confirm_screen('new_person_confirmed')
     else:
         pass
         Factory.MatchingIDError().open()
