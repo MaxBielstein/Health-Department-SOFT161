@@ -1,13 +1,13 @@
 import enum
 from json import dumps
 from kivy import Config
-from kivy.factory import Factory
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'minimum_width', '1200')
 Config.set('graphics', 'minimum_height', '1000')
 
+from kivy.factory import Factory
 from kivy.clock import Clock
 from kivymd.uix.label import MDLabel
 from kivy.properties import StringProperty
@@ -105,7 +105,8 @@ class Health_departmentApp(MDApp):
             self.openmrs_password = path.openmrs_password.text
             return True
         except ValueError:
-            print('value error')
+            self.input_error_message = 'SQL database not connected.  Credentials may be incorrect'
+            Factory.NewInputError().open()
             return False
 
     def abort_button(self):
@@ -148,9 +149,10 @@ class Health_departmentApp(MDApp):
                 self.password = credentials['password']
         except FileNotFoundError:
             # Replace this with error prompt in app
+            self.input_error_message = 'Credentials file not loaded.  File not found error.  Please restart the app and try again'
+            Factory.NewInputError().open()
             print('Database connection failed!')
             print('credentials.json not found')
-            exit(1)
 
 
 # Sends a test query to openmrs to check that the connection worked
@@ -232,7 +234,7 @@ def on_openmrs_disconnect():
     print('openmrs disconnected error')
     app_reference.root.transition.direction = 'right'
     app_reference.root.current = 'home'
-    app_reference.input_error_message= 'Open MRS seems to have disconnected, please lot in again'
+    app_reference.input_error_message = 'Open MRS seems to have disconnected, please lot in again'
     Factory.NewInputError().open()
 
 
@@ -242,7 +244,7 @@ def temperature_posted(_, results):
     global number_of_records_imported
     number_of_records_imported += 1
     if number_of_records_imported >= number_of_records_to_import:
-         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
     print('it worked, it posted')
     print('results')
 
@@ -415,7 +417,8 @@ def import_data_into_openmrs():
                 print(record)
                 global number_of_records_to_import
                 number_of_records_to_import += 1
-                app_reference.root.get_screen('ImportingLoading').ids.current_action_loading_importing.text = f'Importing record {number_of_records_to_import}/{len(import_records)} into openmrs'
+                app_reference.root.get_screen(
+                    'ImportingLoading').ids.current_action_loading_importing.text = f'Importing record {number_of_records_to_import}/{len(import_records)} into openmrs'
                 post_observation_to_patient(record)
             else:
                 on_openmrs_disconnect()
