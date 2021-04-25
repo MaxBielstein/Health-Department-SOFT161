@@ -373,7 +373,7 @@
                     root.ids.view_vaccine_order_summary_button.disabled=True
 
             MDRaisedButton:
-                text: 'Vaccinaiton Rate'
+                text: 'Vaccination Rate'
                 font_size: 20
                 disabled: True
                 id: view_vaccination_rate_button
@@ -412,6 +412,63 @@
         spacing: 25
         orientation: 'vertical'
 
+        MDLabel:
+            text: 'Symptomatic Patients'
+            font_size: 45
+            halign: 'center'
+
+        MDLabel:
+            text: 'Patients with a fever'
+            font_size: 30
+            halign: 'center'
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, None
+                height: sum(child.height+10 for child in self.children)
+                id: scrollview_symptomatic_patients
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back to Login'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+                    app.abort_button()
+
+            MDRaisedButton:
+                text: 'Vaccination Rate'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'VaccinationRate'
+
+            MDRaisedButton:
+                text: 'Vaccine Order Summary'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'VaccineOrderSummary'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
 <VaccinationRate>
     MDCard:
         size_hint: None, None
@@ -422,6 +479,48 @@
         spacing: 25
         orientation: 'vertical'
 
+        MDLabel:
+            text: 'Vaccination Rate'
+            font_size: 45
+            halign: 'center'
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back to Login'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+                    app.abort_button()
+
+            MDRaisedButton:
+                text: 'View Symptomatic Patients'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'SymptomaticPatients'
+
+            MDRaisedButton:
+                text: 'Vaccine Order Summary'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'VaccineOrderSummary'
+
+        Widget:
+            size_hint_y: None
+            height: 10
+
 <VaccineOrderSummary>
     MDCard:
         size_hint: None, None
@@ -431,6 +530,50 @@
         padding: 25
         spacing: 25
         orientation: 'vertical'
+
+        MDLabel:
+            text: 'Vaccine Order Summary'
+            font_size: 45
+            halign: 'center'
+
+    MDBoxLayout:
+        orientation: 'vertical'
+        spacing: 25
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            MDRaisedButton:
+                text: 'Back to Login'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'right'
+                    root.manager.current = 'home'
+                    app.abort_button()
+
+            MDRaisedButton:
+                text: 'View Symptomatic Patients'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'SymptomaticPatients'
+
+
+            MDRaisedButton:
+                text: 'Vaccination Rate'
+                font_size: 20
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'VaccinationRate'
+
+
+        Widget:
+            size_hint_y: None
+            height: 10
 
 <NewInputError@Popup>
     title: 'Input Error'
