@@ -267,7 +267,7 @@ class DistributionApp(MDApp):
     def add_manufacturer_to_clinic(self):
         selected_manufacturer = self.root.get_screen(
             'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.text
-        if selected_manufacturer == 'Current Manufacturers':
+        if selected_manufacturer == 'Available Manufacturers':
             self.input_error_message = 'You must select a manufacturer'
             Factory.NewInputError().open()
         else:
@@ -291,7 +291,30 @@ class DistributionApp(MDApp):
                 Factory.NewInputError().open()
 
     def remove_manufacturer_from_clinic(self):
-        pass
+        selected_manufacturer = self.root.get_screen(
+            'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.text
+        if selected_manufacturer == 'Current Manufacturers':
+            self.input_error_message = 'You must select a manufacturer'
+            Factory.NewInputError().open()
+        else:
+
+            if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                         self.new_clinic_current_clinic)) > 0:
+                clinic_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                                  self.new_clinic_current_clinic)[0]
+                if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
+                                             self.new_clinic_current_clinic)) > 0:
+                    manufacturer_id = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
+                                                            selected_manufacturer)[0]
+                    delete_manufacturer_clinic(self, manufacturer_id, clinic_id)
+                    self.load_manufacturer_spinners_for_clinics()
+                else:
+                    self.input_error_message = 'Manufacturer ID not found'
+                    Factory.NewInputError().open()
+
+            else:
+                self.input_error_message = 'Clinic ID not found'
+                Factory.NewInputError().open()
 
     # End Methods for miscellaneous kivy interaction
     #
@@ -649,6 +672,7 @@ class DistributionApp(MDApp):
 
 # Start methods that finalize creating or removing table entries, and committing them to the database
 
+
 def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
@@ -665,6 +689,29 @@ def new_manufacturer_clinic(self, manufacturer_id, clinic_id):
     manufacturer_clinic = ManufacturerClinics(clinic_id=clinic_id, manufacturer_id=manufacturer_id)
     sql_input(manufacturer_clinic, session)
     self.open_success_message('Manufacturer Clinic Created Successfully')
+
+
+def delete_manufacturer_clinic(self, manufacturer_id, clinic_id):
+    try:
+
+        manufacturer_clinics = session.query(ManufacturerClinics).filter(
+            ManufacturerClinics.manufacturer_id == manufacturer_id,
+            ManufacturerClinics.manufacturer_id == clinic_id).count
+        if manufacturer_clinics is 0:
+            raise ValueError(
+                f"No Manufacturer Clinics with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
+        session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == manufacturer_id,
+                                                       ManufacturerClinics.manufacturer_id == clinic_id).delete()
+        session.commit()
+        self.open_success_message(
+            f'Manufacturer Clinic with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id} deleted')
+        self.load_manufacturer_spinners_for_clinics()
+    except ValueError:
+        self.input_error_message = 'Manufacturer Clinic Not Found'
+        Factory.NewInputError().open()
+    except SQLAlchemyError:
+        self.input_error_message = 'Could Not Open Database'
+        Factory.NewInputError().open()
 
 
 def new_vaccine(self, id, doses, disease, name, manufacturer_id):
