@@ -1071,6 +1071,22 @@
                     halign: 'left'
                     id: order_information_doses
 
+            MDBoxLayout:
+                orientation: 'horizontal'
+                padding: 25
+                spacing: 25
+                pos_hint: {'center_x': 0.5,}
+
+                MDLabel:
+                    text: 'Fulfilled:'
+                    font_size: 15
+                    halign: 'right'
+
+                MDLabel:
+                    font_size: 15
+                    halign: 'left'
+                    id: order_information_fulfillment
+
 
 
     MDBoxLayout:
