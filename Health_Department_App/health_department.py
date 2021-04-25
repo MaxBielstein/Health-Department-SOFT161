@@ -48,7 +48,7 @@ class ImportingLoading(Screen):
 
 
 class RecordType(enum.Enum):
-    OLD_RECORD = 'OLD_RECORD'
+    OTHER_RECORD = 'OTHER_RECORD'
     IMPORT_RECORD = 'IMPORT_RECORD'
     UNMATCHED_RECORD = 'UNMATCHED_RECORD'
 
@@ -129,16 +129,21 @@ class Health_departmentApp(MDApp):
         global number_of_records_loaded
         global patient_uuids
         global unmatched_records
-        global old_records
+        global other_records
         global location_to_import_records
-        global records_to_import
+        global import_records
+        global existing_observations
+        global openmrs_disconnected
+        global concepts
         number_of_records_to_load = 0
         number_of_records_loaded = 0
         patient_uuids = {}
         unmatched_records = []
-        old_records = []
+        import_records = []
+        existing_observations = []
         location_to_import_records = []
-        records_to_import = []
+        openmrs_disconnected = False
+        concepts = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
         self.root.get_screen('DataPreview').ids.scrollview_right.clear_widgets()
 
@@ -167,11 +172,10 @@ def test_openmrs_connection():
                                  connection_failed)
 
 
-# Queries for all visits of a certain patient given their UUID
-def load_visits(patient_uuid):
-    get_parameters = {'v': 'full', 'patient': patient_uuid}
-    rest_connection.send_request('visit', get_parameters, None, on_visits_loaded, on_visits_not_loaded,
-                                 on_visits_not_loaded)
+def load_observations(patient_uuid):
+    get_parameters = {'v': 'full', 'patient': patient_uuid, 'concept': '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
+    rest_connection.send_request('obs', get_parameters, None, on_observations_loaded, on_observations_not_loaded,
+                                 on_observations_not_loaded)
 
 
 # Queries for a single patient given a patient ID
@@ -181,18 +185,14 @@ def load_patient(patient_id):
                                  patient_not_loaded)
 
 
-# *INCOMPLETE* Posts a patient's given temperature record to one of their given visits
-def post_temperature_to_visit(visit, record):
-    print(dumps(visit, indent=2, sort_keys=True))
+def post_observation_to_patient(record):
     print(record)
-    encounterProvider = {
-        "provider": "bb1a7781-7896-40be-aaca-7d1b41d843a6",
-        "encounterRole": "240b26f9-dd88-4172-823d-4a8bfeb7841f"
-    }
-    post_parameters = {'encounterDatetime': f'{record.vaccination_date}', 'patient': visit['patient']['uuid'],
-                       'encounterType': '67a71486-1a54-468f-ac3e-7091a9a79584', 'location': visit['location']['uuid'],
-                       'visit': visit['uuid'], 'encounterProviders': [encounterProvider]}
-    rest_connection.send_request('encounter', None, post_parameters, temperature_posted, temperature_not_posted,
+    print(f'{record.vaccination_date}')
+
+    post_parameters = {'person': patient_uuids[record.patient_id]['UUID'], 'obsDatetime': f'{record.vaccination_date}',
+                       'concept': '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
+                       'value': record.patient_temperature}
+    rest_connection.send_request('obs', None, post_parameters, temperature_posted, temperature_not_posted,
                                  temperature_not_posted)
 
 
@@ -207,6 +207,7 @@ def connection_verified(_, response):
     openmrs_disconnected = False
     loading_bar = app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
     Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
+    # load_concepts()
     app_reference.root.transition.direction = 'left'
     app_reference.root.current = 'LoadingLogin'
 
@@ -228,12 +229,9 @@ def patient_not_loaded(_, response):
     on_openmrs_disconnect()
 
 
-# Patient's visits were not loaded correctly callback
-def on_visits_not_loaded(_, error):
+def on_observations_not_loaded(_, error):
     print(error)
-    global openmrs_disconnected
-    openmrs_disconnected = True
-    on_openmrs_disconnect()
+    print('observations not loaded')
 
 
 def connection_failed(_, error):
@@ -247,13 +245,14 @@ def on_openmrs_disconnect():
     app_reference.root.current = 'home'
     # Show popup saying openmrs disconnected
 
+
 # Patient was loaded correctly callback
 # Adds a patient UUID to a dictionary of patient ids and their information.
-# Also queries to load their visits to determine if they have records that need to be imported.
-# If the patient was loaded correctly, but there doesn't not exist a patient with that ID, the method that counts to make sure all
-# patient callbacks came through is called to insure that the app knows that this callback did come back
+# Also queries to load their observations to determine if they have already existing observations.
 def add_patient_uuid(_, response):
     if len(response['results']) is not 0:
+        global number_of_records_to_load
+        number_of_records_to_load += 1
         print('in')
         print(response)
         id_and_name = response['results'][0]['display'].split(' - ')
@@ -261,45 +260,21 @@ def add_patient_uuid(_, response):
         name = id_and_name[1]
         uuid = response['results'][0]['uuid']
         global patient_uuids
-        patient_uuids[id]['Name'] = name
-        patient_uuids[id]['UUID'] = uuid
-        load_visits(uuid)
+        patient_uuids[id] = {'Name': name, 'UUID': uuid}
+        print(name + ";;")
+        load_observations(uuid)
     else:
         print('unmatched')
-        add_data_to_records(RecordType.UNMATCHED_RECORD, None)
 
 
-# Visits of a patient loaded correctly callback
-# Checks to see if the patient has a current visit with the latest encounter not having their temperature as an observation
-# If this is the case, this visit is added to the locations in which we will later import their records into.
-def on_visits_loaded(_, response):
+def on_observations_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
-    for result in response['results']:
-        if result['stopDatetime'] is None:
-            if len(result['encounters']) is not 0:
-                if len(result['encounters']) is not 0:
-                    if len(result['encounters'][-1]['obs']) is not 0:
-                        for observation in result['encounters'][-1]['obs']:
-                            if 'Temperature' in observation['display']:
-                                remove_from_unmatched_records(result, False)
-                                add_data_to_records(RecordType.OLD_RECORD, result)
-                                print('to old records')
-                                return
-            remove_from_unmatched_records(result, True)
-            add_data_to_records(RecordType.IMPORT_RECORD, result)
-            print('to import')
+    print('got to on observations loaded')
+    if len(response) is not 0:
+        for result in response['results']:
+            existing_observations.append(result)
 
-
-# This method keeps track of all patient records that are queried for and makes sure that each one comes back.
-# It also adds the data into its correct list
-# It moves the loading bar up a bit when this method is called
-def add_data_to_records(record_type, record):
-    if record_type is RecordType.OLD_RECORD:
-        old_records.append(record)
-    elif record_type is RecordType.IMPORT_RECORD:
-        location_to_import_records.append(record)
     global number_of_records_loaded
-    global number_of_records_to_load
     number_of_records_loaded += 1
     if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
         app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
@@ -308,37 +283,66 @@ def add_data_to_records(record_type, record):
             (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
     if number_of_records_loaded is number_of_records_to_load:
         app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
-        remove_old_import_records()
+        sort_records()
         populate_data_preview_screen(app_reference.root)
 
 
-# This method removes any records which are currently in the unmatched records list which been determined to be matched
-def remove_from_unmatched_records(result, to_import):
-    record_to_remove = None
-    for record in unmatched_records:
-        print(result['patient']['display'].split(' - ')[0])
-        print(record.patient_id)
-        print(str(result['patient']['display'].split(' - ')[0]) in record.patient_id)
-        if str(result['patient']['display'].split(' - ')[0]) in record.patient_id:
-            record_to_remove = record
-    if record_to_remove in unmatched_records:
-        unmatched_records.remove(record_to_remove)
-        if to_import:
-            records_to_import.append(record_to_remove)
-
-
-# THis removes old records when the sql database which have already been imported into openmrs
-def remove_old_import_records():
+# Determines which records are records to import and which records are unmatched records
+def sort_records():
     app_reference.root.get_screen(
-        'LoadingLogin').ids.current_action_loading_login.text = 'Filtering out historical records'
-    records_to_remove = []
-    for record in records_to_import:
-        for record2 in records_to_import:
-            if record.vaccination_date < record2.vaccination_date:
-                records_to_remove.append(record)
-    for record in records_to_remove:
-        if record in records_to_import:
-            records_to_import.remove(record)
+        'LoadingLogin').ids.current_action_loading_login.text = 'Sorting records'
+    to_remove_from_unmatched = []
+    to_remove_from_import = []
+
+    # Goes through each patient finding the latest temperature observation that is currently in openmrs
+    # If this observation is before one of the possible unmatched records, that record is added to the import records list
+    # (As long as that patient exists in openmrs)
+    for patient_id in patient_uuids:
+        print(patient_id)
+        observations_of_this_patient = []
+        for observation in existing_observations:
+            if observation['person']['display'].split(' - ')[0] == patient_id:
+                observations_of_this_patient.append(observation)
+        if len(observations_of_this_patient) is not 0:
+            latest_observation = None
+            for observation in observations_of_this_patient:
+                if latest_observation is not None:
+                    if datetime.strptime(observation['obsDatetime'][:len(observation['obsDatetime']) - 5],
+                                         '%Y-%m-%dT%H:%M:%S.%f') > latest_observation:
+                        latest_observation = datetime.strptime(
+                            observation['obsDatetime'][:len(observation['obsDatetime']) - 5], '%Y-%m-%dT%H:%M:%S.%f')
+                else:
+                    latest_observation = datetime.strptime(
+                        observation['obsDatetime'][:len(observation['obsDatetime']) - 5], '%Y-%m-%dT%H:%M:%S.%f')
+            for unmatched_record in unmatched_records:
+                if unmatched_record.vaccination_date > latest_observation:
+                    if unmatched_record.patient_id == patient_id:
+                        import_records.append(unmatched_record)
+
+    # For each patient, only their latest record from within import records is kept.  The rest are removed.
+    for patient in patient_uuids:
+        record_with_latest_vaccination_date = None
+        for record in import_records:
+            if patient == record.patient_id:
+                if record_with_latest_vaccination_date is not None:
+                    if record.vaccination_date < record_with_latest_vaccination_date.vaccination_date:
+                        to_remove_from_import.append(record)
+                    else:
+                        to_remove_from_import.append(record_with_latest_vaccination_date)
+                        record_with_latest_vaccination_date = record
+                else:
+                    record_with_latest_vaccination_date = record
+    for record in to_remove_from_import:
+        import_records.remove(record)
+
+    # All records that are matched with a patient in openmrs are removed from unmatched_records
+    for record in unmatched_records:
+        for patient_id in patient_uuids:
+            if patient_id == record.patient_id:
+                to_remove_from_unmatched.append(record)
+    for record in to_remove_from_unmatched:
+        if record in unmatched_records:
+            unmatched_records.remove(record)
 
 
 # Returns false if something goes wrong while trying to connect to OpenMRS server
@@ -383,27 +387,20 @@ def connect_to_databases(self):
 # *INCOMPLETE* this method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
-    for record in records_to_import:
+    for record in import_records:
         print(record)
-        for visit in location_to_import_records:
-            print(visit)
-            if visit['patient']['display'].split(' - ')[0] in record.patient_id:
-                post_temperature_to_visit(visit, record)
-                print('in')
+        post_observation_to_patient(record)
 
 
 # This method loads all needed records from openMRS into the app
 def load_records_into_app(loading_bar):
     global session
-    global number_of_records_to_load
     people_lots = session.query(PeopleLots)
     loading_bar.value = 0
     app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
         if openmrs_disconnected is False:
             unmatched_records.append(appointment)
-            patient_uuids[appointment.patient_id] = {'latest_appointment': appointment.vaccination_date}
-            number_of_records_to_load += 1
             load_patient(appointment.patient_id)
         else:
             on_openmrs_disconnect()
@@ -427,10 +424,9 @@ def populate_data_preview_screen(root):
                 text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature Taken During Vaccination: {record.patient_temperature}{date}\n-----------------\n',
                 halign="center", )
         )
-
     app_reference.root.get_screen(
         'LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
-    for record in records_to_import:
+    for record in import_records:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
         date = f'\nVaccination Date: {split_date}'
@@ -455,9 +451,8 @@ number_of_records_to_load = 0
 number_of_records_loaded = 0
 patient_uuids = {}
 unmatched_records = []
-records_to_import = []
-old_records = []
-location_to_import_records = []
+import_records = []
+existing_observations = []
 openmrs_disconnected = False
 
 if __name__ == '__main__':
