@@ -12,6 +12,8 @@ import json
 
 
 # Loads the credentials to connect to the database
+from kivymd.uix.label import MDLabel
+
 from database import RecordDatabase, PeopleLots, Lots, People
 
 try:
@@ -256,18 +258,39 @@ class VaccineRecordApp(MDApp):
     def update_person(self):
         update_person_static(self)
 
+    def check_for_patient_id(self):
+        if self.root.ids.patient_id_review_vaccinations.text == '':
+            self.input_error_message = 'Please enter a patient id.'
+            Factory.NewInputError().open()
+            return False
+        return True
+
     def get_vaccination_record(self, patient_id):
-        person, _ = get_person_data(patient_id, session)
-        lots = person.lots
-        vaccines = []
-        for lot in lots:
-            vaccines += lot.vaccine
+        if self.check_for_patient_id():
+            people_lots = session.query(PeopleLots).filter(PeopleLots.patient_id == patient_id).all()
+            path_to_scrollview = self.root.ids.scrollview_review_vaccinations
+            for people_lot in people_lots:
+                lot_id = people_lot.lot_id
+                lot = session.query(Lots).filter(Lots.lot_id == lot_id).one()
+                vaccination_date = people_lot.vaccination_date
+                vaccine_type = get_specific_sql_data('vaccines', 'relevant_disease', 'vaccine_id', lot.vaccine_id)[0]
+                path_to_scrollview.add_widget(
+                    MDLabel(
+                        text=f'Vaccine Type: {vaccine_type}; Lot: {lot_id}; Vaccination Date: {vaccination_date}'
+                    ))
+            self.root.current = 'review_vaccinations_continued'
+            self.root.transition.direction = 'left'
+        else:
+            pass
+
+    def clear_vaccination_records(self):
+        self.root.ids.scrollview_review_vaccinations.clear_widgets()
+        self.root.ids.patient_id_review_vaccinations.text = ''
         
 
 # These methods below where made static so that tests could but run on them
 # with a different sql database
 # They all attempt to input some type of data into the database
-
 def update_person_static(self):
     name = self.new_person_name
     birthdate_month = self.new_person_birthdate_month
