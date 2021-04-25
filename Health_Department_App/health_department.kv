@@ -369,5 +369,19 @@
         Widget:
             size_hint_y: None
             height: 10
-
+<NewInputError@Popup>:
+    title: 'Input Error'
+    font_size: sp(30)
+    size_hint: (None,None)
+    size: (500,200)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'{app.input_error_message}'
+            font_size: sp(15)
+        Button:
+            text: 'Okay'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
 
