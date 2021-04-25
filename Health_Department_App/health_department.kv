@@ -288,7 +288,7 @@
             spacing: 25
 
             MDLabel:
-                text: 'Importing'
+                text: 'Importing Screen'
                 halign: 'center'
                 font_size: 45
 
@@ -401,17 +401,7 @@
         Widget:
             size_hint_y: None
             height: 10
-
-<SymptomaticPatients>
-
-
-<VaccinationRate>
-
-
-<VaccineOrderSummary>
-
-
-<NewInputError@Popup>:
+<NewInputError@Popup>
     title: 'Input Error'
     font_size: sp(30)
     size_hint: (None,None)
@@ -426,6 +416,15 @@
             font_size: sp(30)
             on_press:
                 root.dismiss()
+
+<SymptomaticPatients>
+
+
+<VaccinationRate>
+
+
+<VaccineOrderSummary>
+
 
 
 

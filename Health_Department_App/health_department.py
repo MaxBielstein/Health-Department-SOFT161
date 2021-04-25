@@ -1,6 +1,7 @@
 import enum
 from json import dumps
 from kivy import Config
+from kivy.uix.popup import Popup
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
@@ -43,6 +44,7 @@ class VaccinationRate(Screen):
 
 class VaccineOrderSummary(Screen):
     pass
+
 
 
 class RecordType(enum.Enum):
@@ -150,6 +152,7 @@ class Health_departmentApp(MDApp):
 
     def import_button(self):
         Clock.schedule_once(lambda dt: import_data_into_openmrs(), .5)
+        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = True
 
     def load_credentials_file(self):
         try:
@@ -161,10 +164,9 @@ class Health_departmentApp(MDApp):
                 self.password = credentials['password']
         except FileNotFoundError:
             # Replace this with error prompt in app
-            self.input_error_message = 'Credentials file not loaded.  File not found error.  Please restart the app and try again'
-            Factory.NewInputError().open()
             print('Database connection failed!')
             print('credentials.json not found')
+
 
 
 # Sends a test query to openmrs to check that the connection worked
@@ -238,6 +240,8 @@ def on_observations_not_loaded(_, error):
 # This is a callback to a test query on openmrs
 def connection_failed(_, error):
     print('Connection failed')
+    app_reference.input_error_message = 'Open MRS connection failed, credentials may be incorrect'
+    Factory.NewInputError().open()
     # Launch window saying the connection to openmrs failed
 
 
@@ -257,6 +261,7 @@ def temperature_posted(_, results):
     number_of_records_imported += 1
     if number_of_records_imported >= number_of_records_to_import:
         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
     print('it worked, it posted')
     print('results')
 
@@ -338,7 +343,6 @@ def sort_records():
                 if unmatched_record.vaccination_date > latest_observation:
                     if unmatched_record.patient_id == patient_id:
                         import_records.append(unmatched_record)
-
     loading_bar_login_increment()
 
     # For each patient, only their latest record from within import records is kept.  The rest are removed.
@@ -389,12 +393,18 @@ def connect_to_sql(self):
         return True
     except DatabaseError:
         print('database error')
+        self.input_error_message = 'SQL did not connect, credentials may be incorrect'
+        Factory.NewInputError().open()
         return False
     except NameError:
         print('name error')
+        self.input_error_message = 'SQL did not connect, credentials may be incorrect'
+        Factory.NewInputError().open()
         return False
     except ValueError:
         print('SQL connection value error')
+        self.input_error_message = 'SQL did not connect, credentials may be incorrect'
+        Factory.NewInputError().open()
         return False
 
 
@@ -421,6 +431,8 @@ def loading_bar_import_increment():
 # This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
+    app_reference.root.get_screen(
+            'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
     if len(import_records) is not 0:
         app_reference.root.get_screen(
             'ImportingLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
@@ -437,6 +449,7 @@ def import_data_into_openmrs():
                 break
     else:
         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
         # TODO go to next screen
 
 
