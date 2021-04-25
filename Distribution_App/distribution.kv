@@ -1071,14 +1071,7 @@
                     halign: 'left'
                     id: order_information_doses
 
-            MDLabel:
-                text: 'Confirm Fulfillment'
-                font_size: 30
-                halign: 'center'
 
-            MDSwitch:
-                on_active: root.ids.done_order_button.disabled=False
-                pos_hint: {'center_x': 0.5, 'center_y': 0.5}
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -1096,21 +1089,27 @@
 
             MDRaisedButton:
                 text: 'Back'
-                font_size: 30
+                font_size: 20
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'review_orders_clinic'
 
             MDRaisedButton:
-                text: 'Done'
-                font_size: 30
-                disabled: True
-                id: done_order_button
+                text: 'Fulfill and return to main menu'
+                font_size: 20
                 on_press:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'home'
                     app.on_done()
                     app.open_success_message('Order Successfully Fulfilled')
+
+            MDRaisedButton:
+                text: 'Return to main menu'
+                font_size: 20
+                on_press:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'home'
+                    app.on_done()
 
         Widget:
             size_hint_y: None
