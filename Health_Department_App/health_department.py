@@ -242,8 +242,8 @@ def on_openmrs_disconnect():
 # Adds a patient UUID to a dictionary of patient ids and their information.
 # Also queries to load their observations to determine if they have already existing observations.
 def add_patient_uuid(_, response):
+    global number_of_records_to_load
     if len(response['results']) is not 0 and 'voided' not in response['results'][0]:
-        global number_of_records_to_load
         number_of_records_to_load += 1
         print('in')
         print(response)
@@ -256,7 +256,14 @@ def add_patient_uuid(_, response):
         print(name + ";;")
         load_observations(uuid)
     else:
+        global number_of_patients_loaded
+        number_of_patients_loaded += 1
         print('unmatched')
+        print(f'{number_of_patients_loaded} | {number_of_patients_to_load}')
+        print(f'{number_of_records_loaded} | {number_of_records_to_load}')
+        if number_of_patients_loaded >= number_of_patients_to_load and number_of_records_loaded >= number_of_records_to_load:
+            sort_records()
+            populate_data_preview_screen(app_reference.root)
 
 
 # Observations for a patient loaded callback
@@ -264,14 +271,15 @@ def add_patient_uuid(_, response):
 def on_observations_loaded(_, response):
     print(dumps(response, indent=4, sort_keys=True))
     print('got to on observations loaded')
+    global number_of_records_loaded
+    number_of_records_loaded += 1
     if len(response) is not 0:
         for result in response['results']:
             existing_observations.append(result)
-
-    global number_of_records_loaded
-    number_of_records_loaded += 1
     loading_bar_login_increment()
-    if number_of_records_loaded is number_of_records_to_load:
+    print(number_of_records_loaded)
+    print(number_of_records_to_load)
+    if number_of_records_loaded >= number_of_records_to_load:
         sort_records()
         populate_data_preview_screen(app_reference.root)
 
@@ -386,9 +394,15 @@ def loading_bar_login_increment():
 def import_data_into_openmrs():
     print('ok')
     if len(import_records) is not 0:
+        app_reference.root.get_screen(
+            'ImportLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
         for record in import_records:
-            print(record)
-            post_observation_to_patient(record)
+            if openmrs_disconnected is False:
+                print(record)
+                post_observation_to_patient(record)
+            else:
+                on_openmrs_disconnect()
+                break
     else:
         # TODO change screens as there is not data to import
         pass
@@ -400,8 +414,11 @@ def load_records_into_app():
     people_lots = session.query(PeopleLots)
     app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
+        print(appointment.patient_id)
         if openmrs_disconnected is False:
             unmatched_records.append(appointment)
+            global number_of_patients_to_load
+            number_of_patients_to_load += 1
             load_patient(appointment.patient_id)
         else:
             on_openmrs_disconnect()
@@ -457,6 +474,8 @@ global app_reference
 
 number_of_records_to_load = 0
 number_of_records_loaded = 0
+number_of_patients_to_load = 0
+number_of_patients_loaded = 0
 patient_uuids = {}
 unmatched_records = []
 import_records = []
