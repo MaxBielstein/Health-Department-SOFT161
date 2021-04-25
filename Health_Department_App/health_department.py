@@ -83,9 +83,7 @@ class Health_departmentApp(MDApp):
 
     def load_defaults(self):
         self.load_credentials_file()
-
         self.port = '3306'
-
         self.openmrs_port = '8080'
         self.openmrs_host = 'localhost'
         self.openmrs_user = 'admin'
@@ -95,7 +93,6 @@ class Health_departmentApp(MDApp):
     def login_button(self):
         global app_reference
         app_reference = self
-
         if self.load_login_credentials():
             if connect_to_databases(self):
                 test_openmrs_connection()
@@ -122,7 +119,7 @@ class Health_departmentApp(MDApp):
 
     def abort_button(self):
         self.clear_data_preview_screen()
-        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 1
+        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
 
     def clear_data_preview_screen(self):
         global number_of_records_to_load
@@ -172,6 +169,7 @@ def test_openmrs_connection():
                                  connection_failed)
 
 
+# This loads the observations of a given patient
 def load_observations(patient_uuid):
     get_parameters = {'v': 'full', 'patient': patient_uuid, 'concept': '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'}
     rest_connection.send_request('obs', get_parameters, None, on_observations_loaded, on_observations_not_loaded,
@@ -185,6 +183,7 @@ def load_patient(patient_id):
                                  patient_not_loaded)
 
 
+# This method adds the temperature observation to a patient in openMRS given their record (appointment)
 def post_observation_to_patient(record):
     print(record)
     print(f'{record.vaccination_date}')
@@ -202,12 +201,11 @@ def temperature_posted(_, results):
     print('results')
 
 
+# Connection to openmrs verified method.  This completes the credentials check and moves the app to the next screen
 def connection_verified(_, response):
     global openmrs_disconnected
     openmrs_disconnected = False
-    loading_bar = app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar
-    Clock.schedule_once(lambda dt: load_records_into_app(loading_bar), 2)
-    # load_concepts()
+    Clock.schedule_once(lambda dt: load_records_into_app(), 2)
     app_reference.root.transition.direction = 'left'
     app_reference.root.current = 'LoadingLogin'
 
@@ -229,7 +227,10 @@ def patient_not_loaded(_, response):
     on_openmrs_disconnect()
 
 
+# Observations were not loaded correctly callback
 def on_observations_not_loaded(_, error):
+    global openmrs_disconnected
+    openmrs_disconnected = True
     print(error)
     print('observations not loaded')
 
@@ -279,10 +280,8 @@ def on_observations_loaded(_, response):
     if app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value is 0:
         app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 10
     else:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
-            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
+        loading_bar_increment()
     if number_of_records_loaded is number_of_records_to_load:
-        app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
         sort_records()
         populate_data_preview_screen(app_reference.root)
 
@@ -319,6 +318,8 @@ def sort_records():
                     if unmatched_record.patient_id == patient_id:
                         import_records.append(unmatched_record)
 
+    loading_bar_increment()
+
     # For each patient, only their latest record from within import records is kept.  The rest are removed.
     for patient in patient_uuids:
         record_with_latest_vaccination_date = None
@@ -343,6 +344,7 @@ def sort_records():
     for record in to_remove_from_unmatched:
         if record in unmatched_records:
             unmatched_records.remove(record)
+    loading_bar_increment()
 
 
 # Returns false if something goes wrong while trying to connect to OpenMRS server
@@ -384,6 +386,10 @@ def connect_to_databases(self):
         return False
 
 
+def loading_bar_increment():
+    app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
+            (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
+
 # *INCOMPLETE* this method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
@@ -393,10 +399,9 @@ def import_data_into_openmrs():
 
 
 # This method loads all needed records from openMRS into the app
-def load_records_into_app(loading_bar):
+def load_records_into_app():
     global session
     people_lots = session.query(PeopleLots)
-    loading_bar.value = 0
     app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
         if openmrs_disconnected is False:
@@ -407,6 +412,7 @@ def load_records_into_app(loading_bar):
             break
 
 
+# Populates the data preview screen with the import and unmatched records
 def populate_data_preview_screen(root):
     app_reference.root.get_screen(
         'LoadingLogin').ids.current_action_loading_login.text = 'Populating unmatched records into data preview screen'
@@ -415,6 +421,9 @@ def populate_data_preview_screen(root):
     global unmatched_records
     print('unmatched records below')
     print(len(unmatched_records))
+    loading_bar_increment()
+
+    # Displaying unmatched records
     for record in unmatched_records:
         date_as_string = f'{record.vaccination_date}'
         split_date = date_as_string.split(' ')[0]
@@ -424,6 +433,8 @@ def populate_data_preview_screen(root):
                 text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature Taken During Vaccination: {record.patient_temperature}{date}\n-----------------\n',
                 halign="center", )
         )
+
+    # Displaying records to import
     app_reference.root.get_screen(
         'LoadingLogin').ids.current_action_loading_login.text = 'Populating records to import into data preview screen'
     for record in import_records:
@@ -435,6 +446,7 @@ def populate_data_preview_screen(root):
                 text=f'\nVaccination Record\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                 halign="center", )
         )
+    app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
     root.current = 'DataPreview'
     root.transition.direction = 'left'
 
@@ -444,9 +456,9 @@ def populate_data_preview_screen(root):
 global database
 global session
 global rest_connection
-
 # Assuming only one app runs at once so we can make a static reference to the app
 global app_reference
+
 number_of_records_to_load = 0
 number_of_records_loaded = 0
 patient_uuids = {}
