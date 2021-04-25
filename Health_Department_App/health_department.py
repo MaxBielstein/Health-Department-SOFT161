@@ -205,7 +205,7 @@ def temperature_posted(_, results):
 def connection_verified(_, response):
     global openmrs_disconnected
     openmrs_disconnected = False
-    Clock.schedule_once(lambda dt: load_records_into_app(), 2)
+    Clock.schedule_once(lambda dt: load_records_into_app(), .5)
     app_reference.root.transition.direction = 'left'
     app_reference.root.current = 'LoadingLogin'
 
@@ -282,7 +282,7 @@ def on_observations_loaded(_, response):
 
     global number_of_records_loaded
     number_of_records_loaded += 1
-    loading_bar_increment()
+    loading_bar_login_increment()
     if number_of_records_loaded is number_of_records_to_load:
         sort_records()
         populate_data_preview_screen(app_reference.root)
@@ -320,7 +320,7 @@ def sort_records():
                     if unmatched_record.patient_id == patient_id:
                         import_records.append(unmatched_record)
 
-    loading_bar_increment()
+    loading_bar_login_increment()
 
     # For each patient, only their latest record from within import records is kept.  The rest are removed.
     for patient in patient_uuids:
@@ -346,7 +346,7 @@ def sort_records():
     for record in to_remove_from_unmatched:
         if record in unmatched_records:
             unmatched_records.remove(record)
-    loading_bar_increment()
+    loading_bar_login_increment()
 
 
 # Returns false if something goes wrong while trying to connect to OpenMRS server
@@ -389,7 +389,7 @@ def connect_to_databases(self):
 
 
 # Increments the loading bar a small amount
-def loading_bar_increment():
+def loading_bar_login_increment():
     app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value += \
         (100 - app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value) / 4
 
@@ -397,9 +397,13 @@ def loading_bar_increment():
 # This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
-    for record in import_records:
-        print(record)
-        post_observation_to_patient(record)
+    if len(import_records) is not 0:
+        for record in import_records:
+            print(record)
+            post_observation_to_patient(record)
+    else:
+        # TODO change screens as there is not data to import
+        pass
 
 
 # This method loads all needed records from openMRS into the app
@@ -425,7 +429,7 @@ def populate_data_preview_screen(root):
     global unmatched_records
     print('unmatched records below')
     print(len(unmatched_records))
-    loading_bar_increment()
+    loading_bar_login_increment()
 
     # Displaying unmatched records
     for record in unmatched_records:
