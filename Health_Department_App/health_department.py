@@ -242,7 +242,7 @@ def on_openmrs_disconnect():
 # Adds a patient UUID to a dictionary of patient ids and their information.
 # Also queries to load their observations to determine if they have already existing observations.
 def add_patient_uuid(_, response):
-    if len(response['results']) is not 0:
+    if len(response['results']) is not 0 and 'voided' not in response['results'][0]:
         global number_of_records_to_load
         number_of_records_to_load += 1
         print('in')
