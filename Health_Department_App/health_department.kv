@@ -288,7 +288,7 @@
             spacing: 25
 
             MDLabel:
-                text: 'Importing'
+                text: 'Importing Screen'
                 halign: 'center'
                 font_size: 45
 
@@ -331,6 +331,8 @@
                 on_release:
                     root.ids.back_to_login_button.disabled=False
                     root.ids.view_symptomatic_patients_button.disabled=False
+                    root.ids.view_vaccination_rate_button.disabled=False
+                    root.ids.view_vaccine_order_summary_button.disabled=False
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -345,7 +347,7 @@
 
             MDRaisedButton:
                 text: 'Back to Login'
-                font_size: 30
+                font_size: 20
                 disabled: True
                 id: back_to_login_button
                 on_release:
@@ -353,21 +355,76 @@
                     root.manager.current = 'home'
                     root.ids.back_to_login_button.disabled=True
                     root.ids.view_symptomatic_patients_button.disabled=True
+                    root.ids.view_vaccination_rate_button.disabled=True
+                    root.ids.view_vaccine_order_summary_button.disabled=True
                     app.abort_button()
 
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
-                font_size: 30
+                font_size: 20
                 disabled: True
                 id: view_symptomatic_patients_button
                 on_release:
                     root.manager.transition.direction = 'left'
-                    root.manager.current = 'ImportingLoading'
+                    root.manager.current = 'SymptomaticPatients'
                     root.ids.back_to_login_button.disabled=True
                     root.ids.view_symptomatic_patients_button.disabled=True
+                    root.ids.view_vaccination_rate_button.disabled=True
+                    root.ids.view_vaccine_order_summary_button.disabled=True
+
+            MDRaisedButton:
+                text: 'Vaccinaiton Rate'
+                font_size: 20
+                disabled: True
+                id: view_vaccination_rate_button
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'VaccinationRate'
+                    root.ids.back_to_login_button.disabled=True
+                    root.ids.view_symptomatic_patients_button.disabled=True
+                    root.ids.view_vaccination_rate_button.disabled=True
+                    root.ids.view_vaccine_order_summary_button.disabled=True
+
+            MDRaisedButton:
+                text: 'Vaccine Order Summary'
+                font_size: 20
+                disabled: True
+                id: view_vaccine_order_summary_button
+                on_release:
+                    root.manager.transition.direction = 'left'
+                    root.manager.current = 'VaccineOrderSummary'
+                    root.ids.back_to_login_button.disabled=True
+                    root.ids.view_symptomatic_patients_button.disabled=True
+                    root.ids.view_vaccination_rate_button.disabled=True
+                    root.ids.view_vaccine_order_summary_button.disabled=True
 
         Widget:
             size_hint_y: None
             height: 10
+<NewInputError@Popup>
+    title: 'Input Error'
+    font_size: sp(30)
+    size_hint: (None,None)
+    size: (500,200)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'{app.input_error_message}'
+            font_size: sp(15)
+        Button:
+            text: 'Okay'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
+
+<SymptomaticPatients>
+
+
+<VaccinationRate>
+
+
+<VaccineOrderSummary>
+
+
 
 

@@ -1,12 +1,14 @@
 import enum
 from json import dumps
 from kivy import Config
+from kivy.uix.popup import Popup
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'minimum_width', '1200')
 Config.set('graphics', 'minimum_height', '1000')
 
+from kivy.factory import Factory
 from kivy.clock import Clock
 from kivymd.uix.label import MDLabel
 from kivy.properties import StringProperty
@@ -34,6 +36,16 @@ class DataPreview(Screen):
 class ImportingLoading(Screen):
     pass
 
+class SymptomaticPatients(Screen):
+    pass
+
+class VaccinationRate(Screen):
+    pass
+
+class VaccineOrderSummary(Screen):
+    pass
+
+
 
 class RecordType(enum.Enum):
     OTHER_RECORD = 'OTHER_RECORD'
@@ -53,6 +65,8 @@ class Health_departmentApp(MDApp):
     openmrs_password = StringProperty()
     openmrs_port = StringProperty()
 
+    input_error_message = StringProperty()
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.load_defaults()
@@ -66,6 +80,9 @@ class Health_departmentApp(MDApp):
         sm.add_widget(LoadingLogin(name='LoadingLogin'))
         sm.add_widget(DataPreview(name='DataPreview'))
         sm.add_widget(ImportingLoading(name='ImportingLoading'))
+        sm.add_widget(SymptomaticPatients(name='SymptomaticPatients'))
+        sm.add_widget(VaccinationRate(name='VaccinationRate'))
+        sm.add_widget(VaccineOrderSummary(name='VaccineOrderSummary'))
 
         return sm
 
@@ -102,7 +119,8 @@ class Health_departmentApp(MDApp):
             self.openmrs_password = path.openmrs_password.text
             return True
         except ValueError:
-            print('value error')
+            self.input_error_message = 'SQL database not connected.  Credentials may be incorrect'
+            Factory.NewInputError().open()
             return False
 
     def abort_button(self):
@@ -134,6 +152,7 @@ class Health_departmentApp(MDApp):
 
     def import_button(self):
         Clock.schedule_once(lambda dt: import_data_into_openmrs(), .5)
+        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = True
 
     def load_credentials_file(self):
         try:
@@ -147,7 +166,7 @@ class Health_departmentApp(MDApp):
             # Replace this with error prompt in app
             print('Database connection failed!')
             print('credentials.json not found')
-            exit(1)
+
 
 
 # Sends a test query to openmrs to check that the connection worked
@@ -221,6 +240,8 @@ def on_observations_not_loaded(_, error):
 # This is a callback to a test query on openmrs
 def connection_failed(_, error):
     print('Connection failed')
+    app_reference.input_error_message = 'Open MRS connection failed, credentials may be incorrect'
+    Factory.NewInputError().open()
     # Launch window saying the connection to openmrs failed
 
 
@@ -229,7 +250,8 @@ def on_openmrs_disconnect():
     print('openmrs disconnected error')
     app_reference.root.transition.direction = 'right'
     app_reference.root.current = 'home'
-    # Show popup saying openmrs disconnected
+    app_reference.input_error_message = 'Open MRS seems to have disconnected, please lot in again'
+    Factory.NewInputError().open()
 
 
 # Temperature posted correctly callback
@@ -238,7 +260,8 @@ def temperature_posted(_, results):
     global number_of_records_imported
     number_of_records_imported += 1
     if number_of_records_imported >= number_of_records_to_import:
-         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
     print('it worked, it posted')
     print('results')
 
@@ -320,7 +343,6 @@ def sort_records():
                 if unmatched_record.vaccination_date > latest_observation:
                     if unmatched_record.patient_id == patient_id:
                         import_records.append(unmatched_record)
-
     loading_bar_login_increment()
 
     # For each patient, only their latest record from within import records is kept.  The rest are removed.
@@ -371,12 +393,18 @@ def connect_to_sql(self):
         return True
     except DatabaseError:
         print('database error')
+        self.input_error_message = 'SQL did not connect, credentials may be incorrect'
+        Factory.NewInputError().open()
         return False
     except NameError:
         print('name error')
+        self.input_error_message = 'SQL did not connect, credentials may be incorrect'
+        Factory.NewInputError().open()
         return False
     except ValueError:
         print('SQL connection value error')
+        self.input_error_message = 'SQL did not connect, credentials may be incorrect'
+        Factory.NewInputError().open()
         return False
 
 
@@ -403,6 +431,8 @@ def loading_bar_import_increment():
 # This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
+    app_reference.root.get_screen(
+            'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
     if len(import_records) is not 0:
         app_reference.root.get_screen(
             'ImportingLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
@@ -411,12 +441,15 @@ def import_data_into_openmrs():
                 print(record)
                 global number_of_records_to_import
                 number_of_records_to_import += 1
+                app_reference.root.get_screen(
+                    'ImportingLoading').ids.current_action_loading_importing.text = f'Importing record {number_of_records_to_import}/{len(import_records)} into openmrs'
                 post_observation_to_patient(record)
             else:
                 on_openmrs_disconnect()
                 break
     else:
         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
+        app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
         # TODO go to next screen
 
 
