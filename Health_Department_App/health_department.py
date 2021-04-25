@@ -1,6 +1,7 @@
 import enum
 from json import dumps
 from kivy import Config
+from kivy.factory import Factory
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
@@ -61,6 +62,8 @@ class Health_departmentApp(MDApp):
     openmrs_user = StringProperty()
     openmrs_password = StringProperty()
     openmrs_port = StringProperty()
+
+    input_error_message = StringProperty()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -241,7 +244,8 @@ def on_openmrs_disconnect():
     print('openmrs disconnected error')
     app_reference.root.transition.direction = 'right'
     app_reference.root.current = 'home'
-    # Show popup saying openmrs disconnected
+    app_reference.input_error_message= 'Open MRS seems to have disconnected, please lot in again'
+    Factory.NewInputError().open()
 
 
 # Temperature posted correctly callback
@@ -423,6 +427,7 @@ def import_data_into_openmrs():
                 print(record)
                 global number_of_records_to_import
                 number_of_records_to_import += 1
+                app_reference.root.get_screen('ImportingLoading').ids.current_action_loading_importing.text = f'Importing record {number_of_records_to_import}/{len(import_records)} into openmrs'
                 post_observation_to_patient(record)
             else:
                 on_openmrs_disconnect()
