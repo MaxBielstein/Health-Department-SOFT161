@@ -12,7 +12,7 @@ import json
 
 
 # Loads the credentials to connect to the database
-from database import RecordDatabase, PeopleLots, Lots, People
+from database import RecordDatabase, PeopleLots, Lots, People, Vaccines
 
 try:
     with open('credentials.json', 'r') as credentials_file:
@@ -255,18 +255,19 @@ class VaccineRecordApp(MDApp):
 
     def update_person(self):
         update_person_static(self)
-
-    def get_vaccination_record(self, patient_id):
-        person, _ = get_person_data(patient_id, session)
-        lots = person.lots
-        vaccines = []
-        for lot in lots:
-            vaccines += lot.vaccine
         
 
 # These methods below where made static so that tests could but run on them
 # with a different sql database
 # They all attempt to input some type of data into the database
+def get_vaccination_record(patient_id):
+    people_lots = session.query(PeopleLots).filter(PeopleLots.patient_id == patient_id).all()
+    for people_lot in people_lots:
+        lot_id = people_lot.lot_id
+        lot = session.query(Lots).filter(Lots.lot_id == lot_id).one()
+        vaccination_date = people_lot.vaccination_date
+        vaccine_type = get_specific_sql_data('vaccines', 'relevant_disease', 'vaccine_id', lot.vaccine_id)[0]
+
 
 def update_person_static(self):
     name = self.new_person_name
@@ -371,4 +372,5 @@ def sql_input(data, session):
 
 if __name__ == '__main__':
     app = VaccineRecordApp()
+    get_vaccination_record(27)
     app.run()
