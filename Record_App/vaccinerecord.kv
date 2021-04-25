@@ -631,8 +631,7 @@ ScreenManager:
                     text: 'Get Records'
                     font_size: 30
                     on_press:
-                        root.current = 'review_vaccinations_continued'
-                        root.transition.direction = 'left'
+                        app.get_vaccination_record(patient_id_review_vaccinations.text)
 
             Widget:
                 size_hint_y: None
@@ -681,6 +680,7 @@ ScreenManager:
                     on_press:
                         root.current = 'review_vaccinations'
                         root.transition.direction = 'right'
+                        app.clear_vaccination_records()
 
                 MDRaisedButton:
                     text: 'New Vaccination'
@@ -689,6 +689,8 @@ ScreenManager:
                         root.current = 'new_vaccination'
                         root.transition.direction = 'left'
                         app.clear_new_vaccination_screen()
+                        app.new_vaccination_from_review()
+                        app.clear_vaccination_records()
 
             Widget:
                 size_hint_y: None

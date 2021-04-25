@@ -1,17 +1,13 @@
 import mysql.connector
+import mysql.connector
 from kivy.core.window import Window  # For inspection.
+from kivy.factory import Factory
 from kivy.modules import inspector  # For inspection.
 from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
-from kivymd.uix.button import MDFlatButton
-from kivymd.uix.dialog import MDDialog
-from kivy.factory import Factory
 
 from database import *
-
-import mysql.connector
-import json
 
 
 # Screen Classes
@@ -268,6 +264,18 @@ class DistributionApp(MDApp):
 
             self.root.current = 'm_for_vaccine'
 
+    def add_manufacturer_to_clinic(self):
+        selected_manufacturer = self.root.get_screen('m_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.text
+        if selected_manufacturer == 'Current Manufacturers':
+            self.input_error_message = 'You must select a manufacturer'
+            Factory.NewInputError().open()
+        else:
+            pass
+
+
+    def remove_manufacturer_from_clinic(self):
+        pass
+
     # End Methods for miscellaneous kivy interaction
     #
     #
@@ -308,11 +316,14 @@ class DistributionApp(MDApp):
 
     def load_manufacturer_spinners_for_clinics(self):
         if self.new_clinic_current_clinic is not '':
+            all_manufacturers = get_sql_data('manufacturers', 'manufacturer_name')
             clinics_manufacturers = get_manufacturers_for_clinic(self.new_clinic_current_clinic)
+            unused_manufacturers = []
+            for manufacturer in all_manufacturers:
+                if manufacturer not in clinics_manufacturers:
+                    unused_manufacturers.append(manufacturer)
             self.root.get_screen(
-                'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = get_sql_data(
-                'manufacturers',
-                'manufacturer_name')
+                'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.values = unused_manufacturers
 
             self.root.get_screen(
                 'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.values = clinics_manufacturers
