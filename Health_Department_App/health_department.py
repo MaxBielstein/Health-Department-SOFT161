@@ -125,6 +125,23 @@ class Health_departmentApp(MDApp):
             Factory.NewInputError().open()
             return False
 
+    def load_vaccines_for_selected_disease(self):
+        disease_spinner = self.root.get_screen('VaccinationRate').ids.select_disease_vaccination_rate
+        vaccine_spinner = self.root.get_screen('VaccinationRate').ids.select_vaccine_vaccination_rate
+        vaccine_query = session.query(Vaccines).filter(Vaccines.relevant_disease == disease_spinner.text)
+        values = list()
+        if disease_spinner.text is not 'Select a Disease':
+            if len(vaccine_query.all()) > 0:
+                for vaccine in vaccine_query.all():
+                    values.append(vaccine.vaccine_name)
+                vaccine_spinner.values = values
+            else:
+                vaccine_spinner.text = 'No Vaccines for\nSelected Disease'
+        else:
+            self.input_error_message = 'You must select a disease to see\nassociated diseases.'
+            Factory.NewInputError().open()
+
+
     def load_symptomatic_patients_screen(self):
         appointments = session.query(PeopleLots).all()
         print('OKAY OKAY OKAT')
@@ -602,6 +619,8 @@ def populate_data_preview_screen(root):
     app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
     root.current = 'DataPreview'
     root.transition.direction = 'left'
+
+
 
 
 # Global variables:
