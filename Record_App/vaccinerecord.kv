@@ -50,6 +50,16 @@ ScreenManager:
                     root.current = 'review_vaccinations'
                     root.transition.direction = 'left'
 
+            MDFillRoundFlatButton
+                text: 'Flag Vaccine Lot'
+                font_size: 30
+                pos_hint: {'center_x': 0.5,}
+                size: 0, 60
+                size_hint: None, None
+                increment_width: 85
+                on_press:
+                    root.current = 'flag_vaccine_lot'
+                    root.transition.direction = 'left'
     Screen:
         name: 'new_person'
 
@@ -334,7 +344,7 @@ ScreenManager:
                     write_tab: False
 
                 MDTextField:
-                    hint_text: 'Temperature'
+                    hint_text: 'Temperature \N{DEGREE SIGN}C'
                     id: temperature_input_new_vaccination
                     font_size: 30
                     multiline: False
@@ -691,6 +701,61 @@ ScreenManager:
                         app.clear_new_vaccination_screen()
                         app.new_vaccination_from_review()
                         app.clear_vaccination_records()
+
+            Widget:
+                size_hint_y: None
+                height: 20
+
+    Screen:
+        name: 'flag_vaccine_lot'
+
+        MDCard:
+            size_hint: None, None
+            size: 600, 400
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+            elevation: 5
+            padding: 25
+            spacing: 25
+            orientation: 'vertical'
+
+            MDLabel:
+                text: 'Flag Vaccine Lot'
+                font_size: 45
+                halign: 'center'
+
+            Spinner:
+                id: lot_dropdown
+                font_size: 30
+                text: 'Select Lot'
+                background_color: 0, 1.5, 4, 1
+                pos_hint: {'center_x': 0.5,}
+
+            ScrollView:
+                do_scroll_x: False
+                do_scroll_y: True
+
+                MDBoxLayout:
+                    orientation: 'vertical'
+                    size_hint: 1, None
+                    height: sum(child.height+10 for child in self.children)
+                    id: scrollview_flag_vaccine_lot
+
+        MDBoxLayout:
+            orientation: 'vertical'
+
+            MDBoxLayout:
+                orientation: 'horizontal'
+                spacing: 25
+                size_hint: None, None
+                size: self.minimum_size
+                pos_hint: {'center_x': 0.5,}
+
+                MDRaisedButton:
+                    text: 'Done'
+                    font_size: 30
+                    on_press:
+                        root.current = 'menu'
+                        root.transition.direction = 'right'
 
             Widget:
                 size_hint_y: None

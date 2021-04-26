@@ -1,5 +1,6 @@
 import mysql.connector
 import mysql.connector
+import requests
 from kivy.core.window import Window  # For inspection.
 from kivy.factory import Factory
 from kivy.modules import inspector  # For inspection.
@@ -7,7 +8,7 @@ from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
-
+import urllib.request
 from database import *
 
 
@@ -97,10 +98,14 @@ def get_manufacturers_for_clinic(clinic_name):
     return clinics_manufacturers
 
 
+
+
 # App Class
 class DistributionApp(MDApp):
     # Start property declarations
 
+    # connection
+    connection_message = StringProperty('')
     # message contents
     success_message = StringProperty('')
     input_error_message = StringProperty('')
@@ -131,7 +136,9 @@ class DistributionApp(MDApp):
 
     # end property declarations
 
+
     def build(self):
+
         self.theme_cls.primary_palette = "Blue"
 
         inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
@@ -148,6 +155,8 @@ class DistributionApp(MDApp):
         sm.add_widget(SelectOrder(name='select_order'))
         sm.add_widget(OrderInformation(name='order_information'))
 
+
+
         return sm
 
     # Start Methods for miscellaneous kivy interaction
@@ -155,6 +164,12 @@ class DistributionApp(MDApp):
     def open_success_message(self, message):
         self.success_message = message
         Factory.NewConfirmation().open()
+
+    def clear_edit_manufacturer_screen(self):
+        self.root.get_screen(
+            'select_order').ids.select_manufacturer_to_add_for_clinic_spinner.text = 'Available Manufacturers'
+        self.root.get_screen(
+            'select_order').ids.select_manufacturer_to_remove_for_clinic_spinner.text = 'Current Manufacturers'
 
     def order_selected_continue(self):
         spinner_text = self.root.get_screen('select_order').ids.select_order_to_review.text
@@ -176,8 +191,9 @@ class DistributionApp(MDApp):
             self.root.get_screen('order_information').ids.order_information_doses.text = \
                 str(get_specific_sql_data('orders', 'doses_in_order', 'order_id',
                                           self.view_order_current_order_id)[0])
-            self.root.get_screen('order_information').ids.order_information_fulfillment.text = get_specific_sql_data('orders', 'order_fulfilled', 'order_id',
-                                          self.view_order_current_order_id)[0]
+            self.root.get_screen('order_information').ids.order_information_fulfillment.text = \
+                get_specific_sql_data('orders', 'order_fulfilled', 'order_id',
+                                      self.view_order_current_order_id)[0]
 
 
 
@@ -348,7 +364,6 @@ class DistributionApp(MDApp):
         values = []
         formatted_values = list()
         if self.view_order_manufacturer != '':
-            print('using manufacturer')
             man_id = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
                                            self.view_order_manufacturer)[0]
             self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
@@ -361,10 +376,8 @@ class DistributionApp(MDApp):
             self.root.get_screen('select_order').ids.select_order_to_review.values = formatted_values
 
         if self.view_order_clinic != '':
-            print('using clinic')
             clin_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name', self.view_order_clinic)[
                 0]
-            print(clin_id)
             self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
             values = get_specific_sql_data('orders', 'order_id', 'clinic_id', clin_id)
             for value in values:
@@ -585,7 +598,6 @@ class DistributionApp(MDApp):
         return True
 
     def check_for_required_inputs_new_order(self):
-        print('checking')
         if self.new_order_ID_property is 0:
             self.input_error_message = 'Order ID field must be filled'
             Factory.NewInputError().open()
@@ -700,7 +712,6 @@ def new_clinic(self, name, address, id):
         self.on_done()
         self.open_success_message('Clinic Created Successfully')
     else:
-        pass
         Factory.MatchingIDError().open()
         self.on_done()
 
@@ -721,7 +732,7 @@ def delete_manufacturer_clinic(self, manufacturer_id, clinic_id):
             raise ValueError(
                 f"No Manufacturer Clinics with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
         session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == manufacturer_id,
-                                                       ManufacturerClinics.manufacturer_id == clinic_id).delete()
+                                                  ManufacturerClinics.manufacturer_id == clinic_id).delete()
         session.commit()
         self.open_success_message(
             f'Manufacturer Clinic with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id} deleted')
@@ -742,7 +753,6 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
         self.on_done()
         self.open_success_message('Vaccine Created Successfully')
     else:
-        pass
         Factory.MatchingIDError().open()
         self.on_done()
 
@@ -756,7 +766,6 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
         self.open_success_message('Order Created Successfully')
         self.root.current = 'home'
     else:
-        pass
         Factory.MatchingIDError().open()
         self.on_done()
 
@@ -764,12 +773,16 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
 # End methods that finalize creating new table entries, and committing them to the database
 
 # Loads the database credentials from the credentials.json file
-with open('credentials.json', 'r') as credentials_file:
-    data = json.load(credentials_file)
-    host = data['host']
-    database_name = data['database']
-    user = data['username']
-    password = data['password']
+try:
+    with open('venv/credentials.json', 'r') as credentials_file:
+        data = json.load(credentials_file)
+        host = data['host']
+        database_name = data['database']
+        user = data['username']
+        password = data['password']
+except FileNotFoundError:
+    print('Database connection failed!')
+    print('credentials.json not found')
 
 
 # These methods below query data from the database and return the specified data

@@ -60,6 +60,8 @@
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'review_orders_clinic'
 
+
+
 <ClinicScreen>
 
     MDCard:
@@ -350,8 +352,6 @@
                     font_size: 20
                     id: select_manufacturer_to_remove_for_clinic_spinner
                     background_color: 0, 1.5, 4, 1
-                    on_text:
-                        print("The spinner {} has text {}".format(self, self.text))
 
                 Spinner:
                     size_hint: None, None
@@ -361,8 +361,6 @@
                     font_size: 20
                     id: select_manufacturer_to_add_for_clinic_spinner
                     background_color: 0, 1.5, 4, 1
-                    on_text:
-                        print("The spinner {} has text {}".format(self, self.text))
 
             Widget:
                 size_hint_y: None
@@ -455,8 +453,6 @@
                 font_size: 30
                 id: select_manufacturer_for_new_vaccine_spinner
                 background_color: 0, 1.5, 4, 1
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -556,8 +552,6 @@
                 id: new_vaccine_disease
                 background_color: 0, 1.5, 4, 1
                 values: 'Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio'
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
 
             Widget:
                 size_hint_y: None
@@ -649,7 +643,6 @@
                     background_color: 0, 1.5, 4, 1
                     on_text:
                         app.load_manufacturers_for_new_orders()
-                        print("The spinner {} has text {}".format(self, self.text))
 
                 Spinner:
                     size_hint: None, None
@@ -661,7 +654,6 @@
                     background_color: 0, 1.5, 4, 1
                     on_text:
                         app.load_diseases_for_new_orders()
-                        print("The spinner {} has text {}".format(self, self.text))
 
                 Spinner:
                     size_hint: None, None
@@ -673,7 +665,6 @@
                     background_color: 0, 1.5, 4, 1
                     on_text:
                         app.select_vaccine_for_new_order()
-                        print("The spinner {} has text {}".format(self, self.text))
 
 
             MDLabel:
@@ -788,7 +779,6 @@
                 id: select_clinic_review_order
                 background_color: 0, 1.5, 4, 1
                 on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -877,8 +867,6 @@
                 font_size: 30
                 id: select_manufacturer_review_order
                 background_color: 0, 1.5, 4, 1
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -945,8 +933,6 @@
                 font_size: 30
                 id: select_order_to_review
                 background_color: 0, 1.5, 4, 1
-                on_text:
-                    print("The spinner {} has text {}".format(self, self.text))
 
     MDBoxLayout:
         orientation: 'vertical'
@@ -1163,3 +1149,20 @@
             font_size: sp(30)
             on_press:
                 root.dismiss()
+
+<NewInternetNotification@Popup>:
+    title: 'Connection Status:'
+    font_size: sp(30)
+    size_hint: (None,None)
+    size: (500,200)
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: f'{app.connection_message}'
+            font_size: sp(15)
+        Button:
+            text: 'Okay'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
+
