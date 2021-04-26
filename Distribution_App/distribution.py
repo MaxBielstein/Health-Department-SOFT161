@@ -774,7 +774,7 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
 
 # Loads the database credentials from the credentials.json file
 try:
-    with open('venv/credentials.json', 'r') as credentials_file:
+    with open('credentials.json', 'r') as credentials_file:
         data = json.load(credentials_file)
         host = data['host']
         database_name = data['database']
