@@ -125,10 +125,6 @@ class Health_departmentApp(MDApp):
             Factory.NewInputError().open()
             return False
 
-    def abort_button(self):
-        self.clear_data_preview_screen()
-        self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
-
     def load_symptomatic_patients_screen(self):
         appointments = session.query(PeopleLots).all()
         print('OKAY OKAY OKAT')
@@ -190,6 +186,9 @@ class Health_departmentApp(MDApp):
     def change_screen(self, from_screen):
         if from_screen == 'SymptomaticPatients':
             self.root.get_screen(from_screen).ids.scrollview_symptomatic_patients.clear_widgets()
+        elif from_screen == 'ImportingScreen':
+            self.clear_data_preview_screen()
+            self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
         pass
 
     def load_credentials_file(self):
@@ -500,7 +499,7 @@ def import_data_into_openmrs():
 # This method loads all needed records from openMRS into the app
 def load_records_into_app():
     global session
-    people_lots = session.query(PeopleLots)
+    people_lots = session.query(PeopleLots).all()
     app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
     for appointment in people_lots:
         print(appointment.patient_id)

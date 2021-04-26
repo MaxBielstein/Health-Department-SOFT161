@@ -357,7 +357,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
-                    app.abort_button()
+                    app.change_screen('ImportingScreen')
 
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
@@ -451,7 +451,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
-                    app.abort_button()
+                    app.change_screen('SymptomaticPatients')
 
             MDRaisedButton:
                 text: 'Vaccination Rate'
@@ -562,7 +562,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
-                    app.abort_button()
+                    app.change_screen('VaccinationRate')
 
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
