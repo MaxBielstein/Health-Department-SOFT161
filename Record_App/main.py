@@ -289,6 +289,14 @@ class VaccineRecordApp(MDApp):
     def new_vaccination_from_review(self):
         name = get_specific_sql_data('people', 'name', 'patient_id', self.root.ids.patient_id_review_vaccinations.text)[0]
         self.root.ids.name_input_new_vaccination.text = name
+
+
+def flag_vaccine_lot(selected_lot):
+    people = session.query(PeopleLots).filter(PeopleLots.lot_id == selected_lot).all()
+    for person in people:
+        patient_id = person.patient_id
+        name = get_specific_sql_data('people', 'name', 'patient_id', patient_id)[0]
+        print(name)
         
 
 # These methods below where made static so that tests could but run on them

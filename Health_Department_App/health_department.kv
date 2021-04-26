@@ -255,7 +255,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
-                    app.abort_button()
+                    app.change_screen('DataPreview')
 
             MDRaisedButton:
                 text: 'Import'
@@ -318,22 +318,6 @@
                     size_hint_x: None
                     width: 10
 
-            MDRaisedButton:
-                text: '(Dev button temp) Increase progress bar'
-                font_size: 30
-                on_release:
-                    root.ids.loading_importing_progress_bar.value += 10
-
-
-            MDRaisedButton:
-                text: '(Dev button temp) Enable buttons'
-                font_size: 30
-                on_release:
-                    root.ids.back_to_login_button.disabled=False
-                    root.ids.view_symptomatic_patients_button.disabled=False
-                    root.ids.view_vaccination_rate_button.disabled=False
-                    root.ids.view_vaccine_order_summary_button.disabled=False
-
     MDBoxLayout:
         orientation: 'vertical'
         spacing: 25
@@ -357,13 +341,15 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
-                    app.abort_button()
+                    app.change_screen('ImportingScreen')
 
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
                 font_size: 20
                 disabled: True
                 id: view_symptomatic_patients_button
+                on_press:
+                    app.load_symptomatic_patients_screen()
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
@@ -371,6 +357,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
 
             MDRaisedButton:
                 text: 'Vaccination Rate'
@@ -384,6 +371,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
 
             MDRaisedButton:
                 text: 'Vaccine Order Summary'
@@ -397,6 +385,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
 
         Widget:
             size_hint_y: None
@@ -449,7 +438,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
-                    app.abort_button()
+                    app.change_screen('SymptomaticPatients')
 
             MDRaisedButton:
                 text: 'Vaccination Rate'
@@ -457,6 +446,8 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccinationRate'
+                    app.change_screen('SymptomaticPatients')
+
 
             MDRaisedButton:
                 text: 'Vaccine Order Summary'
@@ -464,6 +455,8 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccineOrderSummary'
+                    app.change_screen('SymptomaticPatients')
+
 
         Widget:
             size_hint_y: None
@@ -484,6 +477,65 @@
             font_size: 45
             halign: 'center'
 
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            Spinner:
+                text: 'Select a Disease'
+                size_hint: None, None
+                size: 300, 100
+                pos_hint: {'center': 'center'}
+                font_size: 30
+                id: select_disease_vaccination_rate
+                background_color: 0, 1.5, 4, 1
+
+            Spinner:
+                text: 'Select a Vaccine'
+                size_hint: None, None
+                size: 300, 100
+                pos_hint: {'center': 'center'}
+                font_size: 30
+                id: select_vaccine_vaccination_rate
+                background_color: 0, 1.5, 4, 1
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'People vaccinated:'
+                font_size: 30
+                halign: 'right'
+
+            MDLabel:
+                text: 'Prefill'
+                font_size: 30
+                halign: 'left'
+                id: people_vaccinated_label
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Not vaccinated for disease:'
+                font_size: 30
+                halign: 'right'
+
+            MDLabel:
+                text: 'Prefill'
+                font_size: 30
+                halign: 'left'
+                id: people_not_vaccinated_label
+
     MDBoxLayout:
         orientation: 'vertical'
         spacing: 25
@@ -501,14 +553,17 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
-                    app.abort_button()
-
+                    app.change_screen('VaccinationRate')
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
                 font_size: 20
+                on_press:
+                    app.load_symptomatic_patients_screen()
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
+                    app.change_screen('VaccinationRate')
+
 
             MDRaisedButton:
                 text: 'Vaccine Order Summary'
@@ -516,6 +571,7 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccineOrderSummary'
+                    app.change_screen('VaccinationRate')
 
         Widget:
             size_hint_y: None
@@ -536,6 +592,26 @@
             font_size: 45
             halign: 'center'
 
+        Spinner:
+            text: 'Select a Disease'
+            size_hint: None, None
+            size: 300, 100
+            pos_hint: {'center': 'center'}
+            font_size: 30
+            id: select_vaccine_vaccine_order_summary
+            background_color: 0, 1.5, 4, 1
+            pos_hint: {'center_x': 0.5,}
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, None
+                height: sum(child.height+10 for child in self.children)
+                id: scrollview_vaccine_order_summary
+
     MDBoxLayout:
         orientation: 'vertical'
         spacing: 25
@@ -553,14 +629,17 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
-                    app.abort_button()
+                    app.change_screen('VaccineOrderSummary')
 
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
                 font_size: 20
+                on_press:
+                    app.load_symptomatic_patients_screen()
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
+                    app.change_screen('VaccineOrderSummary')
 
 
             MDRaisedButton:
@@ -569,7 +648,7 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccinationRate'
-
+                    app.change_screen('VaccineOrderSummary')
 
         Widget:
             size_hint_y: None
