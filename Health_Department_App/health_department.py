@@ -142,7 +142,6 @@ class Health_departmentApp(MDApp):
             self.input_error_message = 'You must select a disease to see\nassociated diseases.'
             Factory.NewInputError().open()
 
-
     def load_symptomatic_patients_screen(self):
         try:
             appointments = session.query(PeopleLots).all()
@@ -155,15 +154,23 @@ class Health_departmentApp(MDApp):
                 latest_record = None
                 records_to_remove = []
                 for appointment in appointments:
-                    if appointment.patient_id is id:
+                    print(appointment.patient_id)
+                    print(id)
+                    print(appointment.patient_id == id)
+                    if appointment.patient_id == id:
                         if latest_record is not None:
-                            if latest_record < appointment.vaccination_date:
-                                latest_record = appointment.vaccination_date
+                            if latest_record.vaccination_date > appointment.vaccination_date:
                                 records_to_remove.append(appointment)
+                            else:
+                                records_to_remove.append(latest_record)
+                                latest_record = appointment
                         else:
-                            latest_record = appointment.vaccination_date
+                            latest_record = appointment
                 for appointment in records_to_remove:
-                    appointments.remove(appointment)
+                    if appointment in appointments:
+                        print('Patient VISIT')
+                        print(appointment.patient_id)
+                        appointments.remove(appointment)
             for record in appointments:
                 if record.patient_temperature is not None:
                     if record.patient_temperature >= 38:
@@ -174,7 +181,7 @@ class Health_departmentApp(MDApp):
                             MDLabel(
                                 text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                                 halign="center", ))
-        except Exception:
+        except FileNotFoundError:
             app_reference.input_error_message = 'SQL database disconnection error loading symptomatic patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
@@ -637,8 +644,6 @@ def populate_data_preview_screen(root):
     app_reference.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 100
     root.current = 'DataPreview'
     root.transition.direction = 'left'
-
-
 
 
 # Global variables:
