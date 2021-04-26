@@ -60,6 +60,7 @@ ScreenManager:
                 on_press:
                     root.current = 'flag_vaccine_lot'
                     root.transition.direction = 'left'
+                    app.set_up_lots_spinner()
     Screen:
         name: 'new_person'
 
@@ -729,6 +730,8 @@ ScreenManager:
                 text: 'Select Lot'
                 background_color: 0, 1.5, 4, 1
                 pos_hint: {'center_x': 0.5,}
+                on_text:
+                    app.flag_vaccine_lot(lot_dropdown_flag.text)
 
             ScrollView:
                 do_scroll_x: False

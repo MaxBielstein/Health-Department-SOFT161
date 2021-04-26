@@ -248,12 +248,16 @@ class VaccineRecordApp(MDApp):
         return True
 
     def set_up_lots_spinner(self):
+        if self.root.current is 'new_vaccination':
+            spinner_path = self.root.ids.lot_dropdown
+        else:
+            spinner_path = self.root.ids.lot_dropdown_flag
         list_of_lots = []
         for lot in get_sql_data('lots', 'lot_id'):
             list_of_lots.append(str(lot))
         list_of_lots.sort()
-        self.root.ids.lot_dropdown.values = list_of_lots
-        self.root.ids.lot_dropdown.text = 'Select Lot'
+        spinner_path.values = list_of_lots
+        spinner_path.text = 'Select Lot'
 
     def update_person(self):
         update_person_static(self)
@@ -290,13 +294,17 @@ class VaccineRecordApp(MDApp):
         name = get_specific_sql_data('people', 'name', 'patient_id', self.root.ids.patient_id_review_vaccinations.text)[0]
         self.root.ids.name_input_new_vaccination.text = name
 
-
-def flag_vaccine_lot(selected_lot):
-    people = session.query(PeopleLots).filter(PeopleLots.lot_id == selected_lot).all()
-    for person in people:
-        patient_id = person.patient_id
-        name = get_specific_sql_data('people', 'name', 'patient_id', patient_id)[0]
-        print(name)
+    def flag_vaccine_lot(self, selected_lot):
+        self.root.ids.scrollview_flag_vaccine_lot.clear_widgets()
+        people = session.query(PeopleLots).filter(PeopleLots.lot_id == selected_lot).all()
+        for person in people:
+            patient_id = person.patient_id
+            name = get_specific_sql_data('people', 'name', 'patient_id', patient_id)[0]
+            self.root.ids.scrollview_flag_vaccine_lot.add_widget(
+                MDLabel(
+                    text=name, font_size=35, halign='center', height=50
+                )
+            )
         
 
 # These methods below where made static so that tests could but run on them
