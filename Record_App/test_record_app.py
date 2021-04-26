@@ -1,6 +1,6 @@
 import unittest
 from database import RecordDatabase
-from main import People, sql_input, new_lot, Lots
+from main import People, sql_input
 
 
 class TestRecordApp(unittest.TestCase):
@@ -24,18 +24,6 @@ class TestRecordApp(unittest.TestCase):
         new_person_from_sql = session.query(People).filter(People.name == 'Ada Lovelace').one()
         self.assertEqual(new_person.name, new_person_from_sql.name)
 
-    """
-    Not sure if this is needed or not, but it does not work right now.
-    
-    def test_create_new_lot(self):
-        url = RecordDatabase.construct_in_memory_url()
-        database = RecordDatabase(url)
-        database.ensure_tables_exist()
-        session = database.create_session()
-        new_lot(self, 1, 4, 6, 18, 2020, session)
-        lot_from_sql = session.query(Lots).filter(Lots.lot_id == 4).one()
-        self.assertEqual(lot_from_sql.vaccine_id, 1)
-    """
 
 if __name__ == '__main__':
     unittest.main()

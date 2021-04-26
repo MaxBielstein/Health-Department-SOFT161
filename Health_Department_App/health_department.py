@@ -159,7 +159,44 @@ class Health_departmentApp(MDApp):
     def load_order_screen(self):
         vaccines = session.query(Vaccines).all()
         diseases = set()
+        for vaccine in vaccines:
+            diseases.add(vaccine.relevant_disease)
+        self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.values = diseases
 
+    def load_orders_placed(self):
+        print('called HERE')
+        self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.clear_widgets()
+        if self.root.get_screen(
+                "VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.text is not 'Select a Disease':
+            disease = self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.text
+            total_orders_with_disease = []
+            vaccines = set()
+            total_orders = session.query(Orders).all()
+            for order in total_orders:
+                if order.vaccine.relevant_disease == disease:
+                    total_orders_with_disease.append(order)
+
+            for order in total_orders_with_disease:
+                vaccines.add(order.vaccine)
+
+            if len(vaccines) is not 0:
+                for vaccine in vaccines:
+                    orders_for_this_vaccine_filled = []
+                    total_orders_for_this_vaccine = []
+                    for order in total_orders_with_disease:
+                        if order.vaccine == vaccine:
+                            total_orders_for_this_vaccine.append(order)
+                            if order.order_fulfilled == "True":
+                                orders_for_this_vaccine_filled.append(order)
+                    self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(MDLabel(
+                        text=f'\nVaccine: {vaccine.vaccine_name}\nOrders fulfilled: {len(orders_for_this_vaccine_filled)}/{len(total_orders_for_this_vaccine)}\n-----------------\n',
+                        halign="center", )
+                    )
+            else:
+                self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(MDLabel(
+                    text=f'\nNo Orders Exist For Vaccines Associated With This Disease\n-----------------\n',
+                    halign="center", )
+                )
 
     def clear_data_preview_screen(self):
         global number_of_records_to_load
@@ -191,9 +228,15 @@ class Health_departmentApp(MDApp):
     def change_screen(self, from_screen):
         if from_screen == 'SymptomaticPatients':
             self.root.get_screen(from_screen).ids.scrollview_symptomatic_patients.clear_widgets()
-        elif from_screen == 'ImportingScreen':
+        elif from_screen == 'ImportingLoading':
             self.clear_data_preview_screen()
             self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
+        elif from_screen == 'VaccineOrderSummary':
+            print(' VACCINE ORDER SUM')
+            self.root.get_screen(from_screen).ids.select_vaccine_vaccine_order_summary.text = 'Select a Disease'
+            self.root.get_screen(from_screen).ids.scrollview_vaccine_order_summary.clear_widgets()
+        elif from_screen == 'DataPreview':
+            self.clear_data_preview_screen()
         pass
 
     def load_credentials_file(self):
@@ -292,16 +335,16 @@ def connection_failed(_, error):
     print('Connection failed')
     app_reference.input_error_message = 'Open MRS connection failed, credentials may be incorrect'
     Factory.NewInputError().open()
-    # Launch window saying the connection to openmrs failed
 
 
 # This method should be called after openmrs disconnects during an operation.
 def on_openmrs_disconnect():
     print('openmrs disconnected error')
-    app_reference.root.transition.direction = 'right'
-    app_reference.root.current = 'home'
     app_reference.input_error_message = 'Open MRS seems to have disconnected, please lot in again'
     Factory.NewInputError().open()
+    app_reference.root.transition.direction = 'right'
+    app_reference.root.current = 'home'
+    app_reference.clear_data_preview_screen()
 
 
 # Temperature posted correctly callback
@@ -312,6 +355,9 @@ def temperature_posted(_, results):
     if number_of_records_imported >= number_of_records_to_import:
         app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
         app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
+        importing_done()
+        app_reference.root.get_screen(
+        'ImportingLoading').ids.current_action_loading_importing.text = f'{number_of_records_imported}/{number_of_records_to_import} records imported into OpenMRS.  Importing Finished'
     print('it worked, it posted')
     print('results')
 
@@ -481,8 +527,6 @@ def loading_bar_import_increment():
 # This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
     print('ok')
-    app_reference.root.get_screen(
-        'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
     if len(import_records) is not 0:
         app_reference.root.get_screen(
             'ImportingLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
@@ -498,7 +542,10 @@ def import_data_into_openmrs():
                 on_openmrs_disconnect()
                 break
     else:
+        app_reference.root.get_screen(
+        'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
         importing_done()
+
 
 
 # This method loads all needed records from openMRS into the app

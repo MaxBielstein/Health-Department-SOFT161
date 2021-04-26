@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from kivy.app import App
-from kivy.core.window import Window
+# from kivy.app import App
+# from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
 from kivymd.app import MDApp
@@ -131,6 +131,10 @@ class VaccineRecordApp(MDApp):
             self.input_error_message = 'Temperature field must be filled'
             Factory.NewInputError().open()
             return False
+        elif self.new_vaccination_temperature < 32.2 or self.new_vaccination_temperature > 43.3:
+            self.input_error_message = 'Temperature is outside accepted range of 32.2 to 43.3'
+            Factory.NewInputError().open()
+            return False
         elif self.new_vaccination_date_month < 1 or self.new_vaccination_date_month > 12 or self.new_vaccination_date_day < 1 \
                 or self.new_vaccination_date_day > 31 or self.new_vaccination_date_year > 9999 or self.new_vaccination_date_year < 1000:
             self.input_error_message = 'Vaccination date fields must be filled in format MMDDYYYY'
@@ -248,12 +252,16 @@ class VaccineRecordApp(MDApp):
         return True
 
     def set_up_lots_spinner(self):
+        if self.root.current is 'new_vaccination':
+            spinner_path = self.root.ids.lot_dropdown
+        else:
+            spinner_path = self.root.ids.lot_dropdown_flag
         list_of_lots = []
         for lot in get_sql_data('lots', 'lot_id'):
             list_of_lots.append(str(lot))
         list_of_lots.sort()
-        self.root.ids.lot_dropdown.values = list_of_lots
-        self.root.ids.lot_dropdown.text = 'Select Lot'
+        spinner_path.values = list_of_lots
+        spinner_path.text = 'Select Lot'
 
     def update_person(self):
         update_person_static(self)
@@ -277,7 +285,7 @@ class VaccineRecordApp(MDApp):
                 path_to_scrollview.add_widget(
                     MDLabel(
                         text=f'Vaccine Type: {vaccine_type}; Lot: {lot_id}; Vaccination Date: {vaccination_date}',
-                        halign='center'
+                        halign='center', height=50
                     ))
             self.root.current = 'review_vaccinations_continued'
             self.root.transition.direction = 'left'
@@ -290,14 +298,18 @@ class VaccineRecordApp(MDApp):
         name = get_specific_sql_data('people', 'name', 'patient_id', self.root.ids.patient_id_review_vaccinations.text)[0]
         self.root.ids.name_input_new_vaccination.text = name
 
+    def flag_vaccine_lot(self, selected_lot):
+        self.root.ids.scrollview_flag_vaccine_lot.clear_widgets()
+        people = session.query(PeopleLots).filter(PeopleLots.lot_id == selected_lot).all()
+        for person in people:
+            patient_id = person.patient_id
+            name = get_specific_sql_data('people', 'name', 'patient_id', patient_id)[0]
+            self.root.ids.scrollview_flag_vaccine_lot.add_widget(
+                MDLabel(
+                    text=name + '; ID: ' + patient_id, font_size=35, halign='center', height=50
+                )
+            )
 
-def flag_vaccine_lot(selected_lot):
-    people = session.query(PeopleLots).filter(PeopleLots.lot_id == selected_lot).all()
-    for person in people:
-        patient_id = person.patient_id
-        name = get_specific_sql_data('people', 'name', 'patient_id', patient_id)[0]
-        print(name)
-        
 
 # These methods below where made static so that tests could but run on them
 # with a different sql database
@@ -403,6 +415,10 @@ def sql_input(data, session):
     session.commit()
 
 
-if __name__ == '__main__':
+def main():
     app = VaccineRecordApp()
     app.run()
+
+
+if __name__ == '__main__':
+    main()
