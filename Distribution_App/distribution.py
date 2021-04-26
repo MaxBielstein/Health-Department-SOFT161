@@ -6,6 +6,7 @@ from kivy.modules import inspector  # For inspection.
 from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
+from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 
 from database import *
 
@@ -175,10 +176,28 @@ class DistributionApp(MDApp):
             self.root.get_screen('order_information').ids.order_information_doses.text = \
                 str(get_specific_sql_data('orders', 'doses_in_order', 'order_id',
                                           self.view_order_current_order_id)[0])
+            self.root.get_screen('order_information').ids.order_information_fulfillment.text = get_specific_sql_data('orders', 'order_fulfilled', 'order_id',
+                                          self.view_order_current_order_id)[0]
+
 
 
         else:
-            self.input_error_message = 'Clinic must be selected'
+            self.input_error_message = 'Order must be selected'
+            Factory.NewInputError().open()
+
+    def fulfill_order(self):
+        try:
+            order = session.query(Orders).filter(Orders.order_id == self.view_order_current_order_id).one()
+            order.order_fulfilled = 'True'
+            session.commit()
+        except NoResultFound:
+            self.input_error_message = 'Order not found'
+            Factory.NewInputError().open()
+        except MultipleResultsFound:
+            self.input_error_message = 'Multiple order results found!'
+            Factory.NewInputError().open()
+        except SQLAlchemyError:
+            self.input_error_message = 'Database setup failed!'
             Factory.NewInputError().open()
 
     def fulfillment_confirmation(self):
@@ -668,6 +687,7 @@ class DistributionApp(MDApp):
         self.root.get_screen('order_information').ids.order_information_clinic.text = ''
         self.root.get_screen('order_information').ids.order_information_manufacturer.text = ''
         self.root.get_screen('order_information').ids.order_information_doses.text = ''
+        self.root.get_screen('order_information').ids.order_information_fulfillment.text = ''
 
 
 # Start methods that finalize creating or removing table entries, and committing them to the database
@@ -729,7 +749,7 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
 
 def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
     order = Orders(order_id=order_id, manufacturer_id=manufacturer_id, clinic_id=clinic_id,
-                   vaccine_id=vaccine_id, doses_in_order=doses, order_fulfilled=False)
+                   vaccine_id=vaccine_id, doses_in_order=doses, order_fulfilled='False')
     if int(order.order_id) not in get_sql_data('orders', 'order_id'):
         sql_input(order, session)
         self.on_done()
