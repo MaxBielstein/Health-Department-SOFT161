@@ -506,6 +506,8 @@
                 font_size: 30
                 id: select_vaccine_vaccination_rate
                 background_color: 0, 1.5, 4, 1
+                on_text:
+                    app.load_vaccines_for_the_disease()
 
         MDBoxLayout:
             orientation: 'horizontal'
@@ -519,7 +521,7 @@
                 halign: 'right'
 
             MDLabel:
-                text: 'Prefill'
+                text: '0'
                 font_size: 30
                 halign: 'left'
                 id: people_vaccinated_label
@@ -536,7 +538,7 @@
                 halign: 'right'
 
             MDLabel:
-                text: 'Prefill'
+                text: '0'
                 font_size: 30
                 halign: 'left'
                 id: people_not_vaccinated_label

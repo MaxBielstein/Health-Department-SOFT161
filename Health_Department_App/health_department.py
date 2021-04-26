@@ -120,7 +120,7 @@ class Health_departmentApp(MDApp):
             self.openmrs_host = path.openmrs_host.text
             self.openmrs_password = path.openmrs_password.text
             return True
-        except ValueError:
+        except FileNotFoundError:
             self.input_error_message = 'SQL database not connected.  Credentials may be incorrect'
             Factory.NewInputError().open()
             return False
@@ -128,18 +128,48 @@ class Health_departmentApp(MDApp):
     def load_vaccines_for_selected_disease(self):
         disease_spinner = self.root.get_screen('VaccinationRate').ids.select_disease_vaccination_rate
         vaccine_spinner = self.root.get_screen('VaccinationRate').ids.select_vaccine_vaccination_rate
-        vaccine_query = session.query(Vaccines).filter(Vaccines.relevant_disease == disease_spinner.text)
-        values = list()
-        if disease_spinner.text is not 'Select a Disease':
-            if len(vaccine_query.all()) > 0:
-                for vaccine in vaccine_query.all():
-                    values.append(vaccine.vaccine_name)
-                vaccine_spinner.values = values
-                vaccine_spinner.text = 'Select a Vaccine'
+        self.root.get_screen("VaccinationRate").ids.people_vaccinated_label.text = '0'
+        self.root.get_screen("VaccinationRate").ids.people_not_vaccinated_label.text = '0'
+        global loading_vaccines_active
+        loading_vaccines_active = True
+        try:
+            vaccine_query = session.query(Vaccines).filter(Vaccines.relevant_disease == disease_spinner.text)
+            values = list()
+            if disease_spinner.text is not 'Select a Disease':
+                if len(vaccine_query.all()) > 0:
+                    for vaccine in vaccine_query.all():
+                        values.append(vaccine.vaccine_name)
+                    vaccine_spinner.values = values
+                    vaccine_spinner.text = 'Select a Vaccine'
+                    loading_vaccines_active = False
+                else:
+                    vaccine_spinner.text = 'No Vaccines for\nSelected Disease'
+                    loading_vaccines_active = False
             else:
-                vaccine_spinner.text = 'No Vaccines for\nSelected Disease'
-        else:
-            self.input_error_message = 'You must select a disease to see\nassociated diseases.'
+                self.input_error_message = 'You must select a disease to see\nassociated diseases.'
+                Factory.NewInputError().open()
+        except Exception:
+            app_reference.input_error_message = 'SQL database disconnection error loading vaccines. \nThe database may no longer be connected. \nPlease restart the app to try again'
+            Factory.NewInputError().open()
+
+    def load_vaccines_for_the_disease(self):
+        try:
+            if loading_vaccines_active is False:
+                vaccine_spinner = self.root.get_screen('VaccinationRate').ids.select_vaccine_vaccination_rate
+                if vaccine_spinner.text is not "Select a Vaccine" and vaccine_spinner.text is not "Not available":
+                    all_people = session.query(People).all()
+                    all_people_set = set(all_people)
+                    all_people_with_vaccine_for_disease = set()
+                    people_lots = session.query(PeopleLots).all()
+                    people_with_this_vaccine_for_disease = set()
+                    for person_lot in people_lots:
+                        if person_lot.lot.vaccine.vaccine_name == vaccine_spinner.text:
+                            people_with_this_vaccine_for_disease.add(person_lot.person)
+                    all_people_with_vaccine_for_disease = all_people_with_vaccine_for_disease.union(people_with_this_vaccine_for_disease)
+                    self.root.get_screen("VaccinationRate").ids.people_vaccinated_label.text = str(len(all_people_with_vaccine_for_disease))
+                    self.root.get_screen("VaccinationRate").ids.people_not_vaccinated_label.text = str(len(all_people_set-all_people_with_vaccine_for_disease))
+        except Exception:
+            app_reference.input_error_message = 'SQL database disconnection error loading number of vaccinated patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
     def load_symptomatic_patients_screen(self):
@@ -181,7 +211,7 @@ class Health_departmentApp(MDApp):
                             MDLabel(
                                 text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                                 halign="center", ))
-        except FileNotFoundError:
+        except Exception:
             app_reference.input_error_message = 'SQL database disconnection error loading symptomatic patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
@@ -665,6 +695,7 @@ unmatched_records = []
 import_records = []
 existing_observations = []
 openmrs_disconnected = False
+loading_vaccines_active = False
 
 if __name__ == '__main__':
     app = Health_departmentApp()
