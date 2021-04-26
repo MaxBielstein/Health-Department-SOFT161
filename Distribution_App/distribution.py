@@ -7,8 +7,10 @@ from kivy.modules import inspector  # For inspection.
 from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
-from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 import urllib.request
+
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
+
 from database import *
 
 
