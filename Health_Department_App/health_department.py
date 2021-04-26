@@ -156,6 +156,11 @@ class Health_departmentApp(MDApp):
                             text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                             halign="center", ))
 
+    def load_order_screen(self):
+        vaccines = session.query(Vaccines).all()
+        diseases = set()
+
+
     def clear_data_preview_screen(self):
         global number_of_records_to_load
         global number_of_records_loaded
