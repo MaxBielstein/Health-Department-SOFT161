@@ -357,6 +357,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
                     app.abort_button()
 
             MDRaisedButton:
@@ -373,6 +374,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
 
             MDRaisedButton:
                 text: 'Vaccination Rate'
@@ -386,6 +388,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
 
             MDRaisedButton:
                 text: 'Vaccine Order Summary'
@@ -399,6 +402,7 @@
                     root.ids.view_symptomatic_patients_button.disabled=True
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
+                    app.change_screen('ImportingLoading')
 
         Widget:
             size_hint_y: None
@@ -451,6 +455,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+                    app.change_screen('SymptomaticPatients')
                     app.abort_button()
 
             MDRaisedButton:
@@ -459,6 +464,8 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccinationRate'
+                    app.change_screen('SymptomaticPatients')
+
 
             MDRaisedButton:
                 text: 'Vaccine Order Summary'
@@ -466,6 +473,8 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccineOrderSummary'
+                    app.change_screen('SymptomaticPatients')
+
 
         Widget:
             size_hint_y: None
@@ -562,6 +571,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+                    app.change_screen('VaccinationRate')
                     app.abort_button()
 
             MDRaisedButton:
@@ -572,6 +582,8 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
+                    app.change_screen('VaccinationRate')
+
 
             MDRaisedButton:
                 text: 'Vaccine Order Summary'
@@ -579,6 +591,7 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccineOrderSummary'
+                    app.change_screen('VaccinationRate')
 
         Widget:
             size_hint_y: None
@@ -636,6 +649,7 @@
                 on_release:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'home'
+                    app.change_screen('VaccineOrderSummary')
                     app.abort_button()
 
             MDRaisedButton:
@@ -646,6 +660,7 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
+                    app.change_screen('VaccineOrderSummary')
 
 
             MDRaisedButton:
@@ -654,6 +669,7 @@
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccinationRate'
+                    app.change_screen('VaccineOrderSummary')
 
 
         Widget:
