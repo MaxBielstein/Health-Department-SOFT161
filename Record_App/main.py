@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from kivy.app import App
-from kivy.core.window import Window
+# from kivy.app import App
+# from kivy.core.window import Window
 from kivy.factory import Factory
 from kivy.properties import NumericProperty, StringProperty
 from kivymd.app import MDApp
@@ -129,6 +129,10 @@ class VaccineRecordApp(MDApp):
             return False
         elif self.new_vaccination_temperature is '':
             self.input_error_message = 'Temperature field must be filled'
+            Factory.NewInputError().open()
+            return False
+        elif self.new_vaccination_temperature < 32.2 or self.new_vaccination_temperature > 43.3:
+            self.input_error_message = 'Temperature is outside accepted range of 32.2 to 43.3'
             Factory.NewInputError().open()
             return False
         elif self.new_vaccination_date_month < 1 or self.new_vaccination_date_month > 12 or self.new_vaccination_date_day < 1 \
