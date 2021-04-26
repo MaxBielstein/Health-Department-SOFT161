@@ -135,6 +135,7 @@ class Health_departmentApp(MDApp):
                 for vaccine in vaccine_query.all():
                     values.append(vaccine.vaccine_name)
                 vaccine_spinner.values = values
+                vaccine_spinner.text = 'Select a Vaccine'
             else:
                 vaccine_spinner.text = 'No Vaccines for\nSelected Disease'
         else:
