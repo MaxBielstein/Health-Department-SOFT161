@@ -1114,6 +1114,7 @@
                 text: 'Fulfill and return to main menu'
                 font_size: 20
                 on_press:
+                    app.fulfill_order()
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'home'
                     app.on_done()
