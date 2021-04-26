@@ -1,0 +1,41 @@
+HomeScreen IDs:
+    database_host - textfield for the authority of the database
+    database_port - textfield for the port number of the database
+    database_username - textfield for the username for the database
+    database_password - textfield for the password for the database
+    database_database - textfield for the Database
+    openmrs_host - textfield for the authority of openmrs
+    openmrs_port - textfield for the port number of openmrs
+    openmrs_user - textfield for the username for openmrs
+    openmrs_password - textfield for the password for openmrs
+
+LoadingLogin IDs:
+    current_action_loading_login - Label that shows what is currently happening in the login process
+    loading_spinner - MDSpinner that shows an action happening
+    loading_login_progress_bar - Progress bar that shows the progress of the login process
+
+DataPreview IDs:
+    scrollview_left - boxlayout inside a scrollview that gets populated with unmatched records
+    scrollview_right - boxlayout inside a scrollview that gets populated with records to import
+
+ImportingLoading IDs:
+    current_action_loading_importing - Label that shows what is currently happening in the importing progress
+    importing_spinner - MDSpinner that shows an action happening
+    loading_importing_progress_bar - Progress bar that shows the progress of the importing progress
+    back_to_login_button - Button that takes you back to the login screen
+    view_symptomatic_patients_screen - Button that takes you to the symptomatic patients screen
+    view_vaccination_rate_button - Button that takes you to the vaccination rate screen
+    view_vaccine_order_summary_button - Button that takes you to the vaccine order screen
+
+SymptomaticPatients IDs:
+    scrollview_symptomatic_patients - boxlayout inside a scrollview that gets populated with patients with a fever
+
+VaccinationRate IDs:
+    select_disease_vaccination_rate - Spinner to choose a disease to get the vaccination rates for
+    select_vaccine_vaccination_rate - Spinner to choose a vaccine to get the vaccination rates for
+    people_vaccinated_label - Label that shows the number of people vaccinated by the choosen vaccine
+    people_not_vaccinated_label - Label that shows the number of people not vaccinated by the choosen disease
+
+VaccineOrderSummary IDs:
+    select_vaccine_vaccine_order_summary - Spinner that lets you pick a disease to see the vaccines for it
+    scrollview_vaccine_order_summary - boxlayout inside a scrollview that gets populated with the vaccine orders

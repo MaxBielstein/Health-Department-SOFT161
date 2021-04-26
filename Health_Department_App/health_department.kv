@@ -494,9 +494,12 @@
                 font_size: 30
                 id: select_disease_vaccination_rate
                 background_color: 0, 1.5, 4, 1
+                values: 'Covid', 'Measles', 'Smallpox', 'Anthrax', 'Mumps', 'Polio'
+                on_text:
+                    app.load_vaccines_for_selected_disease()
 
             Spinner:
-                text: 'Select a Vaccine'
+                text: 'Not available'
                 size_hint: None, None
                 size: 300, 100
                 pos_hint: {'center': 'center'}
