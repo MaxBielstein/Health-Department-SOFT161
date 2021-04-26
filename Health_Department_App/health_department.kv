@@ -484,6 +484,65 @@
             font_size: 45
             halign: 'center'
 
+        MDBoxLayout:
+            orientation: 'horizontal'
+            spacing: 25
+            size_hint: None, None
+            size: self.minimum_size
+            pos_hint: {'center_x': 0.5,}
+
+            Spinner:
+                text: 'Select a Disease'
+                size_hint: None, None
+                size: 300, 100
+                pos_hint: {'center': 'center'}
+                font_size: 30
+                id: select_disease
+                background_color: 0, 1.5, 4, 1
+
+            Spinner:
+                text: 'Select a Vaccine'
+                size_hint: None, None
+                size: 300, 100
+                pos_hint: {'center': 'center'}
+                font_size: 30
+                id: select_vaccine
+                background_color: 0, 1.5, 4, 1
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'People vaccinated:'
+                font_size: 30
+                halign: 'right'
+
+            MDLabel:
+                text: 'Prefill'
+                font_size: 30
+                halign: 'left'
+                id: people_vaccinated_label
+
+        MDBoxLayout:
+            orientation: 'horizontal'
+            padding: 25
+            spacing: 25
+            pos_hint: {'center_x': 0.5,}
+
+            MDLabel:
+                text: 'Not vaccinated for disease:'
+                font_size: 30
+                halign: 'right'
+
+            MDLabel:
+                text: 'Prefill'
+                font_size: 30
+                halign: 'left'
+                id: people_not_vaccinated_label
+
     MDBoxLayout:
         orientation: 'vertical'
         spacing: 25
