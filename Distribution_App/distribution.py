@@ -1,5 +1,6 @@
 import mysql.connector
 import mysql.connector
+import requests
 from kivy.core.window import Window  # For inspection.
 from kivy.factory import Factory
 from kivy.modules import inspector  # For inspection.
@@ -7,7 +8,7 @@ from kivy.properties import NumericProperty, StringProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivymd.app import MDApp
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
-
+import urllib.request
 from database import *
 
 
@@ -97,10 +98,14 @@ def get_manufacturers_for_clinic(clinic_name):
     return clinics_manufacturers
 
 
+
+
 # App Class
 class DistributionApp(MDApp):
     # Start property declarations
 
+    # connection
+    connection_message = StringProperty('')
     # message contents
     success_message = StringProperty('')
     input_error_message = StringProperty('')
@@ -131,7 +136,9 @@ class DistributionApp(MDApp):
 
     # end property declarations
 
+
     def build(self):
+
         self.theme_cls.primary_palette = "Blue"
 
         inspector.create_inspector(Window, self)  # For inspection (press control-e to toggle).
@@ -147,6 +154,8 @@ class DistributionApp(MDApp):
         sm.add_widget(ReviewOrdersManufacturer(name='review_orders_manufacturer'))
         sm.add_widget(SelectOrder(name='select_order'))
         sm.add_widget(OrderInformation(name='order_information'))
+
+
 
         return sm
 
@@ -778,7 +787,6 @@ try:
 except FileNotFoundError:
     print('Database connection failed!')
     print('credentials.json not found')
-
 
 
 # These methods below query data from the database and return the specified data

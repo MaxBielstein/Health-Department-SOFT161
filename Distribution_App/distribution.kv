@@ -60,6 +60,8 @@
                 root.manager.transition.direction = 'left'
                 root.manager.current = 'review_orders_clinic'
 
+
+
 <ClinicScreen>
 
     MDCard:
@@ -1164,14 +1166,19 @@
             on_press:
                 root.dismiss()
 
-<NewJsonError@Popup>:
-    title: 'Authentication Error'
+<NewInternetNotification@Popup>:
+    title: 'Connection Status:'
     font_size: sp(30)
     size_hint: (None,None)
     size: (500,200)
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'The .json file with the needed credentials\ncould not be found. Please close the\n app, retrieve the file,\nand place it in the venv folder.'
+            text: f'{app.connection_message}'
             font_size: sp(15)
+        Button:
+            text: 'Okay'
+            font_size: sp(30)
+            on_press:
+                root.dismiss()
 
