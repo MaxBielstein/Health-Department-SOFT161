@@ -314,13 +314,10 @@
                 id: edit_clinic_label
                 font_size: 35
 
-
-
             Widget:
                 size_hint_y: None
                 height: 30
                 halign: 'center'
-
 
             MDLabel:
                 text: "Select a manufacturer from available manufacturers then press add to add a manufacturer"
@@ -533,8 +530,6 @@
                 font_size: 30
                 input_filter: 'int'
 
-
-
             MDTextField:
                 hint_text: 'Required Doses'
                 id: new_vaccine_required_doses
@@ -666,17 +661,18 @@
                     on_text:
                         app.select_vaccine_for_new_order()
 
-
             MDLabel:
                 text: 'Chosen Clinic: '
                 font_size: 15
                 halign: 'center'
                 id: new_order_clinic
+
             MDLabel:
                 text: 'Assigned Vaccine: '
                 font_size: 15
                 halign: 'center'
                 id: new_order_vaccine
+
             MDTextField:
                 hint_text: 'Number of Doses'
                 id: order_doses
@@ -1072,8 +1068,6 @@
                     font_size: 15
                     halign: 'left'
                     id: order_information_fulfillment
-
-
 
     MDBoxLayout:
         orientation: 'vertical'
