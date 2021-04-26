@@ -36,15 +36,17 @@ class DataPreview(Screen):
 class ImportingLoading(Screen):
     pass
 
+
 class SymptomaticPatients(Screen):
     pass
+
 
 class VaccinationRate(Screen):
     pass
 
+
 class VaccineOrderSummary(Screen):
     pass
-
 
 
 class RecordType(enum.Enum):
@@ -127,6 +129,37 @@ class Health_departmentApp(MDApp):
         self.clear_data_preview_screen()
         self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
 
+    def load_symptomatic_patients_screen(self):
+        appointments = session.query(PeopleLots).all()
+        print('OKAY OKAY OKAT')
+        list_of_ids = []
+        for appointment in appointments:
+            if appointment.patient_id not in list_of_ids:
+                list_of_ids.append(appointment.patient_id)
+        for id in list_of_ids:
+            latest_record = None
+            records_to_remove = []
+            for appointment in appointments:
+                if appointment.patient_id is id:
+                    if latest_record is not None:
+                        if latest_record < appointment.vaccination_date:
+                            latest_record = appointment.vaccination_date
+                            records_to_remove.append(appointment)
+                    else:
+                        latest_record = appointment.vaccination_date
+            for appointment in records_to_remove:
+                appointments.remove(appointment)
+        for record in appointments:
+            if record.patient_temperature is not None:
+                if record.patient_temperature >= 38:
+                    date_as_string = f'{record.vaccination_date}'
+                    split_date = date_as_string.split(' ')[0]
+                    date = f'\nVaccination Date: {split_date}'
+                    self.root.get_screen("SymptomaticPatients").ids.scrollview_symptomatic_patients.add_widget(
+                        MDLabel(
+                            text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
+                            halign="center", ))
+
     def clear_data_preview_screen(self):
         global number_of_records_to_load
         global number_of_records_loaded
@@ -154,6 +187,11 @@ class Health_departmentApp(MDApp):
         Clock.schedule_once(lambda dt: import_data_into_openmrs(), .5)
         app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = True
 
+    def change_screen(self, from_screen):
+        if from_screen == 'SymptomaticPatients':
+            self.root.get_screen(from_screen).ids.scrollview_symptomatic_patients.clear_widgets()
+        pass
+
     def load_credentials_file(self):
         try:
             with open('credentials.json', 'r') as credentials_file:
@@ -171,13 +209,10 @@ class Health_departmentApp(MDApp):
 def importing_done():
     app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
     app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
-    app_reference.root.get_screen('ImportingLoading').ids.back_to_login_button.disabled=False
-    app_reference.root.get_screen('ImportingLoading').ids.view_symptomatic_patients_button.disabled=False
-    app_reference.root.get_screen('ImportingLoading').ids.view_vaccination_rate_button.disabled=False
-    app_reference.root.get_screen('ImportingLoading').ids.view_vaccine_order_summary_button.disabled=False
-
-def change_screen(from_screen):
-    pass
+    app_reference.root.get_screen('ImportingLoading').ids.back_to_login_button.disabled = False
+    app_reference.root.get_screen('ImportingLoading').ids.view_symptomatic_patients_button.disabled = False
+    app_reference.root.get_screen('ImportingLoading').ids.view_vaccination_rate_button.disabled = False
+    app_reference.root.get_screen('ImportingLoading').ids.view_vaccine_order_summary_button.disabled = False
 
 
 # Sends a test query to openmrs to check that the connection worked
@@ -443,7 +478,7 @@ def loading_bar_import_increment():
 def import_data_into_openmrs():
     print('ok')
     app_reference.root.get_screen(
-            'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
+        'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
     if len(import_records) is not 0:
         app_reference.root.get_screen(
             'ImportingLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'

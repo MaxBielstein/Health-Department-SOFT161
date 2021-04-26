@@ -364,6 +364,8 @@
                 font_size: 20
                 disabled: True
                 id: view_symptomatic_patients_button
+                on_press:
+                    app.load_symptomatic_patients_screen()
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
@@ -506,6 +508,8 @@
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
                 font_size: 20
+                on_press:
+                    app.load_symptomatic_patients_screen()
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
@@ -558,6 +562,8 @@
             MDRaisedButton:
                 text: 'View Symptomatic Patients'
                 font_size: 20
+                on_press:
+                    app.load_symptomatic_patients_screen()
                 on_release:
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'SymptomaticPatients'
