@@ -318,22 +318,6 @@
                     size_hint_x: None
                     width: 10
 
-            MDRaisedButton:
-                text: '(Dev button temp) Increase progress bar'
-                font_size: 30
-                on_release:
-                    root.ids.loading_importing_progress_bar.value += 10
-
-
-            MDRaisedButton:
-                text: '(Dev button temp) Enable buttons'
-                font_size: 30
-                on_release:
-                    root.ids.back_to_login_button.disabled=False
-                    root.ids.view_symptomatic_patients_button.disabled=False
-                    root.ids.view_vaccination_rate_button.disabled=False
-                    root.ids.view_vaccine_order_summary_button.disabled=False
-
     MDBoxLayout:
         orientation: 'vertical'
         spacing: 25
