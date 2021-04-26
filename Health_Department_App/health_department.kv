@@ -497,7 +497,7 @@
                 size: 300, 100
                 pos_hint: {'center': 'center'}
                 font_size: 30
-                id: select_disease
+                id: select_disease_vaccination_rate
                 background_color: 0, 1.5, 4, 1
 
             Spinner:
@@ -506,7 +506,7 @@
                 size: 300, 100
                 pos_hint: {'center': 'center'}
                 font_size: 30
-                id: select_vaccine
+                id: select_vaccine_vaccination_rate
                 background_color: 0, 1.5, 4, 1
 
         MDBoxLayout:
@@ -594,6 +594,26 @@
             text: 'Vaccine Order Summary'
             font_size: 45
             halign: 'center'
+
+        Spinner:
+            text: 'Select a Disease'
+            size_hint: None, None
+            size: 300, 100
+            pos_hint: {'center': 'center'}
+            font_size: 30
+            id: select_vaccine_vaccine_order_summary
+            background_color: 0, 1.5, 4, 1
+            pos_hint: {'center_x': 0.5,}
+
+        ScrollView:
+            do_scroll_x: False
+            do_scroll_y: True
+
+            MDBoxLayout:
+                orientation: 'vertical'
+                size_hint: 1, None
+                height: sum(child.height+10 for child in self.children)
+                id: scrollview_vaccine_order_summary
 
     MDBoxLayout:
         orientation: 'vertical'
