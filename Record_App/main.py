@@ -306,10 +306,10 @@ class VaccineRecordApp(MDApp):
             name = get_specific_sql_data('people', 'name', 'patient_id', patient_id)[0]
             self.root.ids.scrollview_flag_vaccine_lot.add_widget(
                 MDLabel(
-                    text=name, font_size=35, halign='center', height=50
+                    text=name + '; ID: ' + patient_id, font_size=35, halign='center', height=50
                 )
             )
-        
+
 
 # These methods below where made static so that tests could but run on them
 # with a different sql database
@@ -415,6 +415,10 @@ def sql_input(data, session):
     session.commit()
 
 
-if __name__ == '__main__':
+def main():
     app = VaccineRecordApp()
     app.run()
+
+
+if __name__ == '__main__':
+    main()
