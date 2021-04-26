@@ -159,7 +159,44 @@ class Health_departmentApp(MDApp):
     def load_order_screen(self):
         vaccines = session.query(Vaccines).all()
         diseases = set()
+        for vaccine in vaccines:
+            diseases.add(vaccine.relevant_disease)
+        self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.values = diseases
 
+    def load_orders_placed(self):
+        print('called HERE')
+        self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.clear_widgets()
+        if self.root.get_screen(
+                "VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.text is not 'Select a Disease':
+            disease = self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.text
+            total_orders_with_disease = []
+            vaccines = set()
+            total_orders = session.query(Orders).all()
+            for order in total_orders:
+                if order.vaccine.relevant_disease == disease:
+                    total_orders_with_disease.append(order)
+
+            for order in total_orders_with_disease:
+                vaccines.add(order.vaccine)
+
+            if len(vaccines) is not 0:
+                for vaccine in vaccines:
+                    orders_for_this_vaccine_filled = []
+                    total_orders_for_this_vaccine = []
+                    for order in total_orders_with_disease:
+                        if order.vaccine == vaccine:
+                            total_orders_for_this_vaccine.append(order)
+                            if order.order_fulfilled == "True":
+                                orders_for_this_vaccine_filled.append(order)
+                    self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(MDLabel(
+                        text=f'\nVaccine: {vaccine.vaccine_name}\nOrders fulfilled: {len(orders_for_this_vaccine_filled)}/{len(total_orders_for_this_vaccine)}\n-----------------\n',
+                        halign="center", )
+                    )
+            else:
+                self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(MDLabel(
+                    text=f'\nNo Orders Exist For Vaccines Associated With This Disease\n-----------------\n',
+                    halign="center", )
+                )
 
     def clear_data_preview_screen(self):
         global number_of_records_to_load
@@ -194,6 +231,10 @@ class Health_departmentApp(MDApp):
         elif from_screen == 'ImportingScreen':
             self.clear_data_preview_screen()
             self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
+        elif from_screen == 'VaccineOrderSummary':
+            print(' VACCINE ORDER SUM')
+            self.root.get_screen(from_screen).ids.select_vaccine_vaccine_order_summary.text = 'Select a Disease'
+            self.root.get_screen(from_screen).ids.scrollview_vaccine_order_summary.clear_widgets()
         pass
 
     def load_credentials_file(self):

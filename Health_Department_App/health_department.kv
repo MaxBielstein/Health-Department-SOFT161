@@ -264,6 +264,7 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'ImportingLoading'
                     app.import_button()
+                    app.change_screen('DataPreview')
 
         Widget:
             size_hint_y: None
@@ -386,6 +387,7 @@
                     root.ids.view_vaccination_rate_button.disabled=True
                     root.ids.view_vaccine_order_summary_button.disabled=True
                     app.change_screen('ImportingLoading')
+                    app.load_order_screen()
 
         Widget:
             size_hint_y: None
@@ -456,6 +458,7 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccineOrderSummary'
                     app.change_screen('SymptomaticPatients')
+                    app.load_order_screen()
 
 
         Widget:
@@ -572,6 +575,7 @@
                     root.manager.transition.direction = 'left'
                     root.manager.current = 'VaccineOrderSummary'
                     app.change_screen('VaccinationRate')
+                    app.load_order_screen()
 
         Widget:
             size_hint_y: None
@@ -601,6 +605,8 @@
             id: select_vaccine_vaccine_order_summary
             background_color: 0, 1.5, 4, 1
             pos_hint: {'center_x': 0.5,}
+            on_text:
+                app.load_orders_placed()
 
         ScrollView:
             do_scroll_x: False
