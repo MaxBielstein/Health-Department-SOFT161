@@ -156,6 +156,12 @@ class DistributionApp(MDApp):
         self.success_message = message
         Factory.NewConfirmation().open()
 
+    def clear_edit_manufacturer_screen(self):
+        self.root.get_screen(
+            'select_order').ids.select_manufacturer_to_add_for_clinic_spinner.text = 'Available Manufacturers'
+        self.root.get_screen(
+            'select_order').ids.select_manufacturer_to_remove_for_clinic_spinner.text = 'Current Manufacturers'
+
     def order_selected_continue(self):
         spinner_text = self.root.get_screen('select_order').ids.select_order_to_review.text
         if spinner_text != 'No Orders for Selected Clinic' and spinner_text != 'No Orders for Selected Manufacturer' and \
@@ -176,8 +182,9 @@ class DistributionApp(MDApp):
             self.root.get_screen('order_information').ids.order_information_doses.text = \
                 str(get_specific_sql_data('orders', 'doses_in_order', 'order_id',
                                           self.view_order_current_order_id)[0])
-            self.root.get_screen('order_information').ids.order_information_fulfillment.text = get_specific_sql_data('orders', 'order_fulfilled', 'order_id',
-                                          self.view_order_current_order_id)[0]
+            self.root.get_screen('order_information').ids.order_information_fulfillment.text = \
+                get_specific_sql_data('orders', 'order_fulfilled', 'order_id',
+                                      self.view_order_current_order_id)[0]
 
 
 
@@ -700,7 +707,6 @@ def new_clinic(self, name, address, id):
         self.on_done()
         self.open_success_message('Clinic Created Successfully')
     else:
-        pass
         Factory.MatchingIDError().open()
         self.on_done()
 
@@ -721,7 +727,7 @@ def delete_manufacturer_clinic(self, manufacturer_id, clinic_id):
             raise ValueError(
                 f"No Manufacturer Clinics with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
         session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == manufacturer_id,
-                                                       ManufacturerClinics.manufacturer_id == clinic_id).delete()
+                                                  ManufacturerClinics.manufacturer_id == clinic_id).delete()
         session.commit()
         self.open_success_message(
             f'Manufacturer Clinic with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id} deleted')
@@ -742,7 +748,6 @@ def new_vaccine(self, id, doses, disease, name, manufacturer_id):
         self.on_done()
         self.open_success_message('Vaccine Created Successfully')
     else:
-        pass
         Factory.MatchingIDError().open()
         self.on_done()
 
@@ -756,7 +761,6 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
         self.open_success_message('Order Created Successfully')
         self.root.current = 'home'
     else:
-        pass
         Factory.MatchingIDError().open()
         self.on_done()
 
@@ -764,12 +768,17 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
 # End methods that finalize creating new table entries, and committing them to the database
 
 # Loads the database credentials from the credentials.json file
-with open('credentials.json', 'r') as credentials_file:
-    data = json.load(credentials_file)
-    host = data['host']
-    database_name = data['database']
-    user = data['username']
-    password = data['password']
+try:
+    with open('venv/credentials.json', 'r') as credentials_file:
+        data = json.load(credentials_file)
+        host = data['host']
+        database_name = data['database']
+        user = data['username']
+        password = data['password']
+except FileNotFoundError:
+    print('Database connection failed!')
+    print('credentials.json not found')
+
 
 
 # These methods below query data from the database and return the specified data
