@@ -281,7 +281,7 @@ class VaccineRecordApp(MDApp):
                 path_to_scrollview.add_widget(
                     MDLabel(
                         text=f'Vaccine Type: {vaccine_type}; Lot: {lot_id}; Vaccination Date: {vaccination_date}',
-                        halign='center'
+                        halign='center', height=50
                     ))
             self.root.current = 'review_vaccinations_continued'
             self.root.transition.direction = 'left'
