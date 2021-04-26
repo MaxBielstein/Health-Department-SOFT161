@@ -364,7 +364,6 @@ class DistributionApp(MDApp):
         values = []
         formatted_values = list()
         if self.view_order_manufacturer != '':
-            print('using manufacturer')
             man_id = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
                                            self.view_order_manufacturer)[0]
             self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
@@ -377,10 +376,8 @@ class DistributionApp(MDApp):
             self.root.get_screen('select_order').ids.select_order_to_review.values = formatted_values
 
         if self.view_order_clinic != '':
-            print('using clinic')
             clin_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name', self.view_order_clinic)[
                 0]
-            print(clin_id)
             self.root.get_screen('select_order').ids.select_order_to_review.text = 'Select an Order'
             values = get_specific_sql_data('orders', 'order_id', 'clinic_id', clin_id)
             for value in values:
@@ -601,7 +598,6 @@ class DistributionApp(MDApp):
         return True
 
     def check_for_required_inputs_new_order(self):
-        print('checking')
         if self.new_order_ID_property is 0:
             self.input_error_message = 'Order ID field must be filled'
             Factory.NewInputError().open()
