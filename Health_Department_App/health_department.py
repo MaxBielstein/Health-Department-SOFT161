@@ -126,42 +126,50 @@ class Health_departmentApp(MDApp):
             return False
 
     def load_symptomatic_patients_screen(self):
-        appointments = session.query(PeopleLots).all()
-        print('OKAY OKAY OKAT')
-        list_of_ids = []
-        for appointment in appointments:
-            if appointment.patient_id not in list_of_ids:
-                list_of_ids.append(appointment.patient_id)
-        for id in list_of_ids:
-            latest_record = None
-            records_to_remove = []
+        try:
+            appointments = session.query(PeopleLots).all()
+            print('OKAY OKAY OKAT')
+            list_of_ids = []
             for appointment in appointments:
-                if appointment.patient_id is id:
-                    if latest_record is not None:
-                        if latest_record < appointment.vaccination_date:
+                if appointment.patient_id not in list_of_ids:
+                    list_of_ids.append(appointment.patient_id)
+            for id in list_of_ids:
+                latest_record = None
+                records_to_remove = []
+                for appointment in appointments:
+                    if appointment.patient_id is id:
+                        if latest_record is not None:
+                            if latest_record < appointment.vaccination_date:
+                                latest_record = appointment.vaccination_date
+                                records_to_remove.append(appointment)
+                        else:
                             latest_record = appointment.vaccination_date
-                            records_to_remove.append(appointment)
-                    else:
-                        latest_record = appointment.vaccination_date
-            for appointment in records_to_remove:
-                appointments.remove(appointment)
-        for record in appointments:
-            if record.patient_temperature is not None:
-                if record.patient_temperature >= 38:
-                    date_as_string = f'{record.vaccination_date}'
-                    split_date = date_as_string.split(' ')[0]
-                    date = f'\nVaccination Date: {split_date}'
-                    self.root.get_screen("SymptomaticPatients").ids.scrollview_symptomatic_patients.add_widget(
-                        MDLabel(
-                            text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
-                            halign="center", ))
+                for appointment in records_to_remove:
+                    appointments.remove(appointment)
+            for record in appointments:
+                if record.patient_temperature is not None:
+                    if record.patient_temperature >= 38:
+                        date_as_string = f'{record.vaccination_date}'
+                        split_date = date_as_string.split(' ')[0]
+                        date = f'\nVaccination Date: {split_date}'
+                        self.root.get_screen("SymptomaticPatients").ids.scrollview_symptomatic_patients.add_widget(
+                            MDLabel(
+                                text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
+                                halign="center", ))
+        except Exception:
+            app_reference.input_error_message = 'SQL database disconnection error loading symptomatic patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
+            Factory.NewInputError().open()
 
     def load_order_screen(self):
-        vaccines = session.query(Vaccines).all()
-        diseases = set()
-        for vaccine in vaccines:
-            diseases.add(vaccine.relevant_disease)
-        self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.values = diseases
+        try:
+            vaccines = session.query(Vaccines).all()
+            diseases = set()
+            for vaccine in vaccines:
+                diseases.add(vaccine.relevant_disease)
+            self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.values = diseases
+        except Exception:
+            app_reference.input_error_message = 'SQL database disconnection error loading orders into app. \nThe database may no longer be connected. \nPlease restart the app to try again'
+            Factory.NewInputError().open()
 
     def load_orders_placed(self):
         print('called HERE')
@@ -171,32 +179,37 @@ class Health_departmentApp(MDApp):
             disease = self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.text
             total_orders_with_disease = []
             vaccines = set()
-            total_orders = session.query(Orders).all()
-            for order in total_orders:
-                if order.vaccine.relevant_disease == disease:
-                    total_orders_with_disease.append(order)
+            try:
+                total_orders = session.query(Orders).all()
+                for order in total_orders:
+                    if order.vaccine.relevant_disease == disease:
+                        total_orders_with_disease.append(order)
 
-            for order in total_orders_with_disease:
-                vaccines.add(order.vaccine)
+                for order in total_orders_with_disease:
+                    vaccines.add(order.vaccine)
 
-            if len(vaccines) is not 0:
-                for vaccine in vaccines:
-                    orders_for_this_vaccine_filled = []
-                    total_orders_for_this_vaccine = []
-                    for order in total_orders_with_disease:
-                        if order.vaccine == vaccine:
-                            total_orders_for_this_vaccine.append(order)
-                            if order.order_fulfilled == "True":
-                                orders_for_this_vaccine_filled.append(order)
+                if len(vaccines) is not 0:
+                    for vaccine in vaccines:
+                        orders_for_this_vaccine_filled = []
+                        total_orders_for_this_vaccine = []
+                        for order in total_orders_with_disease:
+                            if order.vaccine == vaccine:
+                                total_orders_for_this_vaccine.append(order)
+                                if order.order_fulfilled == "True":
+                                    orders_for_this_vaccine_filled.append(order)
+                        self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(
+                            MDLabel(
+                                text=f'\nVaccine: {vaccine.vaccine_name}\nOrders fulfilled: {len(orders_for_this_vaccine_filled)}/{len(total_orders_for_this_vaccine)}\n-----------------\n',
+                                halign="center", )
+                        )
+                else:
                     self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(MDLabel(
-                        text=f'\nVaccine: {vaccine.vaccine_name}\nOrders fulfilled: {len(orders_for_this_vaccine_filled)}/{len(total_orders_for_this_vaccine)}\n-----------------\n',
+                        text=f'\nNo Orders Exist For Vaccines Associated With This Disease\n-----------------\n',
                         halign="center", )
                     )
-            else:
-                self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.add_widget(MDLabel(
-                    text=f'\nNo Orders Exist For Vaccines Associated With This Disease\n-----------------\n',
-                    halign="center", )
-                )
+            except Exception:
+                app_reference.input_error_message = 'SQL database disconnection error loading orders placed. \nThe database may no longer be connected. \nPlease restart the app to try again'
+                Factory.NewInputError().open()
 
     def clear_data_preview_screen(self):
         global number_of_records_to_load
@@ -357,7 +370,7 @@ def temperature_posted(_, results):
         app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
         importing_done()
         app_reference.root.get_screen(
-        'ImportingLoading').ids.current_action_loading_importing.text = f'{number_of_records_imported}/{number_of_records_to_import} records imported into OpenMRS.  Importing Finished'
+            'ImportingLoading').ids.current_action_loading_importing.text = f'{number_of_records_imported}/{number_of_records_to_import} records imported into OpenMRS.  Importing Finished'
     print('it worked, it posted')
     print('results')
 
@@ -543,26 +556,30 @@ def import_data_into_openmrs():
                 break
     else:
         app_reference.root.get_screen(
-        'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
+            'ImportingLoading').ids.current_action_loading_importing.text = f'No records to import'
         importing_done()
-
 
 
 # This method loads all needed records from openMRS into the app
 def load_records_into_app():
     global session
-    people_lots = session.query(PeopleLots).all()
-    app_reference.root.get_screen('LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
-    for appointment in people_lots:
-        print(appointment.patient_id)
-        if openmrs_disconnected is False:
-            unmatched_records.append(appointment)
-            global number_of_patients_to_load
-            number_of_patients_to_load += 1
-            load_patient(appointment.patient_id)
-        else:
-            on_openmrs_disconnect()
-            break
+    try:
+        people_lots = session.query(PeopleLots).all()
+        app_reference.root.get_screen(
+            'LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
+        for appointment in people_lots:
+            print(appointment.patient_id)
+            if openmrs_disconnected is False:
+                unmatched_records.append(appointment)
+                global number_of_patients_to_load
+                number_of_patients_to_load += 1
+                load_patient(appointment.patient_id)
+            else:
+                on_openmrs_disconnect()
+                break
+    except Exception:
+        app_reference.input_error_message = 'SQL database disconnection error loading records into app. \nThe database may no longer be connected. \nPlease restart the app to try again'
+        Factory.NewInputError().open()
 
 
 # Populates the data preview screen with the import and unmatched records
