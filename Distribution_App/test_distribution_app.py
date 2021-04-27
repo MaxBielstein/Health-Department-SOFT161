@@ -17,6 +17,14 @@ class MyTestCase(unittest.TestCase):
         new_vaccine_from_sql = session.query(Vaccines).filter(Vaccines.vaccine_name == 'Test_name').one()
         self.assertEqual(new_vaccine.relevant_disease, new_vaccine_from_sql.relevant_disease)
 
+    def test_fulfill_order(self):
+        url = RecordDatabase.construct_in_memory_url()
+        database = RecordDatabase(url)
+        database.ensure_tables_exist()
+        session = database.create_session()
+
+        self.assertEqual(True, True)
+
 
 if __name__ == '__main__':
     unittest.main()
