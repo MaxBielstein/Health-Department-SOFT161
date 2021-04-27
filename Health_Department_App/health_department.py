@@ -300,6 +300,7 @@ class Health_departmentApp(MDApp):
         Clock.schedule_once(lambda dt: import_data_into_openmrs(), .5)
         app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = True
 
+    # Clears a given screen that you are changing from
     def change_screen(self, from_screen):
         if from_screen == 'SymptomaticPatients':
             self.root.get_screen(from_screen).ids.scrollview_symptomatic_patients.clear_widgets()
@@ -312,7 +313,15 @@ class Health_departmentApp(MDApp):
             self.root.get_screen(from_screen).ids.scrollview_vaccine_order_summary.clear_widgets()
         elif from_screen == 'DataPreview':
             self.clear_data_preview_screen()
-        pass
+        elif from_screen == 'VaccinationRate':
+            self.root.get_screen("VaccinationRate").ids.people_vaccinated_label.text = '0'
+            self.root.get_screen("VaccinationRate").ids.people_not_vaccinated_label.text = '0'
+            self.root.get_screen('VaccinationRate').ids.select_vaccine_vaccination_rate.values = []
+            global loading_vaccines_active
+            loading_vaccines_active = True
+            self.root.get_screen('VaccinationRate').ids.select_vaccine_vaccination_rate.text = 'Not available'
+            loading_vaccines_active = False
+            self.root.get_screen('VaccinationRate').ids.select_disease_vaccination_rate.text = 'Select a Disease'
 
     def load_credentials_file(self):
         try:
