@@ -321,10 +321,14 @@ def update_person_static(self):
     birthdate_year = self.new_person_birthdate_year
     birthdate = datetime(year=birthdate_year, month=birthdate_month, day=birthdate_day)
     person, mysql_session = get_person_data(self.new_person_patient_id, session)
+    update_person_commit(birthdate, name, person, session)
+    self.confirm_screen('person_updated')
+
+
+def update_person_commit(birthdate, name, person, session_parameter):
     person.name = name
     person.birthdate = birthdate
-    self.confirm_screen('person_updated')
-    session.commit()
+    session_parameter.commit()
 
 
 def new_vaccination_record(self, lot_id, name, temperature, vaccine_month, vaccine_day, vaccine_year):
