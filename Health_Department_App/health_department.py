@@ -1,7 +1,8 @@
 import enum
 from json import dumps
+
+import sqlalchemy
 from kivy import Config
-from kivy.uix.popup import Popup
 
 Config.set('graphics', 'width', '1200')
 Config.set('graphics', 'height', '1000')
@@ -123,7 +124,7 @@ class Health_departmentApp(MDApp):
             self.openmrs_host = path.openmrs_host.text
             self.openmrs_password = path.openmrs_password.text
             return True
-        except FileNotFoundError:
+        except sqlalchemy.exc.OperationalError:
             self.input_error_message = 'SQL database not connected.  Credentials may be incorrect'
             Factory.NewInputError().open()
             return False
@@ -151,7 +152,7 @@ class Health_departmentApp(MDApp):
             else:
                 self.input_error_message = 'You must select a disease to see\nassociated diseases.'
                 Factory.NewInputError().open()
-        except Exception:
+        except sqlalchemy.exc.OperationalError:
             app_reference.input_error_message = 'SQL database disconnection error loading vaccines. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
@@ -174,7 +175,7 @@ class Health_departmentApp(MDApp):
                         len(all_people_with_vaccine_for_disease))
                     self.root.get_screen("VaccinationRate").ids.people_not_vaccinated_label.text = str(
                         len(all_people_set - all_people_with_vaccine_for_disease))
-        except Exception:
+        except sqlalchemy.exc.OperationalError:
             app_reference.input_error_message = 'SQL database disconnection error loading number of vaccinated patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
@@ -221,7 +222,7 @@ class Health_departmentApp(MDApp):
                             MDLabel(
                                 text=f'\nSymptomatic Patient\nPatient ID: {record.patient_id} \nTemperature taken during vaccination: {record.patient_temperature}{date}\n-----------------\n',
                                 halign="center", ))
-        except Exception:
+        except sqlalchemy.exc.OperationalError:
             app_reference.input_error_message = 'SQL database disconnection error loading symptomatic patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
@@ -232,7 +233,7 @@ class Health_departmentApp(MDApp):
             for vaccine in vaccines:
                 diseases.add(vaccine.relevant_disease)
             self.root.get_screen("VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.values = diseases
-        except Exception:
+        except sqlalchemy.exc.OperationalError:
             app_reference.input_error_message = 'SQL database disconnection error loading orders into app. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
 
@@ -272,7 +273,7 @@ class Health_departmentApp(MDApp):
                         text=f'\nNo Orders Exist For Vaccines Associated With This Disease\n-----------------\n',
                         halign="center", )
                     )
-            except Exception:
+            except sqlalchemy.exc.OperationalError:
                 app_reference.input_error_message = 'SQL database disconnection error loading orders placed. \nThe database may no longer be connected. \nPlease restart the app to try again'
                 Factory.NewInputError().open()
 
@@ -672,7 +673,7 @@ def load_records_into_app():
             else:
                 on_openmrs_disconnect()
                 break
-    except Exception:
+    except sqlalchemy.exc.OperationalError:
         app_reference.input_error_message = 'SQL database disconnection error loading records into app. \nThe database may no longer be connected. \nPlease restart the app to try again'
         Factory.NewInputError().open()
 
