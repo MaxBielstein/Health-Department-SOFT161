@@ -58,9 +58,10 @@ ScreenManager:
                 size_hint: None, None
                 increment_width: 85
                 on_press:
+                    app.set_up_lots_spinner()
                     root.current = 'flag_vaccine_lot'
                     root.transition.direction = 'left'
-                    app.set_up_lots_spinner()
+
     Screen:
         name: 'new_person'
 
