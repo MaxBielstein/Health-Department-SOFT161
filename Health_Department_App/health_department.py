@@ -275,21 +275,16 @@ class Health_departmentApp(MDApp):
         global number_of_records_loaded
         global patient_uuids
         global unmatched_records
-        global other_records
-        global location_to_import_records
         global import_records
         global existing_observations
         global openmrs_disconnected
-        global concepts
         number_of_records_to_load = 0
         number_of_records_loaded = 0
         patient_uuids = {}
         unmatched_records = []
         import_records = []
         existing_observations = []
-        location_to_import_records = []
         openmrs_disconnected = False
-        concepts = []
         self.root.get_screen('DataPreview').ids.scrollview_left.clear_widgets()
         self.root.get_screen('DataPreview').ids.scrollview_right.clear_widgets()
 
@@ -621,7 +616,6 @@ def import_data_into_openmrs():
 
 # This method loads all needed records from openMRS into the app
 def load_records_into_app():
-    global session
     try:
         people_lots = session.query(PeopleLots).all()
         app_reference.root.get_screen(
