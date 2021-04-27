@@ -89,13 +89,16 @@ class Health_departmentApp(MDApp):
         return sm
 
     def load_defaults(self):
-        self.load_credentials_file()
+        # Loading credentials is optional because sometimes you might not want to, and it is not in the specification that it is required.
+        # This method still exists though in case someone would want to load the credentials from a file.
+        # self.load_credentials_file()
         self.port = '3306'
+        self.database_name = 'ethanr'
+        self.user = 'ethanr'
+        self.host = 'cse.unl.edu'
         self.openmrs_port = '8080'
         self.openmrs_host = 'localhost'
         self.openmrs_user = 'admin'
-        # TODO remove line below
-        self.openmrs_password = 'Admin123'
 
     def login_button(self):
         global app_reference
@@ -385,6 +388,9 @@ def connection_verified(_, response):
     global openmrs_disconnected
     openmrs_disconnected = False
     Clock.schedule_once(lambda dt: load_records_into_app(), .5)
+    path = app_reference.root.get_screen('home').ids
+    path.database_password.text = ""
+    path.openmrs_password.text = ""
     app_reference.root.transition.direction = 'left'
     app_reference.root.current = 'LoadingLogin'
 
