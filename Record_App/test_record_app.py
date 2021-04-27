@@ -42,6 +42,7 @@ class TestRecordApp(unittest.TestCase):
         update_person_commit(birthdate, name, updated_person, session)
         new_person_from_sql = session.query(People).filter(People.patient_id == 1).one()
         self.assertEqual(updated_person.name, new_person_from_sql.name)
+        self.assertEqual(updated_person.birthdate, new_person_from_sql.birthdate)
 
 
 if __name__ == '__main__':
