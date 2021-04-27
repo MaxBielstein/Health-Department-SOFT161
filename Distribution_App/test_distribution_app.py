@@ -2,6 +2,7 @@ import unittest
 
 from database import RecordDatabase, add_starter_data
 from distribution import Vaccines, sql_input, Manufacturers, Orders, DistributionApp, ManufacturerClinics, delete_manufacturer_clinic
+from kivy.factory import Factory
 
 
 class MyTestCase(unittest.TestCase):

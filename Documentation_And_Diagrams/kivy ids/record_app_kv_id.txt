@@ -1,1 +1,33 @@
+new_person screen IDs:
+    name_entry_new_person - Textfield where a user can put in the name of a new person
+    patient_id_entry_new_person - Textfield where a user can put in the ID of a person
+    month_entry_new_person - Textfield where a user can put in a persons brith month
+    day_entry_new_person - Textfield where a user can put in a persons birth day
+    year_entry_new_person - Textfield where a user can put in a persons birth year
 
+new_vaccination screen IDs:
+    lot_dropdown - Spinner where a user can select a lot
+
+new_lot screen IDs:
+    new_lot_vaccine_dropdown - Spinner where a user can select a vaccine
+    lot_id_entry_new_lot - Textfield where a user can enter the ID for a new lot
+    month_entry_new_lot - Textfield where a user can enter the month the new lot was manufactured
+    day_entry_new_lot - Textfield where a user can enter the day the new lot was manufactured
+    year_entry_new_lot - Textfield where a user can enter the year teh new lot was manufactured
+
+new_vaccination_continued screen IDs:
+    name_input_new_vaccination - Textfield where a user can enter a persons name for a new vaccination
+    temperature_input_new_vaccination - Textfield where a user can enter a persons temperature for a new vaccination
+    month_entry_new_vaccination - Textfield where a user can input the month a vaccination was given
+    day_entry_new_vaccination - Textfield where a user can input the day a vaccination was given
+    year_entry_new_vaccination - Textfield where a user can input the year a vaccination was given
+
+review_vaccinations screen IDs:
+    patient_id_review_vaccinations - Textfield where a user can input the patient id to review vaccinations
+
+review_vaccinations_continued screen IDs:
+    scrollview_review_vaccinations - boxlayout inside a scrollview that gets populated with a patients vaccination records
+
+flag_vaccine_lot screen IDs:
+    lot_dropdown_flag - Spinner that lets you choose a lot to flag
+    scrollview_flag_vaccine_lot - boxlayout inside a scrollview that gets populated with lot info

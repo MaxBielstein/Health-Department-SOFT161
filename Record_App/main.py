@@ -252,10 +252,10 @@ class VaccineRecordApp(MDApp):
         return True
 
     def set_up_lots_spinner(self):
-        if self.root.current is 'new_vaccination':
-            spinner_path = self.root.ids.lot_dropdown
-        else:
+        if self.root.current is 'menu':
             spinner_path = self.root.ids.lot_dropdown_flag
+        else:
+            spinner_path = self.root.ids.lot_dropdown
         list_of_lots = []
         for lot in get_sql_data('lots', 'lot_id'):
             list_of_lots.append(str(lot))
