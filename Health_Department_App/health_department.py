@@ -182,7 +182,6 @@ class Health_departmentApp(MDApp):
     def load_symptomatic_patients_screen(self):
         try:
             appointments = session.query(PeopleLots).all()
-            print('OKAY OKAY OKAT')
             list_of_ids = []
             # Creates a list of patients (their ids) in the database
             for appointment in appointments:
@@ -193,9 +192,6 @@ class Health_departmentApp(MDApp):
                 latest_record = None
                 records_to_remove = []
                 for appointment in appointments:
-                    print(appointment.patient_id)
-                    print(id)
-                    print(appointment.patient_id == id)
                     if appointment.patient_id == id:
                         if latest_record is not None:
                             if latest_record.vaccination_date > appointment.vaccination_date:
@@ -207,8 +203,6 @@ class Health_departmentApp(MDApp):
                             latest_record = appointment
                 for appointment in records_to_remove:
                     if appointment in appointments:
-                        print('Patient VISIT')
-                        print(appointment.patient_id)
                         appointments.remove(appointment)
             # Goes through the list of appointments (Newest one per person) and checks if they have a fever
             # If they do have a fever, a label for them is added
@@ -238,7 +232,6 @@ class Health_departmentApp(MDApp):
             Factory.NewInputError().open()
 
     def load_orders_placed(self):
-        print('called HERE')
         self.root.get_screen("VaccineOrderSummary").ids.scrollview_vaccine_order_summary.clear_widgets()
         if self.root.get_screen(
                 "VaccineOrderSummary").ids.select_vaccine_vaccine_order_summary.text is not 'Select a Disease':
@@ -312,7 +305,6 @@ class Health_departmentApp(MDApp):
             self.clear_data_preview_screen()
             self.root.get_screen('LoadingLogin').ids.loading_login_progress_bar.value = 0
         elif from_screen == 'VaccineOrderSummary':
-            print(' VACCINE ORDER SUM')
             self.root.get_screen(from_screen).ids.select_vaccine_vaccine_order_summary.text = 'Select a Disease'
             self.root.get_screen(from_screen).ids.scrollview_vaccine_order_summary.clear_widgets()
         elif from_screen == 'DataPreview':
@@ -336,7 +328,6 @@ class Health_departmentApp(MDApp):
                 self.user = credentials['username']
                 self.password = credentials['password']
         except FileNotFoundError:
-            # Replace this with error prompt in app
             print('Database connection failed!')
             print('credentials.json not found')
 
@@ -374,9 +365,6 @@ def load_patient(patient_id):
 
 # This method adds the temperature observation to a patient in openMRS given their record (appointment)
 def post_observation_to_patient(record):
-    print(record)
-    print(f'{record.vaccination_date}')
-
     post_parameters = {'person': patient_uuids[record.patient_id]['UUID'], 'obsDatetime': f'{record.vaccination_date}',
                        'concept': '5088AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
                        'value': record.patient_temperature}
@@ -398,8 +386,6 @@ def connection_verified(_, response):
 
 # Temperature did not post correctly callback
 def temperature_not_posted(_, error):
-    print(dumps(error, indent=2, sort_keys=True))
-    print('it didnt work')
     global openmrs_disconnected
     openmrs_disconnected = True
     on_openmrs_disconnect()
@@ -407,7 +393,6 @@ def temperature_not_posted(_, error):
 
 # Patient was not loaded correctly callback
 def patient_not_loaded(_, response):
-    print('not loaded')
     global openmrs_disconnected
     openmrs_disconnected = True
     on_openmrs_disconnect()
@@ -417,21 +402,17 @@ def patient_not_loaded(_, response):
 def on_observations_not_loaded(_, error):
     global openmrs_disconnected
     openmrs_disconnected = True
-    print(error)
-    print('observations not loaded')
 
 
 # Initial openmrs connection test failed, could be because of login credentials.
 # This is a callback to a test query on openmrs
 def connection_failed(_, error):
-    print('Connection failed')
     app_reference.input_error_message = 'Open MRS connection failed, credentials may be incorrect'
     Factory.NewInputError().open()
 
 
 # This method should be called after openmrs disconnects during an operation.
 def on_openmrs_disconnect():
-    print('openmrs disconnected error')
     app_reference.input_error_message = 'Open MRS seems to have disconnected, please lot in again'
     Factory.NewInputError().open()
     app_reference.root.transition.direction = 'right'
@@ -450,8 +431,6 @@ def temperature_posted(_, results):
         importing_done()
         app_reference.root.get_screen(
             'ImportingLoading').ids.current_action_loading_importing.text = f'{number_of_records_imported}/{number_of_records_to_import} records imported into OpenMRS.  Importing Finished'
-    print('it worked, it posted')
-    print('results')
 
 
 # Patient was loaded correctly callback
@@ -461,22 +440,16 @@ def add_patient_uuid(_, response):
     global number_of_records_to_load
     if len(response['results']) is not 0 and 'voided' not in response['results'][0]:
         number_of_records_to_load += 1
-        print('in')
-        print(response)
         id_and_name = response['results'][0]['display'].split(' - ')
         id = id_and_name[0]
         name = id_and_name[1]
         uuid = response['results'][0]['uuid']
         global patient_uuids
         patient_uuids[id] = {'Name': name, 'UUID': uuid}
-        print(name + ";;")
         load_observations(uuid)
     else:
         global number_of_patients_loaded
         number_of_patients_loaded += 1
-        print('unmatched')
-        print(f'{number_of_patients_loaded} | {number_of_patients_to_load}')
-        print(f'{number_of_records_loaded} | {number_of_records_to_load}')
         if number_of_patients_loaded >= number_of_patients_to_load and number_of_records_loaded >= number_of_records_to_load:
             sort_records()
             populate_data_preview_screen(app_reference.root)
@@ -485,16 +458,12 @@ def add_patient_uuid(_, response):
 # Observations for a patient loaded callback
 # Adds their observations to the existing observations list and confirms that the query came back
 def on_observations_loaded(_, response):
-    print(dumps(response, indent=4, sort_keys=True))
-    print('got to on observations loaded')
     global number_of_records_loaded
     number_of_records_loaded += 1
     if len(response) is not 0:
         for result in response['results']:
             existing_observations.append(result)
     loading_bar_login_increment()
-    print(number_of_records_loaded)
-    print(number_of_records_to_load)
     if number_of_records_loaded >= number_of_records_to_load:
         sort_records()
         populate_data_preview_screen(app_reference.root)
@@ -526,7 +495,6 @@ def sort_records():
 # (As long as that patient exists in openmrs)
 def check_for_existing_records_in_openmrs():
     for patient_id in patient_uuids:
-        print(patient_id)
         observations_of_this_patient = []
         for observation in existing_observations:
             if observation['person']['display'].split(' - ')[0] == patient_id:
@@ -597,17 +565,14 @@ def connect_to_sql(self):
         session = record_database.create_session()
         return True
     except DatabaseError:
-        print('database error')
         self.input_error_message = 'SQL did not connect, credentials may be incorrect'
         Factory.NewInputError().open()
         return False
     except NameError:
-        print('name error')
         self.input_error_message = 'SQL did not connect, credentials may be incorrect'
         Factory.NewInputError().open()
         return False
     except ValueError:
-        print('SQL connection value error')
         self.input_error_message = 'SQL did not connect, credentials may be incorrect'
         Factory.NewInputError().open()
         return False
@@ -635,13 +600,11 @@ def loading_bar_import_increment():
 
 # This method imports the 'records to import' into open_mrs
 def import_data_into_openmrs():
-    print('ok')
     if len(import_records) is not 0:
         app_reference.root.get_screen(
             'ImportingLoading').ids.current_action_loading_importing.text = f'Importing {len(import_records)} records into openmrs'
         for record in import_records:
             if openmrs_disconnected is False:
-                print(record)
                 global number_of_records_to_import
                 number_of_records_to_import += 1
                 app_reference.root.get_screen(
@@ -664,7 +627,6 @@ def load_records_into_app():
         app_reference.root.get_screen(
             'LoadingLogin').ids.current_action_loading_login.text = 'Loading records from OpenMRS'
         for appointment in people_lots:
-            print(appointment.patient_id)
             if openmrs_disconnected is False:
                 unmatched_records.append(appointment)
                 global number_of_patients_to_load
@@ -685,8 +647,6 @@ def populate_data_preview_screen(root):
     path_to_scrollview_left = root.get_screen('DataPreview').ids.scrollview_left
     path_to_scrollview_right = root.get_screen('DataPreview').ids.scrollview_right
     global unmatched_records
-    print('unmatched records below')
-    print(len(unmatched_records))
     loading_bar_login_increment()
 
     # Displaying unmatched records
