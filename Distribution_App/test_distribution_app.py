@@ -1,7 +1,7 @@
 import unittest
 
 from database import RecordDatabase
-from distribution import Vaccines, sql_input, Manufacturers
+from distribution import Vaccines, sql_input, Manufacturers, Orders, DistributionApp
 
 
 class MyTestCase(unittest.TestCase):
@@ -22,8 +22,12 @@ class MyTestCase(unittest.TestCase):
         database = RecordDatabase(url)
         database.ensure_tables_exist()
         session = database.create_session()
-
-        self.assertEqual(True, True)
+        app = DistributionApp()
+        order_from_sql = session.query(Orders).filter(Orders.order_id == 1).one()
+        self.assertFalse(order_from_sql.order_fulfilled)
+        app.view_order_current_order_id = 1
+        app.fulfill_order()
+        self.assertTrue(order_from_sql.order_fulfilled)
 
 
 if __name__ == '__main__':
