@@ -95,13 +95,10 @@ class Health_departmentApp(MDApp):
         self.port = '3306'
         self.database_name = 'ethanr'
         self.user = 'ethanr'
-        self.password = '4ft:Ke'
         self.host = 'cse.unl.edu'
         self.openmrs_port = '8080'
         self.openmrs_host = 'localhost'
         self.openmrs_user = 'admin'
-        # TODO remove line below
-        self.openmrs_password = 'Admin123'
 
     def login_button(self):
         global app_reference
