@@ -100,8 +100,6 @@ def get_manufacturers_for_clinic(clinic_name):
     return clinics_manufacturers
 
 
-
-
 # App Class
 class DistributionApp(MDApp):
     # Start property declarations
@@ -156,9 +154,6 @@ class DistributionApp(MDApp):
         sm.add_widget(ReviewOrdersManufacturer(name='review_orders_manufacturer'))
         sm.add_widget(SelectOrder(name='select_order'))
         sm.add_widget(OrderInformation(name='order_information'))
-
-
-
         return sm
 
     # Start Methods for miscellaneous kivy interaction
@@ -196,9 +191,6 @@ class DistributionApp(MDApp):
             self.root.get_screen('order_information').ids.order_information_fulfillment.text = \
                 get_specific_sql_data('orders', 'order_fulfilled', 'order_id',
                                       self.view_order_current_order_id)[0]
-
-
-
         else:
             self.input_error_message = 'Order must be selected'
             Factory.NewInputError().open()
@@ -705,8 +697,6 @@ class DistributionApp(MDApp):
 
 
 # Start methods that finalize creating or removing table entries, and committing them to the database
-
-
 def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
