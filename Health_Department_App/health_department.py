@@ -165,9 +165,12 @@ class Health_departmentApp(MDApp):
                     for person_lot in people_lots:
                         if person_lot.lot.vaccine.vaccine_name == vaccine_spinner.text:
                             people_with_this_vaccine_for_disease.add(person_lot.person)
-                    all_people_with_vaccine_for_disease = all_people_with_vaccine_for_disease.union(people_with_this_vaccine_for_disease)
-                    self.root.get_screen("VaccinationRate").ids.people_vaccinated_label.text = str(len(all_people_with_vaccine_for_disease))
-                    self.root.get_screen("VaccinationRate").ids.people_not_vaccinated_label.text = str(len(all_people_set-all_people_with_vaccine_for_disease))
+                    all_people_with_vaccine_for_disease = all_people_with_vaccine_for_disease.union(
+                        people_with_this_vaccine_for_disease)
+                    self.root.get_screen("VaccinationRate").ids.people_vaccinated_label.text = str(
+                        len(all_people_with_vaccine_for_disease))
+                    self.root.get_screen("VaccinationRate").ids.people_not_vaccinated_label.text = str(
+                        len(all_people_set - all_people_with_vaccine_for_disease))
         except Exception:
             app_reference.input_error_message = 'SQL database disconnection error loading number of vaccinated patients. \nThe database may no longer be connected. \nPlease restart the app to try again'
             Factory.NewInputError().open()
@@ -177,9 +180,11 @@ class Health_departmentApp(MDApp):
             appointments = session.query(PeopleLots).all()
             print('OKAY OKAY OKAT')
             list_of_ids = []
+            # Creates a list of patients (their ids) in the database
             for appointment in appointments:
                 if appointment.patient_id not in list_of_ids:
                     list_of_ids.append(appointment.patient_id)
+            # Goes through each patient and removes their not current records from the list of appointments
             for id in list_of_ids:
                 latest_record = None
                 records_to_remove = []
@@ -201,6 +206,8 @@ class Health_departmentApp(MDApp):
                         print('Patient VISIT')
                         print(appointment.patient_id)
                         appointments.remove(appointment)
+            # Goes through the list of appointments (Newest one per person) and checks if they have a fever
+            # If they do have a fever, a label for them is added
             for record in appointments:
                 if record.patient_temperature is not None:
                     if record.patient_temperature >= 38:
@@ -321,6 +328,7 @@ class Health_departmentApp(MDApp):
             print('credentials.json not found')
 
 
+# This method gets called once all records are done importing in order to allow access to the rest of the app
 def importing_done():
     app_reference.root.get_screen('ImportingLoading').ids.loading_importing_progress_bar.value = 100
     app_reference.root.get_screen('ImportingLoading').ids.importing_spinner.active = False
@@ -486,6 +494,21 @@ def sort_records():
     # Goes through each patient finding the latest temperature observation that is currently in openmrs
     # If this observation is before one of the possible unmatched records, that record is added to the import records list
     # (As long as that patient exists in openmrs)
+    check_for_existing_records_in_openmrs()
+    loading_bar_login_increment()
+
+    # For each patient, only their latest record from within import records is kept.  The rest are removed.
+    remove_past_records_from_import_list(to_remove_from_import)
+
+    # All records that are matched with a patient in openmrs are removed from unmatched_records
+    remove_matched_records_from_unmatched_records(to_remove_from_unmatched)
+    loading_bar_login_increment()
+
+
+# Goes through each patient finding the latest temperature observation that is currently in openmrs
+# If this observation is before one of the possible unmatched records, that record is added to the import records list
+# (As long as that patient exists in openmrs)
+def check_for_existing_records_in_openmrs():
     for patient_id in patient_uuids:
         print(patient_id)
         observations_of_this_patient = []
@@ -507,9 +530,10 @@ def sort_records():
                 if unmatched_record.vaccination_date > latest_observation:
                     if unmatched_record.patient_id == patient_id:
                         import_records.append(unmatched_record)
-    loading_bar_login_increment()
 
-    # For each patient, only their latest record from within import records is kept.  The rest are removed.
+
+# For each patient, only their latest record from within import records is kept.  The rest are removed.
+def remove_past_records_from_import_list(to_remove_from_import):
     for patient in patient_uuids:
         record_with_latest_vaccination_date = None
         for record in import_records:
@@ -525,7 +549,9 @@ def sort_records():
     for record in to_remove_from_import:
         import_records.remove(record)
 
-    # All records that are matched with a patient in openmrs are removed from unmatched_records
+
+# All records that are matched with a patient in openmrs are removed from unmatched_records
+def remove_matched_records_from_unmatched_records(to_remove_from_unmatched):
     for record in unmatched_records:
         for patient_id in patient_uuids:
             if patient_id == record.patient_id:
@@ -533,7 +559,6 @@ def sort_records():
     for record in to_remove_from_unmatched:
         if record in unmatched_records:
             unmatched_records.remove(record)
-    loading_bar_login_increment()
 
 
 # Returns false if something goes wrong while trying to connect to OpenMRS server
