@@ -716,7 +716,6 @@ def new_manufacturer_clinic(self, manufacturer_id, clinic_id):
 
 def delete_manufacturer_clinic(self, manufacturer_id, clinic_id):
     try:
-
         manufacturer_clinics = session.query(ManufacturerClinics).filter(
             ManufacturerClinics.manufacturer_id == manufacturer_id,
             ManufacturerClinics.manufacturer_id == clinic_id).count

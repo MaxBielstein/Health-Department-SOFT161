@@ -1,7 +1,7 @@
 import unittest
 
 from database import RecordDatabase
-from distribution import Vaccines, sql_input, Manufacturers, Orders, DistributionApp
+from distribution import Vaccines, sql_input, Manufacturers, Orders, DistributionApp, ManufacturerClinics, delete_manufacturer_clinic
 
 
 class MyTestCase(unittest.TestCase):
@@ -28,6 +28,19 @@ class MyTestCase(unittest.TestCase):
         app.view_order_current_order_id = 1
         app.fulfill_order()
         self.assertTrue(order_from_sql.order_fulfilled)
+
+    def test_delete_manufacturer_clinic(self):
+        url = RecordDatabase.construct_in_memory_url()
+        database = RecordDatabase(url)
+        database.ensure_tables_exist()
+        session = database.create_session()
+        app = DistributionApp()
+        manufacturer_clinic = session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == 1
+                                                                        and ManufacturerClinics.clinic_id == 2).count()
+        self.assertEqual(manufacturer_clinic, 1)
+        delete_manufacturer_clinic(app, 1, 2)
+        self.assertEqual(manufacturer_clinic, 0)
+
 
 
 if __name__ == '__main__':
