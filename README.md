@@ -27,6 +27,7 @@ This screen shows you the unmatched records as well as the records to import.  T
 #### Importing Screen
 This screen will show you the status of the records that it is currently importing, if any are importing.  Once the records are done importing there will be a label saying that the importing has finished and you will be able to access the rest of the app. See Notes 2.
 
+#### 
 #### Notes
-1. In the case that you want to import all records newer than the last observation for that patient, you can simply delete the remove_past_records_from_import_list() method call from inside of the sort_records() method.  We have that method because that is how we interpreted the specification for this app. However as noted, this is an easy fix if you would like all of the records newer than the last observation. 
+1. In the case that you want to import all records newer than the last observation for that patient, you can simply delete the remove_past_records_from_import_list() method call from inside of the sort_records() method.  We have that method because that is how we interpreted the specification for this app. However as noted, this is an easy fix if you would like all of the records newer than the last observation. This process for determining records to import keeps records that are already in OpenMRS from being imported again.
 2. In the original specification it was required for the app to " display a success message and allow the user to close the application.", in which the message is the label showing the status of the import (should be finished) and the option to close is simply the X on the top right of the application window.
