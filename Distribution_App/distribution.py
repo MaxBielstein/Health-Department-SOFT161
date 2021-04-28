@@ -198,10 +198,13 @@ class DistributionApp(MDApp):
     def fulfill_order(self):
         selected_order = session.query(Orders).filter(Orders.order_id == self.view_order_current_order_id).one()
         if selected_order.order_fulfilled == 'True':
-            self.open_success_message('Order has already been fulfilled.')
+            self.open_success_message('Order has already been fulfilled.\nRedirecting to home screen')
+            self.root.transition.direction = 'left'
+            self.root.current = 'home'
         else:
             try:
                 fulfill_order_helper(session, self.view_order_current_order_id)
+                self.open_success_message('Order fulfilled successfully')
                 self.root.transition.direction = 'left'
                 self.root.current = 'home'
             except NoResultFound:
@@ -283,7 +286,7 @@ class DistributionApp(MDApp):
     def get_selected_manufacturer_for_vaccines(self):
         if 'Select a Manufacturer' in self.root.get_screen(
                 'new_vaccine').ids.select_manufacturer_for_new_vaccine_spinner.text:
-            self.input_error_message = 'You must select a manufacturer'
+            self.input_error_message = 'You must select a manufacturer '
             Factory.NewInputError().open()
             self.on_done()
         else:
@@ -300,7 +303,7 @@ class DistributionApp(MDApp):
         selected_manufacturer = self.root.get_screen(
             'm_for_clinic').ids.select_manufacturer_to_add_for_clinic_spinner.text
         if selected_manufacturer == 'Available Manufacturers':
-            self.input_error_message = 'You must select a manufacturer'
+            self.input_error_message = 'You must select a manufacturer from available manufacturers'
             Factory.NewInputError().open()
         else:
             if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
@@ -324,7 +327,7 @@ class DistributionApp(MDApp):
         selected_manufacturer = self.root.get_screen(
             'm_for_clinic').ids.select_manufacturer_to_remove_for_clinic_spinner.text
         if selected_manufacturer == 'Current Manufacturers':
-            self.input_error_message = 'You must select a manufacturer'
+            self.input_error_message = 'You must select a manufacturer from current manufacturers'
             Factory.NewInputError().open()
         else:
             if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
@@ -339,14 +342,14 @@ class DistributionApp(MDApp):
                         delete_manufacturer_clinic(session, manufacturer_id, clinic_id)
                     except ValueError:
                         print('value error')
-                        self.input_error_message = 'Manufacturer Clinic Not Found'
+                        self.input_error_message = 'Manufacturer Clinic Relationship Not Found'
                         Factory.NewInputError().open()
                     except SQLAlchemyError:
                         print('sql alchemy error')
                         self.input_error_message = 'Could Not Open Database'
                         Factory.NewInputError().open()
                     self.open_success_message(
-                        f'Manufacturer Clinic with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id} deleted')
+                        f'Manufacturer with Manufacturer id {manufacturer_id}\n removed from clinic with Clinic id {clinic_id}')
                     self.load_manufacturer_spinners_for_clinics()
                 else:
                     self.input_error_message = 'Manufacturer ID not found'
@@ -721,7 +724,7 @@ def new_clinic(self, name, address, id):
 def new_manufacturer_clinic(self, manufacturer_id, clinic_id):
     manufacturer_clinic = ManufacturerClinics(clinic_id=clinic_id, manufacturer_id=manufacturer_id)
     sql_input(manufacturer_clinic, session)
-    self.open_success_message('Manufacturer Clinic Created Successfully')
+    self.open_success_message('Manufacturer Added to Clinic Successfully')
 
 
 def delete_manufacturer_clinic(session, manufacturer_id, clinic_id):
@@ -730,7 +733,7 @@ def delete_manufacturer_clinic(session, manufacturer_id, clinic_id):
         ManufacturerClinics.manufacturer_id == clinic_id).count
     if manufacturer_clinics is 0:
         raise ValueError(
-            f"No Manufacturer Clinics with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
+            f"No Manufacturer Clinic Relationships with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
     session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == manufacturer_id and
                                               ManufacturerClinics.manufacturer_id == clinic_id).delete()
     session.commit()
