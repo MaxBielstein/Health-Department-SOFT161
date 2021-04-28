@@ -39,11 +39,15 @@ class MyTestCase(unittest.TestCase):
         database.ensure_tables_exist()
         session = database.create_session()
         add_starter_data(session)
-        app = DistributionApp()
-        manufacturer_clinic_count = session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == 1).count()
+        manufacturer_clinic_count = session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == 1 and
+                                                                              ManufacturerClinics.clinic_id == 2).count()
+        print(manufacturer_clinic_count)
         self.assertEqual(manufacturer_clinic_count, 1)
-        delete_manufacturer_clinic(app, 1, 2)
-        self.assertEqual(manufacturer_clinic_count, 0)
+        delete_manufacturer_clinic(session, 1, 2)
+        new_manufacturer_clinic_count = session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == 1 and
+                                                                                  ManufacturerClinics.clinic_id == 2).count()
+        print(new_manufacturer_clinic_count)
+        self.assertEqual(new_manufacturer_clinic_count, 0)
 
 
 if __name__ == '__main__':

@@ -335,7 +335,18 @@ class DistributionApp(MDApp):
                                              self.new_clinic_current_clinic)) > 0:
                     manufacturer_id = get_specific_sql_data('manufacturers', 'manufacturer_id', 'manufacturer_name',
                                                             selected_manufacturer)[0]
-                    delete_manufacturer_clinic(self, manufacturer_id, clinic_id)
+                    try:
+                        delete_manufacturer_clinic(session, manufacturer_id, clinic_id)
+                    except ValueError:
+                        print('value error')
+                        self.input_error_message = 'Manufacturer Clinic Not Found'
+                        Factory.NewInputError().open()
+                    except SQLAlchemyError:
+                        print('sql alchemy error')
+                        self.input_error_message = 'Could Not Open Database'
+                        Factory.NewInputError().open()
+                    self.open_success_message(
+                        f'Manufacturer Clinic with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id} deleted')
                     self.load_manufacturer_spinners_for_clinics()
                 else:
                     self.input_error_message = 'Manufacturer ID not found'
@@ -714,26 +725,16 @@ def new_manufacturer_clinic(self, manufacturer_id, clinic_id):
     self.open_success_message('Manufacturer Clinic Created Successfully')
 
 
-def delete_manufacturer_clinic(self, manufacturer_id, clinic_id):
-    try:
-        manufacturer_clinics = session.query(ManufacturerClinics).filter(
-            ManufacturerClinics.manufacturer_id == manufacturer_id,
-            ManufacturerClinics.manufacturer_id == clinic_id).count
-        if manufacturer_clinics is 0:
-            raise ValueError(
-                f"No Manufacturer Clinics with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
-        session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == manufacturer_id,
-                                                  ManufacturerClinics.manufacturer_id == clinic_id).delete()
-        session.commit()
-        self.open_success_message(
-            f'Manufacturer Clinic with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id} deleted')
-        self.load_manufacturer_spinners_for_clinics()
-    except ValueError:
-        self.input_error_message = 'Manufacturer Clinic Not Found'
-        Factory.NewInputError().open()
-    except SQLAlchemyError:
-        self.input_error_message = 'Could Not Open Database'
-        Factory.NewInputError().open()
+def delete_manufacturer_clinic(session, manufacturer_id, clinic_id):
+    manufacturer_clinics = session.query(ManufacturerClinics).filter(
+        ManufacturerClinics.manufacturer_id == manufacturer_id and
+        ManufacturerClinics.manufacturer_id == clinic_id).count
+    if manufacturer_clinics is 0:
+        raise ValueError(
+            f"No Manufacturer Clinics with Manufacturer id {manufacturer_id}\n and Clinic id {clinic_id}")
+    session.query(ManufacturerClinics).filter(ManufacturerClinics.manufacturer_id == manufacturer_id and
+                                              ManufacturerClinics.manufacturer_id == clinic_id).delete()
+    session.commit()
 
 
 def new_vaccine(self, id, doses, disease, name, manufacturer_id):
