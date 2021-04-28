@@ -160,7 +160,9 @@
 
                     app.create_new_clinic()
                     app.load_manufacturer_spinners_for_clinics()
+
                     app.load_edit_clinic()
+
 
         Widget:
             size_hint_y: None
@@ -401,6 +403,7 @@
                 on_press:
                     root.manager.transition.direction = 'right'
                     root.manager.current = 'clinic'
+                    app.on_done()
 
             MDRaisedButton:
                 text: 'Done'

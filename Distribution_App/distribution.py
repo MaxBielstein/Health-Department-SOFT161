@@ -712,7 +712,6 @@ def new_clinic(self, name, address, id):
     clinic = VaccinationClinics(clinic_id=id, clinic_name=name, clinic_address=address)
     if int(clinic.clinic_id) not in get_sql_data('vaccination_clinics', 'clinic_id'):
         sql_input(clinic, session)
-        self.on_done()
         self.open_success_message('Clinic Created Successfully')
     else:
         Factory.MatchingIDError().open()
