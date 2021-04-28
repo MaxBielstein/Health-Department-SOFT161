@@ -24,7 +24,15 @@ By pressing "New Vaccine" a user can enter a new vaccine into the database. They
 By selecting "New Order", the user is presented with three spinners that have logic to make sure they are selected in the proper order. These spinners prompt for a clinic, manufacturer, and disease. They dynamically update based on the selections made on the other spinners. After these are filled, the code will automatically assign a vaccine. The user then enters the number of required doses and assigns an order ID. From there, the user can place the order. 
 ###### Reviewing orders
 By selecting "Review Orders", the user can view the details of an order, and choose to mark it as fulfilled. The user can filter orders by clinics or manufacturers, then select an order. After selecting an order, the user is presented with all the needed information about the order, and given the option to fulfill it and return to the home screen, go back to select another order, or just return to the home screen. 
-
+## Record App
+The vaccination record app is a mobile app that can register patients, vaccination records, and vaccine lots into the database.
+#### Functionality
+Ability to create patients to put into the database.  Takes inputs: Name, Patient ID, Birthdate.
+Ability to update patients already in the database. 
+Ability to create vaccination lots to put into the database. Takes inputes: Vaccine, Lot ID, Manufacture Date.
+Ability to create vaccination records (Instances of a vaccination for a given patient).  Takes inputes: Lot ID, Name, Patient Temperature, Vaccination Date.
+Ability to review all vaccinations of a given patient.  Takes inputes: Patient ID.
+Ability to review which patients have gotten a vaccine from a certain lot.  Takes inputs: Lot ID.
 ## Health Department App
 The health department app is a desktop app used to import data from the database that the mobile apps use into OpenMRS.
 It is also used for viewing certain data that is within the database such as symptomatic patients.
