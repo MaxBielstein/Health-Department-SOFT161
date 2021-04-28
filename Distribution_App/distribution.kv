@@ -1095,10 +1095,7 @@
                 font_size: 20
                 on_press:
                     app.fulfill_order()
-                    root.manager.transition.direction = 'left'
-                    root.manager.current = 'home'
                     app.on_done()
-                    app.open_success_message('Order Successfully Fulfilled')
 
             MDRaisedButton:
                 text: 'Return to main menu'

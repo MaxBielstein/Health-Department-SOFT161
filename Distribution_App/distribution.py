@@ -196,17 +196,23 @@ class DistributionApp(MDApp):
             Factory.NewInputError().open()
 
     def fulfill_order(self):
-        try:
-            fulfill_order_helper(session, self.view_order_current_order_id)
-        except NoResultFound:
-            self.input_error_message = 'Order not found'
-            Factory.NewInputError().open()
-        except MultipleResultsFound:
-            self.input_error_message = 'Multiple order results found!'
-            Factory.NewInputError().open()
-        except SQLAlchemyError:
-            self.input_error_message = 'Database setup failed!'
-            Factory.NewInputError().open()
+        selected_order = session.query(Orders).filter(Orders.order_id == self.view_order_current_order_id).one()
+        if selected_order.order_fulfilled == 'True':
+            self.open_success_message('Order has already been fulfilled.')
+        else:
+            try:
+                fulfill_order_helper(session, self.view_order_current_order_id)
+                self.root.transition.direction = 'left'
+                self.root.current = 'home'
+            except NoResultFound:
+                self.input_error_message = 'Order not found'
+                Factory.NewInputError().open()
+            except MultipleResultsFound:
+                self.input_error_message = 'Multiple order results found!'
+                Factory.NewInputError().open()
+            except SQLAlchemyError:
+                self.input_error_message = 'Database setup failed!'
+                Factory.NewInputError().open()
 
     def fulfillment_confirmation(self):
         self.root.get_screen('OrderInformation').ids.done_order_button.disabled = False
@@ -264,7 +270,6 @@ class DistributionApp(MDApp):
                 disease != '' and disease != 'Select a Disease':
             vaccines_filtered_by_manufacturer = set(get_specific_sql_data('vaccines', 'vaccine_name', 'manufacturer_id',
                                                                           self.new_order_manufacturer_ids[0]))
-
             vaccines_filtered_by_disease = set(get_specific_sql_data('vaccines', 'vaccine_name', 'relevant_disease',
                                                                      self.root.get_screen(
                                                                          'order_vaccine').ids.order_select_disease.text))
@@ -298,7 +303,6 @@ class DistributionApp(MDApp):
             self.input_error_message = 'You must select a manufacturer'
             Factory.NewInputError().open()
         else:
-
             if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
                                          self.new_clinic_current_clinic)) > 0:
                 clinic_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
@@ -312,7 +316,6 @@ class DistributionApp(MDApp):
                 else:
                     self.input_error_message = 'Manufacturer ID not found'
                     Factory.NewInputError().open()
-
             else:
                 self.input_error_message = 'Clinic ID not found'
                 Factory.NewInputError().open()
@@ -324,7 +327,6 @@ class DistributionApp(MDApp):
             self.input_error_message = 'You must select a manufacturer'
             Factory.NewInputError().open()
         else:
-
             if len(get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
                                          self.new_clinic_current_clinic)) > 0:
                 clinic_id = get_specific_sql_data('vaccination_clinics', 'clinic_id', 'clinic_name',
