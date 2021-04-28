@@ -1,7 +1,7 @@
 import unittest
 
 from database import RecordDatabase, add_starter_data
-from distribution import Vaccines, sql_input, Manufacturers, Orders, DistributionApp, ManufacturerClinics, \
+from distribution import Vaccines, sql_input, Manufacturers, Orders, ManufacturerClinics, \
     delete_manufacturer_clinic, fulfill_order_helper
 
 
@@ -24,7 +24,6 @@ class MyTestCase(unittest.TestCase):
         database.ensure_tables_exist()
         session = database.create_session()
         add_starter_data(session)
-        app = DistributionApp()
         order_from_sql = session.query(Orders).filter(Orders.order_id == 1).one()
         print('query works')
         print(order_from_sql.order_fulfilled)
