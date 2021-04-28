@@ -122,11 +122,11 @@ class PeopleLots(Persisted):
 
 
 def add_starter_data(session_to_add_to):
-    manufacturer1 = Manufacturers(manufacturer_id=1, manufacturer_name='manufacturer 1',
+    manufacturer1 = Manufacturers(manufacturer_id=1, manufacturer_name='Tesla',
                                   manufacturer_location='Nebraska')
-    manufacturer2 = Manufacturers(manufacturer_id=2, manufacturer_name='manufacturer 2',
+    manufacturer2 = Manufacturers(manufacturer_id=2, manufacturer_name='Burger King',
                                   manufacturer_location='Colorado')
-    manufacturer3 = Manufacturers(manufacturer_id=3, manufacturer_name='manufacturer 3',
+    manufacturer3 = Manufacturers(manufacturer_id=3, manufacturer_name='Costco',
                                   manufacturer_location='California')
     vaccination_clinic1 = VaccinationClinics(clinic_name='UNL Vaccination Clinic',
                                              clinic_address='123 UNL street',
