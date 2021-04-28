@@ -546,7 +546,7 @@ class DistributionApp(MDApp):
             self.on_done()
             return False
         if self.new_clinic_ID_property is 0:
-            self.input_error_message = 'no id found'
+            self.input_error_message = 'You must enter a valid clinic ID'
             Factory.NewInputError().open()
             self.on_done()
             return False
@@ -773,7 +773,7 @@ def fulfill_order_helper(session, order_to_fulfill):
 
 # Loads the database credentials from the credentials.json file
 try:
-    with open('credentials.json', 'r') as credentials_file:
+    with open('venv/credentials.json', 'r') as credentials_file:
         data = json.load(credentials_file)
         host = data['host']
         database_name = data['database']
@@ -782,6 +782,7 @@ try:
 except FileNotFoundError:
     print('Database connection failed!')
     print('credentials.json not found')
+    exit(1)
 
 
 # These methods below query data from the database and return the specified data
