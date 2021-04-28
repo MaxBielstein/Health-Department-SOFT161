@@ -1,8 +1,8 @@
 # soft161-Group-Capstone
 
-## Important Note
-
 This is for the SOFT161 capstone project at the University of Nebraska-Lincoln for Taylor Runge, Nick Colleran, Max Bielstein, and Ethan Rasgorshek.
+
+## Important Note
 
 This project uses aditional widgets from KivyMD and as such requires that anyone working on or viewing the project run the following command in a directory above the project's scope
 	
