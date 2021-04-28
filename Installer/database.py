@@ -190,7 +190,7 @@ def add_starter_data(session_to_add_to):
 
 if __name__ == '__main__':
     try:
-        with open('credentials.json', 'r') as credentials_file:
+        with open('venv/credentials.json', 'r') as credentials_file:
             data = json.load(credentials_file)
             host = data['host']
             database_name = data['database']
