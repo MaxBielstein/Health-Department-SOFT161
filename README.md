@@ -1,5 +1,7 @@
 # soft161-Group-Capstone
 
+## Important Note
+
 This is for the SOFT161 capstone project at the University of Nebraska-Lincoln for Taylor Runge, Nick Colleran, Max Bielstein, and Ethan Rasgorshek.
 
 This project uses aditional widgets from KivyMD and as such requires that anyone working on or viewing the project run the following command in a directory above the project's scope
@@ -7,6 +9,8 @@ This project uses aditional widgets from KivyMD and as such requires that anyone
 	pip install kivymd
 
 If you would like to learn more about KivyMD you can refer to the documentation here https://kivymd.readthedocs.io/en/latest/
+
+One important thing to note when reviewing the Kivy for the project is that MDSpinner is different from the kivy spinner. The MDSpinner is a status indicator that we use in the Health Department app as opposed to the normal kivy spinner which is a dropdown menu. Other things to note is that some kivy widgets have different names due to the project using the KivyMD counterpart.
 
 ## Health Department App
 The health department app is used to import data from the database that the mobile apps use into OpenMRS.
