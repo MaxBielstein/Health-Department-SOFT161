@@ -9,6 +9,7 @@ Config.set('graphics', 'height', '1000')
 Config.set('graphics', 'minimum_width', '1200')
 Config.set('graphics', 'minimum_height', '1000')
 
+# Due to the way KivyMD works, these imports have to remain below the Config settings
 from kivy.factory import Factory
 from kivy.clock import Clock
 from kivymd.uix.label import MDLabel
@@ -550,7 +551,7 @@ def connect_to_openmrs(openmrs_host, openmrs_port, openmrs_user, openmrs_passwor
         return False
 
 
-# Returns false if something goes wrong while connecting to the sql databsae
+# Returns false if something goes wrong while connecting to the sql database
 def connect_to_sql(self):
     try:
         url = RecordDatabase.construct_mysql_url(self.host, self.port, self.database_name, self.user, self.password)
