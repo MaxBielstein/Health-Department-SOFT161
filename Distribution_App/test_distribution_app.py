@@ -17,7 +17,6 @@ class MyTestCase(unittest.TestCase):
         new_vaccine_from_sql = session.query(Vaccines).filter(Vaccines.vaccine_name == 'Test_name').one()
         self.assertEqual(new_vaccine.relevant_disease, new_vaccine_from_sql.relevant_disease)
 
-    """
     def test_fulfill_order(self):
         url = RecordDatabase.construct_in_memory_url()
         database = RecordDatabase(url)
@@ -31,7 +30,6 @@ class MyTestCase(unittest.TestCase):
         app.view_order_current_order_id = 1
         app.fulfill_order()
         # self.assertEqual('True', order_from_sql.order_fulfilled)
-    """
 
     def test_delete_manufacturer_clinic(self):
         url = RecordDatabase.construct_in_memory_url()

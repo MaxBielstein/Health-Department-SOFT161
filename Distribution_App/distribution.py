@@ -197,9 +197,7 @@ class DistributionApp(MDApp):
 
     def fulfill_order(self):
         try:
-            order = session.query(Orders).filter(Orders.order_id == self.view_order_current_order_id).one()
-            order.order_fulfilled = 'True'
-            session.commit()
+            fulfill_order_helper(session, self.view_order_current_order_id)
         except NoResultFound:
             self.input_error_message = 'Order not found'
             Factory.NewInputError().open()
@@ -761,6 +759,11 @@ def new_order(self, order_id, manufacturer_id, clinic_id, vaccine_id, doses):
         Factory.MatchingIDError().open()
         self.on_done()
 
+
+def fulfill_order_helper(session, order_to_fulfill):
+    order = session.query(Orders).filter(Orders.order_id == order_to_fulfill).one()
+    order.order_fulfilled = 'True'
+    session.commit()
 
 # End methods that finalize creating new table entries, and committing them to the database
 
